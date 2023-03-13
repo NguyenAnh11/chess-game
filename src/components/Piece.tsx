@@ -12,7 +12,7 @@ type PieceProps = {
 };
 
 export default function Piece({ piece, square }: PieceProps) {
-  const { moveMethod, width } = useChess();
+  const { moveMethod, boardWidth: width } = useChess();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({

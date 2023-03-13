@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import BoardMain from "./components/BoardMain";
-import { Flex, Box, Container } from "@chakra-ui/react";
+import { Flex, Box } from "@chakra-ui/react";
 import ChessProvider from "./contexts/ChessContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -8,8 +8,6 @@ import { Setting } from "./types";
 import BoardSidebar from "./components/BoardSidebar";
 
 const App = () => {
-  const ref = useRef<HTMLDivElement>(null);
-
   const [setting, setSetting] = useState<Setting>({
     squareColor: "green",
     coordinate: "inside",
@@ -21,20 +19,20 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <Container w="100%" h="100%" userSelect="none">
-        <Box w="min-content" margin="0 auto" position="relative">
-          <ChessProvider width={640} orientation="w" {...setting}>
-            <Flex direction="column">
-              <Box my="2">
-                <DndProvider backend={HTML5Backend}>
-                  <BoardMain ref={ref} />
-                </DndProvider>
-                <BoardSidebar/>
-              </Box>
-            </Flex>
+      <Flex h="100vh" align="center" justify="center" userSelect="none">
+        <Flex position="relative" h="min-content">
+          <ChessProvider boardWidth={600} orientation="w" {...setting}>
+            <Box flex="1">
+              <DndProvider backend={HTML5Backend}>
+                <BoardMain />
+              </DndProvider>
+            </Box>
+            <Box flex="1">
+              <BoardSidebar />
+            </Box>
           </ChessProvider>
-        </Box>
-      </Container>
+        </Flex>
+      </Flex>
     </React.Fragment>
   );
 };

@@ -1,38 +1,37 @@
-import React, { forwardRef, RefObject } from "react";
-import { Box, useOutsideClick } from "@chakra-ui/react";
+import React, { useRef } from "react";
+import { Box, Flex, useOutsideClick } from "@chakra-ui/react";
 import { useChess } from "../contexts/ChessContext";
 import Squares from "./Squares";
 import HighlightSquares from "./HighlightSquares";
-import Notation from "./Notation";
 
 type BoardMainProps = {};
 
-const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(
-  (props: BoardMainProps, ref) => {
-    const { width, onClearSelectedSquare } = useChess();
+export default function BoardMain(_: BoardMainProps) {
+  const ref = useRef<HTMLDivElement>(null);
 
-    useOutsideClick({
-      ref: ref as RefObject<HTMLDivElement>,
-      handler: () => {
-        onClearSelectedSquare();
-      },
-    });
+  const { boardWidth, onClearSelectedSquare: onClearSelectedSquare } =
+    useChess();
 
-    return (
-      <React.Fragment>
+  useOutsideClick({
+    ref: ref,
+    handler: () => {
+      onClearSelectedSquare();
+    },
+  });
+
+  return (
+    <React.Fragment>
+      <Flex direction="column">
         <Box
           ref={ref}
           position="relative"
-          width={`${width}px`}
-          height={`${width}px`}
+          width={`${boardWidth}px`}
+          height={`${boardWidth}px`}
         >
-          <Notation />
           <HighlightSquares />
           <Squares />
         </Box>
-      </React.Fragment>
-    );
-  }
-);
-
-export default BoardMain;
+      </Flex>
+    </React.Fragment>
+  );
+}

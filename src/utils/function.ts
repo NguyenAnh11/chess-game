@@ -76,15 +76,3 @@ function toPiece(piece: string): Piece {
 function toColumn(index: number): string {
   return COLUMNS[index];
 }
-
-export function getDefaultSquareStyle(width: number) : CSSProperties {
-  let style: CSSProperties = {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: `${width / 8}px`,
-    height: `${width / 8}px`,
-  }
-
-  return style;
-}
