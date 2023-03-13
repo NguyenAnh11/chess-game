@@ -1,10 +1,10 @@
-import { Image, Flex } from "@chakra-ui/react";
-import { CSSProperties, useMemo } from "react";
+import { Box } from "@chakra-ui/react";
+import { CSSProperties, ReactNode, useMemo } from "react";
 import { useDrag } from "react-dnd";
 import { useChess } from "../contexts/ChessContext";
 import { Square } from "chess.js";
 import { Piece as Pc } from "../types";
-import { PIECE_COLOR_OPTIONS } from "../utils/consts";
+import { PIECES } from "../utils";
 
 type PieceProps = {
   piece: Pc;
@@ -12,12 +12,15 @@ type PieceProps = {
 };
 
 export default function Piece({ piece, square }: PieceProps) {
-  const { moveMethod, pieceColor } = useChess();
+  const { moveMethod, width } = useChess();
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: "piece",
       item: { square },
+      options: {
+        dropEffect: "move"
+      },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -28,15 +31,16 @@ export default function Piece({ piece, square }: PieceProps) {
   const pieceStyle = useMemo((): CSSProperties => {
     return {
       zIndex: 5,
-      touchAction: "none",
-      cursor: moveMethod === "c" ? "default" : "-webkit-grab",
       opacity: isDragging ? 0 : 1,
+      cursor: moveMethod === "c" ? "default" : "grab",
     };
   }, [moveMethod, isDragging]);
 
   return (
-    <Flex ref={drag} justify="center" align="center" style={pieceStyle}>
-      <Image src={PIECE_COLOR_OPTIONS[pieceColor].pieces[piece]} />
-    </Flex>
+    <Box ref={drag} style={pieceStyle}>
+      <svg viewBox={"1 1 43 43"} width={width / 8} height={width / 8}>
+        <g>{PIECES[piece] as ReactNode}</g>
+      </svg>
+    </Box>
   );
 }

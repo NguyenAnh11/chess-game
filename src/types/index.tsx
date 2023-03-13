@@ -1,64 +1,65 @@
 import { Square } from "chess.js";
 
 export type Piece =
-  | "bn"
-  | "bb"
-  | "bq"
-  | "bk"
-  | "br"
-  | "bp"
-  | "wn"
-  | "wb"
-  | "wq"
-  | "wk"
-  | "wr"
-  | "wp";
+  | "bN"
+  | "bB"
+  | "bQ"
+  | "bK"
+  | "bR"
+  | "bP"
+  | "wN"
+  | "wB"
+  | "wQ"
+  | "wK"
+  | "wR"
+  | "wP";
 
 export type BoardPosition = { [sq in Square]?: Piece };
 
 export type Coord = {
-  x: number;
-  y: number;
+  row: number;
+  col: number;
 };
 
-export type Dimession = { 
+export type Dimession = {
   width: number;
   height: number;
-}
+};
 
 export type BoardOrientation = "w" | "b";
-
-export type BoardColor = "green";
 
 export type MoveMethod = "dc" | "d" | "c";
 
 export type Coordinate = "none" | "inside" | "outside";
 
-export type PieceColor = "neo" | "neo_wood";
-
-export type Turn = "w" | "b";
-
-export interface IPieceColorOption {
-  label: string;
-  value: PieceColor;
-  pieces: { [c in Piece]: string };
-}
-
 export type SquareColor = "green";
+
+export type SquareStatus =
+  | "default"
+  | "over"
+  | "highlight"
+  | "premove"
+  | "legal";
 
 export type SquareStyle = {
   [prop in
     | "default.light"
     | "default.dark"
     | "over"
-    | "highlight:light"
-    | "highlight:dark"
+    | "highlight"
     | "premove:light"
-    | "premove:dark"]: string;
+    | "premove:dark"
+    | "legal:light"
+    | "legal:dark"]: string;
 };
 
+export type PromotionPiece = "n" | "b" | "q" | "r";
+
 export type Setting = {
-  pieceColor: PieceColor;
   squareColor: SquareColor;
   coordinate: Coordinate;
+  moveMethod: MoveMethod;
+  showLegalMove: boolean;
+  enablePremove: boolean;
+  showHighlightMove: boolean;
 };

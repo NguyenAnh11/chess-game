@@ -1,17 +1,22 @@
 import React, { useRef, useState } from "react";
-import Board from "./components/Board";
+import BoardMain from "./components/BoardMain";
 import { Flex, Box, Container } from "@chakra-ui/react";
 import ChessProvider from "./contexts/ChessContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Setting } from "./types";
+import BoardSidebar from "./components/BoardSidebar";
 
 const App = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const [setting] = useState<Setting>({
-    pieceColor: "neo",
-    coordinate: "inside",
+
+  const [setting, setSetting] = useState<Setting>({
     squareColor: "green",
+    coordinate: "inside",
+    moveMethod: "dc",
+    enablePremove: false,
+    showLegalMove: true,
+    showHighlightMove: true,
   });
 
   return (
@@ -22,8 +27,9 @@ const App = () => {
             <Flex direction="column">
               <Box my="2">
                 <DndProvider backend={HTML5Backend}>
-                  <Board ref={ref} />
+                  <BoardMain ref={ref} />
                 </DndProvider>
+                <BoardSidebar/>
               </Box>
             </Flex>
           </ChessProvider>

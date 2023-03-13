@@ -1,29 +1,40 @@
 import { Box } from "@chakra-ui/react";
-import React, { useMemo } from "react";
+import React, { CSSProperties, useMemo } from "react";
 import { useChess } from "../contexts/ChessContext";
+import { getPosition, getDefaultSquareStyle } from "../utils";
+import "../index.css";
 
-export default function HighlightSquare() {
-  const { highlightSquares, squareCoords, width } = useChess();
+type HighlightSquaresProps = {};
 
-  const highlightBox = useMemo(
-    () =>
-      highlightSquares.map((sq, index) => {
-        const coord = squareCoords[sq]!;
+export default function HighlightSquares(props: HighlightSquaresProps) {
+  const { width, orientation, squareStyle, highlightMoves } = useChess();
+
+  const style = useMemo((): CSSProperties => {
+    return {
+      ...getDefaultSquareStyle(width),
+      backgroundColor: squareStyle["highlight"],
+      pointerEvents: "none",
+      opacity: 0.5,
+      zIndex: 1,
+    };
+  }, [width]);
+
+  return (
+    <React.Fragment>
+      {highlightMoves.map((square, index) => {
+        const { row, col } = getPosition(square, orientation);
+
         return (
           <Box
             key={index}
-            position="absolute"
-            top={coord.y}
-            left={coord.x}
-            w={width / 8}
-            h={width / 8}
-            bg="red.200"
-            zIndex={1}
+            style={style}
+            className={`square-${col + 1}${8 - row}`}
+            onMouseDownCapture={(e) => {
+              console.log(e.target);
+            }}
           />
         );
-      }),
-    [highlightSquares]
+      })}
+    </React.Fragment>
   );
-
-  return <React.Fragment>{highlightBox}</React.Fragment>;
 }

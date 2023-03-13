@@ -1,5 +1,6 @@
-import { Chess, Square } from "chess.js";
-import { BoardOrientation, BoardPosition, Coord, Piece } from "../types";
+import { Square } from "chess.js";
+import { CSSProperties } from "react";
+import { BoardPosition, Coord, Piece, BoardOrientation } from "../types";
 import {
   BLACK_COLUMNS,
   BLACK_ROWS,
@@ -8,17 +9,12 @@ import {
   COLUMNS,
 } from "./consts";
 
-export function getCoord(
-  orientation: BoardOrientation,
-  width: number,
-  square: Square
-): Coord {
-  const cellWidth = width / 8;
+export function getPosition(square: Square, orientation: BoardOrientation): Coord {
   const rows = orientation === "w" ? WHITE_ROWS : BLACK_ROWS;
-  const y = rows[parseInt(square[1]) - 1] * cellWidth + cellWidth / 2;
+  const row = rows[parseInt(square[1]) - 1];
   const cols = orientation === "w" ? WHITE_COLUMNS : BLACK_COLUMNS;
-  const x = cols[square[0]] * cellWidth + cellWidth / 2;
-  return { x, y };
+  const col = cols[square[0]];
+  return { row, col };
 }
 
 export function convertFen(fen: string | BoardPosition): BoardPosition {
@@ -73,27 +69,22 @@ function isValidFen(fen: string): boolean {
 
 function toPiece(piece: string): Piece {
   return (piece === piece.toLowerCase()
-    ? "b" + piece.toLowerCase()
-    : "w" + piece.toLowerCase()) as unknown as Piece;
+    ? "b" + piece.toUpperCase()
+    : "w" + piece) as unknown as Piece;
 }
 
 function toColumn(index: number): string {
   return COLUMNS[index];
 }
 
-export function makeMove(
-  game: Chess,
-  from: Square,
-  to: Square,
-  onEnd: () => void
-): Chess {
-  const newGame = new Chess(game.fen());
-  try {
-    newGame.move({ from, to });
-  } catch {
-  } finally {
-    onEnd();
+export function getDefaultSquareStyle(width: number) : CSSProperties {
+  let style: CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: `${width / 8}px`,
+    height: `${width / 8}px`,
   }
 
-  return newGame;
+  return style;
 }

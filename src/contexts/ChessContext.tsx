@@ -5,33 +5,27 @@ import React, {
   useState,
   useEffect,
   useMemo,
-  Dispatch,
-  SetStateAction,
 } from "react";
 import {
-  BoardPosition,
   BoardOrientation,
+  BoardPosition,
   Coordinate,
   MoveMethod,
-  PieceColor as Pc,
-  Turn,
   SquareColor as Sc,
   SquareStyle,
-  Coord,
-  Dimession,
 } from "../types";
-import { SQUARE_STYLE } from "../utils/consts";
-import { convertFen, makeMove } from "../utils/function";
+import { SQUARE_STYLE, convertFen } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
   width: number;
-  pieceColor: Pc;
   squareColor: Sc;
   coordinate: Coordinate;
-  orientation?: BoardOrientation;
-  moveMethod?: MoveMethod;
-  enablePremove?: boolean;
+  orientation: BoardOrientation;
+  moveMethod: MoveMethod;
+  enablePremove: boolean;
+  showLegalMove: boolean;
+  showHighlightMove: boolean;
 };
 
 type ChessContext = {
@@ -40,17 +34,14 @@ type ChessContext = {
   width: number;
   turn: string;
   enablePremove: boolean;
-  orientation: BoardOrientation;
+  orientation: "w" | "b";
   coordinate: Coordinate;
   moveMethod: MoveMethod;
-  pieceColor: Pc;
   squareStyle: SquareStyle;
-  squareCoords: { [sq in Square]?: Coord };
-  selectedSquare: Square | undefined;
-  highlightSquares: Square[];
+  highlightMoves: Square[];
+  legalMoves: Square[];
   onLeftClickDown: (sq: Square) => void;
   onClearSelectedSquare: () => void;
-  setSquareCoords: Dispatch<SetStateAction<{ [sq in Square]?: Coord }>>;
   onDropPiece: (source: Square, target: Square) => void;
 };
 
@@ -61,36 +52,22 @@ export const useChess = () => useContext(ChessContext);
 const ChessProvider = ({
   children,
   width,
-  pieceColor,
   squareColor,
   coordinate,
-  orientation = "w",
-  moveMethod = "dc",
-  enablePremove = true,
+  orientation,
+  moveMethod,
+  enablePremove,
+  showLegalMove,
+  showHighlightMove,
 }: ChessboardProviderProps) => {
   const [game, setGame] = useState(new Chess());
-  const [turn, setTurn] = useState<Turn>("w");
+  const [turn, setTurn] = useState<"w" | "b">("w");
   const [position, setPosition] = useState(convertFen(game.fen()));
   const [selectedSquare, setSelectedSquare] = useState<Square | undefined>(
     undefined
   );
-  const [history, setHistory] = useState<(Move & { fen: string })[]>([]);
-  const [squareCoords, setSquareCoords] = useState<{ [sq in Square]?: Coord }>(
-    {}
-  );
-
-  const highlightSquares = useMemo((): Square[] => {
-    const squares: Square[] = [];
-    if (selectedSquare) squares.push(selectedSquare);
-
-    const lastMove =
-      history.length === 0 ? undefined : history[history.length - 1];
-    if (lastMove) {
-      squares.push(lastMove.from, lastMove.to);
-    }
-
-    return squares;
-  }, [selectedSquare, history]);
+  const [history, setHistory] = useState<Move[]>([]);
+  const [legalMoves, setLegalMoves] = useState<Square[]>([]);
 
   const onClearSelectedSquare = () => setSelectedSquare(undefined);
 
@@ -107,24 +84,50 @@ const ChessProvider = ({
       return;
     }
 
-    const newGame = makeMove(
-      game,
-      selectedSquare!,
-      square,
-      onClearSelectedSquare
-    );
-    setGame(newGame);
+    try {
+      const newGame = new Chess(game.fen());
+      const move = newGame.move({ from: selectedSquare!, to: square });
+      setHistory((prev) => [...prev, move]);
+      setGame(newGame);
+    } catch {
+    } finally {
+      setSelectedSquare(undefined);
+    }
   };
 
   const onDropPiece = (source: Square, target: Square) => {};
 
+  const highlightMoves = useMemo((): Square[] => {
+    const moves: Square[] = [];
+
+    if (showHighlightMove) {
+      if (selectedSquare) moves.push(selectedSquare);
+
+      const lastMove =
+        history.length === 0 ? undefined : history[history.length - 1];
+      if (lastMove) moves.push(lastMove.from, lastMove.to);
+    }
+
+    return moves;
+  }, [selectedSquare, history, showHighlightMove]);
+
   useEffect(() => {
     setPosition(convertFen(game.fen()));
-
     setTurn(game.turn());
-
-    setHistory(game.history({ verbose: true }));
   }, [game]);
+
+  useEffect(() => {
+    if (selectedSquare) {
+      if (showLegalMove) {
+        const moves = game
+          .moves({ square: selectedSquare, verbose: true })
+          .map((p) => p.to) as Square[];
+        setLegalMoves(moves);
+      }
+    } else {
+      setLegalMoves([]);
+    }
+  }, [selectedSquare, showLegalMove]);
 
   return (
     <ChessContext.Provider
@@ -137,15 +140,12 @@ const ChessProvider = ({
         orientation,
         moveMethod,
         coordinate,
-        pieceColor,
         squareStyle: SQUARE_STYLE[squareColor],
-        squareCoords,
-        selectedSquare,
-        highlightSquares,
+        highlightMoves,
+        legalMoves,
         onLeftClickDown,
         onClearSelectedSquare,
         onDropPiece,
-        setSquareCoords,
       }}
     >
       {children}

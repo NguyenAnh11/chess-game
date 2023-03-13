@@ -4,13 +4,34 @@ import React, {
   MouseEvent,
   useState,
   useMemo,
-  useRef,
 } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useChess } from "../contexts/ChessContext";
 import { useDrop } from "react-dnd";
 import { Square as Sq } from "chess.js";
-import Notation from "./Notation";
+import { SquareStyle } from "../types";
+
+type PossibleMoveProps = {
+  isBlack: boolean;
+  width: number;
+  squareStyle: SquareStyle;
+};
+
+function PossibleMove({ width, isBlack, squareStyle }: PossibleMoveProps) {
+  const style = useMemo((): CSSProperties => {
+    return {
+      position: "absolute",
+      borderRadius: "50%",
+      width: `${width / 4}px`,
+      height: `${width / 4}px`,
+      backgroundColor: isBlack
+        ? squareStyle["legal:dark"]
+        : squareStyle["legal:light"],
+    };
+  }, [isBlack, width]);
+
+  return <Box style={style} />;
+}
 
 type SquareProps = {
   children: React.ReactNode;
@@ -20,24 +41,9 @@ type SquareProps = {
   isBlack: boolean;
 };
 
-export default function Square({
-  children,
-  r,
-  c,
-  square,
-  isBlack,
-}: SquareProps) {
-  const {
-    width,
-    moveMethod,
-    squareStyle,
-    coordinate,
-    onDropPiece,
-    onLeftClickDown,
-    setSquareCoords,
-  } = useChess();
-
-  const squareRef = useRef<HTMLDivElement>(null);
+export default function Square({ children, square, isBlack }: SquareProps) {
+  const { width, moveMethod, squareStyle, onDropPiece, onLeftClickDown } =
+    useChess();
 
   const [{ isOver }, drop] = useDrop(
     () => ({
@@ -55,12 +61,10 @@ export default function Square({
   const initialStyle = useMemo((): CSSProperties => {
     let style: CSSProperties = {
       position: "relative",
-      display: "flex",
-      width: width / 8,
-      height: width / 8,
-      backgroundColor: isBlack
-        ? squareStyle["default.dark"]
-        : squareStyle["default.light"],
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
       boxShadow: isOver ? squareStyle.over : "none",
     };
 
@@ -71,14 +75,7 @@ export default function Square({
 
   useEffect(() => {
     setStyle(initialStyle);
-  }, [width, isOver, isBlack]);
-
-  useEffect(() => {
-    if (squareRef.current) {
-      const { x, y } = squareRef.current.getBoundingClientRect();
-      setSquareCoords((prev) => ({ ...prev, [square]: { x, y} }));
-    }
-  }, [width]);
+  }, [width, isOver]);
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if (e.button === 0) {
@@ -87,9 +84,8 @@ export default function Square({
 
         setStyle((prev) => ({
           ...prev,
-          backgroundColor: isBlack
-            ? squareStyle["highlight:dark"]
-            : squareStyle["highlight:light"],
+          backgroundColor: squareStyle["highlight"],
+          opacity: 0.5,
         }));
         return;
       }
@@ -114,19 +110,16 @@ export default function Square({
   };
 
   return (
-    <Box
+    <Flex
       ref={drop}
       style={style}
-      onMouseUp={handleMouseUp}
       onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onContextMenu={(e) => {
         e.preventDefault();
       }}
     >
-      <Flex ref={squareRef} w="100%" h="100%">
-        {children}
-        {coordinate !== "none" && <Notation r={r} c={c} isBlack={isBlack} />}
-      </Flex>
-    </Box>
+      {children}
+    </Flex>
   );
 }
