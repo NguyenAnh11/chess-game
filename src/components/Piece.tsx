@@ -5,6 +5,7 @@ import { useChess } from "../contexts/ChessContext";
 import { Square } from "chess.js";
 import { Piece as Pc } from "../types";
 import { PIECES } from "../utils";
+import { getEmptyImage } from "react-dnd-html5-backend";
 
 type PieceProps = {
   piece: Pc;
@@ -14,7 +15,7 @@ type PieceProps = {
 export default function Piece({ piece, square }: PieceProps) {
   const { moveMethod, boardWidth: width } = useChess();
 
-  const [{ isDragging }, drag] = useDrag(
+  const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
       type: "piece",
       item: { square },
@@ -27,6 +28,8 @@ export default function Piece({ piece, square }: PieceProps) {
     }),
     []
   );
+
+  dragPreview(getEmptyImage(), { captureDraggingState: true })
 
   const pieceStyle = useMemo((): CSSProperties => {
     return {
