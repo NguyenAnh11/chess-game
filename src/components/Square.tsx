@@ -17,7 +17,7 @@ type SquareProps = {
   row: number;
   col: number;
   square: Sq;
-  isBlack: boolean;
+  squareColor: "w" | "b";
 };
 
 export default function Square({
@@ -25,10 +25,19 @@ export default function Square({
   row,
   col,
   square,
-  isBlack,
+  squareColor,
 }: SquareProps) {
-  const { boardWidth, moveMethod, squareStyle, onDropPiece, onLeftClickDown } =
-    useChess();
+  const {
+    lastMove,
+    orientation,
+    moveMethod,
+    squareStyle,
+    onDropPiece,
+    onLeftClickDown,
+    onClearLeftClick,
+    onRightClickDown,
+    onClearRightClicks,
+  } = useChess();
 
   const [style, setStyle] = useState<CSSProperties>();
 
@@ -47,43 +56,63 @@ export default function Square({
 
   const initialStyle = useMemo(
     (): CSSProperties => ({
-      width: `${boardWidth / 8}px`,
-      height: `${boardWidth / 8}px`,
-      touchAction: "none",
-      backgroundColor: isBlack
-        ? squareStyle["default.dark"]
-        : squareStyle["default.light"],
+      background:
+        squareColor === "b"
+          ? squareStyle["default.dark"]
+          : squareStyle["default.light"],
       boxShadow: isOver ? squareStyle["over"] : "none",
     }),
-    [boardWidth, isOver, isBlack]
+    [isOver]
   );
 
   useEffect(() => {
     setStyle(initialStyle);
-  }, [boardWidth, isOver]);
+  }, [isOver]);
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    console.log('Mouse down')
     if (e.button === 0) {
+      //clear right click
+      onClearRightClicks();
+      debugger;
+      if (
+        lastMove &&
+        lastMove.to === square &&
+        lastMove.color !== orientation
+      ) {
+        setStyle((prev) => ({ ...prev, boxShadow: squareStyle["over"] }));
+        return;
+      }
+
       if (moveMethod === "d") {
         if (!children) return;
         setStyle((prev) => ({
           ...prev,
-          backgroundColor: squareStyle["highlight"],
           opacity: 0.5,
+          boxShadow: squareStyle["over"],
+          backgroundColor: squareStyle["highlight"],
         }));
         return;
       }
 
+      //set left click
       onLeftClickDown(square);
     }
 
     if (e.button === 2) {
+      //clear left click
+      onClearLeftClick();
+      //set right click
+      onRightClickDown(square);
     }
   };
 
   const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
     if (e.button === 0) {
-      if (moveMethod === "d") {
+      if (
+        moveMethod === "d" ||
+        (lastMove && lastMove.color !== orientation && lastMove.to === square)
+      ) {
         setStyle(initialStyle);
         return;
       }
@@ -113,7 +142,7 @@ export default function Square({
       >
         {children}
       </Flex>
-      <Notation r={row} c={col} isBlack={isBlack} />
+      <Notation r={row} c={col} isBlack={squareColor === "b"} />
     </Flex>
   );
 }

@@ -5,7 +5,6 @@ import { useChess } from "../contexts/ChessContext";
 import { Square } from "chess.js";
 import { Piece as Pc } from "../types";
 import { PIECES } from "../utils";
-import { getEmptyImage } from "react-dnd-html5-backend";
 
 type PieceProps = {
   piece: Pc;
@@ -13,14 +12,17 @@ type PieceProps = {
 };
 
 export default function Piece({ piece, square }: PieceProps) {
-  const { moveMethod, boardWidth: width } = useChess();
+  const { moveMethod, onDragPieceBegin } = useChess();
 
-  const [{ isDragging }, drag, dragPreview] = useDrag(
+  const [{ isDragging }, drag] = useDrag(
     () => ({
       type: "piece",
-      item: { square },
+      item: () => {
+        onDragPieceBegin(square);
+        return { square };
+      },
       options: {
-        dropEffect: "move"
+        dropEffect: "move",
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
@@ -29,19 +31,17 @@ export default function Piece({ piece, square }: PieceProps) {
     []
   );
 
-  dragPreview(getEmptyImage(), { captureDraggingState: true })
-
-  const pieceStyle = useMemo((): CSSProperties => {
-    return {
-      zIndex: 5,
+  const pieceStyle = useMemo(
+    (): CSSProperties => ({
       opacity: isDragging ? 0 : 1,
       cursor: moveMethod === "c" ? "default" : "grab",
-    };
-  }, [moveMethod, isDragging]);
+    }),
+    [moveMethod, isDragging]
+  );
 
   return (
-    <Box ref={drag} style={pieceStyle}>
-      <svg viewBox={"1 1 43 43"} width={width / 8} height={width / 8}>
+    <Box ref={drag} w="full" h="full" zIndex="5" style={pieceStyle}>
+      <svg viewBox={"1 1 43 43"}>
         <g>{PIECES[piece] as ReactNode}</g>
       </svg>
     </Box>

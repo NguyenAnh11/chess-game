@@ -39,6 +39,7 @@ export const SQUARE_STYLE: { [color in Sc]: SquareStyle } = {
     "premove:light": "#ec7e6a",
     "legal:dark": "#6a874d",
     "legal:light": "#d6d6bd",
+    "king:check": "#FF0000"
   },
 };
 

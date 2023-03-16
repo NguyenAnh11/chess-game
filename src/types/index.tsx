@@ -34,12 +34,15 @@ export type Coordinate = "none" | "inside" | "outside";
 
 export type SquareColor = "green";
 
+export type SquareInfo = Coord & { color: "w" | "b" };
+
 export type SquareStatus =
   | "default"
   | "over"
   | "highlight"
   | "premove"
-  | "legal";
+  | "legal"
+  | "check";
 
 export type SquareStyle = {
   [prop in
@@ -50,16 +53,26 @@ export type SquareStyle = {
     | "premove:light"
     | "premove:dark"
     | "legal:light"
-    | "legal:dark"]: string;
+    | "legal:dark"
+    | "king:check"]: string;
 };
 
-export type PromotionPiece = "n" | "b" | "q" | "r";
+export type Premove = {
+  source: Square;
+  target: Square;
+  piece: Piece;
+};
+
+export type HighlightSquare = {
+  square: Square;
+  type: "left" | "right" | "premove" | "king:check";
+}
 
 export type Setting = {
   squareColor: SquareColor;
   coordinate: Coordinate;
   moveMethod: MoveMethod;
-  showLegalMove: boolean;
   enablePremove: boolean;
+  showHintMove: boolean;
   showHighlightMove: boolean;
 };

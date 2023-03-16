@@ -2,7 +2,20 @@
     position: absolute;
     top: 0;
     left: 0;
+    width: 72px;
+    height: 72px;
     touch-action: "none";
+}
+
+.highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 72px;
+    height: 72px;
+    z-index: 1;
+    pointer-events: none;
+    touch-action: none;
 }
 
 .square-88 {

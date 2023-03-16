@@ -1,36 +1,43 @@
 import { Box } from "@chakra-ui/react";
-import React, { CSSProperties, useMemo } from "react";
+import React, { CSSProperties } from "react";
 import { useChess } from "../contexts/ChessContext";
-import { getPosition } from "../utils";
+import { getSquareInfo } from "../utils";
 import "../index.css";
 
 type HighlightSquaresProps = {};
 
 export default function HighlightSquares(_: HighlightSquaresProps) {
-  const { orientation, boardWidth, squareStyle, highlightSquares } = useChess();
-
-  const style = useMemo(
-    (): CSSProperties => ({
-      width: `${boardWidth / 8}px`,
-      height: `${boardWidth / 8}px`,
-      backgroundColor: squareStyle["highlight"],
-      pointerEvents: "none",
-      opacity: 0.5,
-      zIndex: 1,
-    }),
-    [boardWidth]
-  );
+  const { orientation, squareStyle, highlightSquares } = useChess();
 
   return (
     <React.Fragment>
-      {highlightSquares.map((square, index) => {
-        const { row, col } = getPosition(square, orientation);
+      {highlightSquares.map((hq, index) => {
+        const { row, col, color } = getSquareInfo(hq.square, orientation);
+
+        const style: CSSProperties = {};
+        switch (hq.type) {
+          case "left":
+            style.background = squareStyle["highlight"];
+            style.opacity = 0.5;
+            break;
+          case "premove":
+          case "right":
+            style.background =
+              color === "b"
+                ? squareStyle["premove:dark"]
+                : squareStyle["premove:light"];
+            style.opacity = 0.5;
+            break;
+          case "king:check":
+            style.background = squareStyle["king:check"];
+            break;
+        }
 
         return (
           <Box
             key={index}
             style={style}
-            className={`square square-${col + 1}${8 - row}`}
+            className={`highlight square-${col + 1}${8 - row}`}
           />
         );
       })}

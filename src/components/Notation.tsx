@@ -10,7 +10,7 @@ type NotationProps = {
 };
 
 export default function Notation({ r, c, isBlack }: NotationProps) {
-  const { boardWidth, orientation, squareStyle } = useChess();
+  const { orientation, squareStyle } = useChess();
 
   const row = useMemo(
     () => (orientation === "w" ? WHITE_ROWS[r] : BLACK_ROWS[r]) + 1,
@@ -28,13 +28,13 @@ export default function Notation({ r, c, isBlack }: NotationProps) {
       userSelect: "none",
       padding: "0px 2px",
       fontWeight: 600,
-      fontSize: boardWidth / 35,
+      fontSize: 576 / 35,
       zIndex: 2,
       color: isBlack
         ? squareStyle["default.light"]
         : squareStyle["default.dark"],
     }),
-    [boardWidth, squareStyle]
+    [squareStyle]
   );
 
   const alphaStyle = { alignSelf: "flex-end", right: 0 };

@@ -10,7 +10,9 @@ import {
   BoardOrientation,
   BoardPosition,
   Coordinate,
+  HighlightSquare,
   MoveMethod,
+  Premove,
   SquareColor as Sc,
   SquareStyle,
 } from "../types";
@@ -18,31 +20,33 @@ import { SQUARE_STYLE, convertFen } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
-  boardWidth: number;
   squareColor: Sc;
   coordinate: Coordinate;
   orientation: BoardOrientation;
   moveMethod: MoveMethod;
   enablePremove: boolean;
-  showLegalMove: boolean;
+  showHintMove: boolean;
   showHighlightMove: boolean;
 };
 
 type ChessContext = {
   game: Chess;
   position: BoardPosition;
-  boardWidth: number;
   turn: string;
   enablePremove: boolean;
   orientation: "w" | "b";
   coordinate: Coordinate;
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
-  highlightSquares: Square[];
+  highlightSquares: HighlightSquare[];
   legalMoves: Square[];
+  lastMove: Move | undefined;
   onLeftClickDown: (sq: Square) => void;
-  onClearSelectedSquare: () => void;
+  onClearLeftClick: () => void;
   onDropPiece: (source: Square, target: Square) => void;
+  onRightClickDown: (square: Square) => void;
+  onClearRightClicks: () => void;
+  onDragPieceBegin: (square: Square) => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -51,94 +55,160 @@ export const useChess = () => useContext(ChessContext);
 
 const ChessProvider = ({
   children,
-  boardWidth,
   squareColor,
   coordinate,
   orientation,
   moveMethod,
   enablePremove,
-  showLegalMove,
+  showHintMove,
   showHighlightMove,
 }: ChessboardProviderProps) => {
   const [game, setGame] = useState(new Chess());
   const [turn, setTurn] = useState<"w" | "b">("w");
   const [position, setPosition] = useState(convertFen(game.fen()));
   const [history, setHistory] = useState<Move[]>([]);
-  const [selectedSquare, setSelectedSquare] = useState<Square | undefined>(
-    undefined
+  const [premoves, setPrremoves] = useState<Premove[]>([]);
+  const [rightClicks, setRightClicks] = useState<Square[]>([]);
+  const [leftClick, setLeftClick] = useState<Square | undefined>(undefined);
+  const [highlightSquares, setHighlightSquares] = useState<HighlightSquare[]>(
+    []
   );
+  const [hintMoves, setHintMoves] = useState<Square[]>([]);
 
-  const onClearSelectedSquare = () => setSelectedSquare(undefined);
+  const onClearLeftClick = () => setLeftClick(undefined);
 
   const onLeftClickDown = (square: Square) => {
     if (
       game.isGameOver() ||
       game.isDraw() ||
-      game.isCheckmate() ||
-      (!selectedSquare && !position[square])
+      game.isCheck() ||
+      (!leftClick && !position[square])
     )
       return;
 
-    const sq = !selectedSquare
-      ? square
-      : selectedSquare === square
-      ? undefined
-      : null;
+    const sq = !leftClick ? square : leftClick === square ? undefined : null;
     if (sq !== null) {
-      setSelectedSquare(sq);
+      setLeftClick(sq);
       return;
     }
 
     try {
       const newGame = new Chess(game.fen());
-      const move = newGame.move({ from: selectedSquare!, to: square });
+      const move = newGame.move({ from: leftClick!, to: square });
       setHistory((prev) => [...prev, move]);
       setGame(newGame);
     } catch {
       showHighlightMove && position[square]
-        ? setSelectedSquare(square)
-        : setSelectedSquare(undefined);
+        ? setLeftClick(square)
+        : setLeftClick(undefined);
     }
   };
 
-  const onDropPiece = (source: Square, target: Square) => {};
+  const onClearRightClicks = () => setRightClicks([]);
 
-  const highlightSquares = useMemo((): Square[] => {
-    const moves: Square[] = [];
-    if (showHighlightMove) {
-      if (selectedSquare) moves.push(selectedSquare);
+  const onRightClickDown = (square: Square) => {
+    if (!rightClicks.some((p) => p === square)) {
+      setRightClicks((prev) => [...prev, square]);
+    } else {
+      setRightClicks((prev) => prev.filter((p) => p !== square));
+    }
+  };
 
-      const lastMove =
-        history.length === 0 ? undefined : history[history.length - 1];
-      if (lastMove) moves.push(lastMove.from, lastMove.to);
+  const onDragPieceBegin = (square: Square) => {
+    if (leftClick) return;
+    setLeftClick(square);
+  };
+
+  const onDropPiece = (source: Square, target: Square) => {
+    if (game.isCheck()) {
+      const kingSquares = game
+        .board()
+        .flatMap((p) => p.filter((p) => p !== null && p.type === "k"));
+
+      console.log(kingSquares);
+
+      const kingSquare =
+        turn === "w"
+          ? kingSquares.find((p) => p?.color === "w")
+          : kingSquares.find((p) => p?.color === "b");
+
+      if (kingSquare) {
+        setHighlightSquares((prev) => [
+          ...prev,
+          { square: kingSquare.square, type: "king:check" },
+        ]);
+        return;
+      }
     }
 
-    return moves;
-  }, [selectedSquare, history, showHighlightMove]);
+    if (source === target) return;
 
-  const legalMoves = useMemo((): Square[] => {
-    let moves: Square[] = [];
-    if (showLegalMove && selectedSquare) {
-      moves = game
-        .moves({ square: selectedSquare, verbose: true })
-        .map((p) => p.to) as Square[];
-    }
+    try {
+      const newGame = new Chess(game.fen());
+      const move = newGame.move({ from: source, to: target });
+      setHistory((prev) => [...prev, move]);
+      setGame(newGame);
+    } catch (e) {}
+  };
 
-    return moves;
-  }, [selectedSquare, showLegalMove]);
+  const lastMove = useMemo(
+    (): Move | undefined =>
+      history.length === 0 ? undefined : history[history.length - 1],
+    []
+  );
 
   useEffect(() => {
     setPosition(convertFen(game.fen()));
-    setSelectedSquare(undefined);
+    setLeftClick(undefined);
     setTurn(game.turn());
   }, [game]);
+
+  useEffect(() => {
+    const squares: HighlightSquare[] = [];
+
+    if (rightClicks.length > 0) {
+      squares.push(
+        ...(rightClicks.map((square) => ({
+          square,
+          type: "right",
+        })) as HighlightSquare[])
+      );
+    }
+
+    if (showHighlightMove) {
+      const lefts: Square[] = [];
+
+      if (leftClick) lefts.push(leftClick);
+
+      const lastMove =
+        history.length === 0 ? undefined : history[history.length - 1];
+      if (lastMove) lefts.push(lastMove.from, lastMove.to);
+
+      for (const left of [...new Set(lefts)]) {
+        if (!rightClicks.includes(left)) {
+          squares.push({ square: left, type: "left" });
+        }
+      }
+    }
+
+    setHighlightSquares(squares);
+  }, [leftClick, history, showHighlightMove, rightClicks]);
+
+  useEffect(() => {
+    if (showHintMove) {
+      let moves = game
+        .moves({ square: leftClick, verbose: true })
+        .map((p) => p.to) as Square[];
+
+      setHintMoves(moves);
+    }
+  }, [leftClick, showHintMove]);
 
   return (
     <ChessContext.Provider
       value={{
         game,
         position,
-        boardWidth,
         turn,
         enablePremove,
         orientation,
@@ -146,10 +216,14 @@ const ChessProvider = ({
         coordinate,
         squareStyle: SQUARE_STYLE[squareColor],
         highlightSquares,
-        legalMoves,
+        legalMoves: hintMoves,
+        lastMove,
         onLeftClickDown,
-        onClearSelectedSquare,
+        onClearLeftClick,
         onDropPiece,
+        onRightClickDown,
+        onClearRightClicks,
+        onDragPieceBegin,
       }}
     >
       {children}
