@@ -15,8 +15,10 @@ import {
   Premove,
   SquareColor as Sc,
   SquareStyle,
+  KingSquare,
+  HintMove,
 } from "../types";
-import { SQUARE_STYLE, convertFen } from "../utils";
+import { SQUARE_STYLE, convertFen, getSquareInfo } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
@@ -39,8 +41,10 @@ type ChessContext = {
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
   highlightSquares: HighlightSquare[];
-  legalMoves: Square[];
+  hintMoves: HintMove[];
   lastMove: Move | undefined;
+  leftClick: Square | undefined;
+  kingUnderAttack: KingSquare | undefined;
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
   onDropPiece: (source: Square, target: Square) => void;
@@ -70,25 +74,23 @@ const ChessProvider = ({
   const [premoves, setPrremoves] = useState<Premove[]>([]);
   const [rightClicks, setRightClicks] = useState<Square[]>([]);
   const [leftClick, setLeftClick] = useState<Square | undefined>(undefined);
-  const [highlightSquares, setHighlightSquares] = useState<HighlightSquare[]>(
-    []
-  );
-  const [hintMoves, setHintMoves] = useState<Square[]>([]);
+  const [kingUnderAttack, setKingUnderAttack] = useState<
+    KingSquare | undefined
+  >();
 
   const onClearLeftClick = () => setLeftClick(undefined);
 
   const onLeftClickDown = (square: Square) => {
-    if (
-      game.isGameOver() ||
-      game.isDraw() ||
-      game.isCheck() ||
-      (!leftClick && !position[square])
-    )
+    if (game.isGameOver() || game.isDraw() || (!leftClick && !position[square]))
       return;
 
-    const sq = !leftClick ? square : leftClick === square ? undefined : null;
-    if (sq !== null) {
-      setLeftClick(sq);
+    if (!leftClick) {
+      setLeftClick(square);
+      return;
+    }
+
+    if (leftClick === square) {
+      setLeftClick(undefined);
       return;
     }
 
@@ -98,16 +100,24 @@ const ChessProvider = ({
       setHistory((prev) => [...prev, move]);
       setGame(newGame);
     } catch {
-      showHighlightMove && position[square]
-        ? setLeftClick(square)
-        : setLeftClick(undefined);
+      if (game.inCheck()) {
+        setLeftClick(undefined);
+        return;
+      }
+
+      if (showHintMove && position[square]) {
+        setLeftClick(square);
+      } else {
+        setLeftClick(undefined);
+      }
     }
   };
 
   const onClearRightClicks = () => setRightClicks([]);
 
   const onRightClickDown = (square: Square) => {
-    if (!rightClicks.some((p) => p === square)) {
+    const exist = rightClicks.some((p) => p === square);
+    if (!exist) {
       setRightClicks((prev) => [...prev, square]);
     } else {
       setRightClicks((prev) => prev.filter((p) => p !== square));
@@ -120,35 +130,40 @@ const ChessProvider = ({
   };
 
   const onDropPiece = (source: Square, target: Square) => {
-    if (game.isCheck()) {
-      const kingSquares = game
-        .board()
-        .flatMap((p) => p.filter((p) => p !== null && p.type === "k"));
-
-      console.log(kingSquares);
-
-      const kingSquare =
-        turn === "w"
-          ? kingSquares.find((p) => p?.color === "w")
-          : kingSquares.find((p) => p?.color === "b");
-
-      if (kingSquare) {
-        setHighlightSquares((prev) => [
-          ...prev,
-          { square: kingSquare.square, type: "king:check" },
-        ]);
-        return;
-      }
+    if (source === target) {
+      setLeftClick(undefined);
+      return;
     }
 
-    if (source === target) return;
-
     try {
-      const newGame = new Chess(game.fen());
-      const move = newGame.move({ from: source, to: target });
+      const move = game.move({ from: source, to: target });
       setHistory((prev) => [...prev, move]);
-      setGame(newGame);
-    } catch (e) {}
+
+      setPosition(convertFen(game.fen()));
+      setTurn(game.turn());
+
+      if (!game.inCheck()) {
+        setKingUnderAttack(undefined);
+      }
+    } catch (e) {
+      if (game.inCheck()) {
+        if (kingUnderAttack) return;
+        const king = game
+          .board()
+          .flatMap((rows) =>
+            rows.filter(
+              (col) =>
+                col !== null && col.type === "k" && col.color === game.turn()
+            )
+          )[0];
+
+        if (king) {
+          const { row, col } = getSquareInfo(king.square, orientation);
+          setKingUnderAttack({ square: king.square, row, col });
+          return;
+        }
+      }
+    }
   };
 
   const lastMove = useMemo(
@@ -157,15 +172,8 @@ const ChessProvider = ({
     []
   );
 
-  useEffect(() => {
-    setPosition(convertFen(game.fen()));
-    setLeftClick(undefined);
-    setTurn(game.turn());
-  }, [game]);
-
-  useEffect(() => {
+  const highlightSquares = useMemo((): HighlightSquare[] => {
     const squares: HighlightSquare[] = [];
-
     if (rightClicks.length > 0) {
       squares.push(
         ...(rightClicks.map((square) => ({
@@ -191,18 +199,34 @@ const ChessProvider = ({
       }
     }
 
-    setHighlightSquares(squares);
+    return squares;
   }, [leftClick, history, showHighlightMove, rightClicks]);
 
-  useEffect(() => {
-    if (showHintMove) {
-      let moves = game
-        .moves({ square: leftClick, verbose: true })
-        .map((p) => p.to) as Square[];
-
-      setHintMoves(moves);
+  const hintMoves = useMemo((): HintMove[] => {
+    const hintMoves: HintMove[] = [];
+    if (showHintMove && leftClick) {
+      const moves = game.moves({ square: leftClick, verbose: true });
+      for (const { to } of moves) {
+        const move: HintMove = {
+          square: to,
+          type: !position[to] ? "hint" : "capture",
+        };
+        hintMoves.push(move);
+      }
     }
+
+    return hintMoves;
   }, [leftClick, showHintMove]);
+
+  useEffect(() => {
+    setPosition(convertFen(game.fen()));
+    setLeftClick(undefined);
+    setTurn(game.turn());
+
+    if (!game.inCheck()) {
+      setKingUnderAttack(undefined);
+    }
+  }, [game]);
 
   return (
     <ChessContext.Provider
@@ -216,8 +240,10 @@ const ChessProvider = ({
         coordinate,
         squareStyle: SQUARE_STYLE[squareColor],
         highlightSquares,
-        legalMoves: hintMoves,
+        hintMoves,
         lastMove,
+        leftClick,
+        kingUnderAttack,
         onLeftClickDown,
         onClearLeftClick,
         onDropPiece,

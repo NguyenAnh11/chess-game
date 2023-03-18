@@ -3,8 +3,7 @@ import { Box, Flex, useOutsideClick } from "@chakra-ui/react";
 import { useChess } from "../contexts/ChessContext";
 import Squares from "./Squares";
 import HighlightSquares from "./HighlightSquares";
-import MoveHints from "./MoveHints";
-import CaptureHints from "./CaptureHints";
+import HintMoves from "./HintMoves";
 
 type BoardMainProps = {};
 
@@ -26,8 +25,7 @@ export default function BoardMain(_: BoardMainProps) {
         <Box ref={ref} position="relative" w="xl" height="xl">
           <HighlightSquares />
           <Squares />
-          <MoveHints/>
-          <CaptureHints/>
+          <HintMoves />
         </Box>
       </Flex>
     </React.Fragment>

@@ -7,7 +7,8 @@ import "../index.css";
 type HighlightSquaresProps = {};
 
 export default function HighlightSquares(_: HighlightSquaresProps) {
-  const { orientation, squareStyle, highlightSquares } = useChess();
+  const { orientation, squareStyle, highlightSquares, kingUnderAttack } =
+    useChess();
 
   return (
     <React.Fragment>
@@ -18,7 +19,6 @@ export default function HighlightSquares(_: HighlightSquaresProps) {
         switch (hq.type) {
           case "left":
             style.background = squareStyle["highlight"];
-            style.opacity = 0.5;
             break;
           case "premove":
           case "right":
@@ -26,10 +26,6 @@ export default function HighlightSquares(_: HighlightSquaresProps) {
               color === "b"
                 ? squareStyle["premove:dark"]
                 : squareStyle["premove:light"];
-            style.opacity = 0.5;
-            break;
-          case "king:check":
-            style.background = squareStyle["king:check"];
             break;
         }
 
@@ -37,10 +33,18 @@ export default function HighlightSquares(_: HighlightSquaresProps) {
           <Box
             key={index}
             style={style}
-            className={`highlight square-${col + 1}${8 - row}`}
+            className={`highlight square square-${col + 1}${8 - row}`}
           />
         );
       })}
+      {kingUnderAttack && (
+        <Box
+          bg={squareStyle["king:check"]}
+          className={`king square square-${kingUnderAttack.col + 1}${
+            8 - kingUnderAttack.row
+          }`}
+        />
+      )}
     </React.Fragment>
   );
 }

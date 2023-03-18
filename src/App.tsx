@@ -4,8 +4,8 @@ import ChessProvider from "./contexts/ChessContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Setting } from "./types";
-import BoardSidebar from "./components/BoardSidebar";
-import BoardMain from "./components/BoardMain";
+import BoardSidebar from "./components/Board.Sidebar";
+import BoardMain from "./components/Board.Main";
 
 const App = () => {
   const [setting, setSetting] = useState<Setting>({

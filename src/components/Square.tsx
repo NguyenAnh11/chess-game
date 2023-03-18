@@ -28,15 +28,16 @@ export default function Square({
   squareColor,
 }: SquareProps) {
   const {
-    lastMove,
-    orientation,
     moveMethod,
+    orientation,
     squareStyle,
-    onDropPiece,
+    lastMove,
+    leftClick,
     onLeftClickDown,
     onClearLeftClick,
     onRightClickDown,
     onClearRightClicks,
+    onDropPiece,
   } = useChess();
 
   const [style, setStyle] = useState<CSSProperties>();
@@ -70,13 +71,13 @@ export default function Square({
   }, [isOver]);
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
-    console.log('Mouse down')
     if (e.button === 0) {
       //clear right click
       onClearRightClicks();
-      debugger;
+
       if (
         lastMove &&
+        leftClick &&
         lastMove.to === square &&
         lastMove.color !== orientation
       ) {
