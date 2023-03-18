@@ -19,7 +19,7 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <Flex h="100vh" align="center" justify="center" userSelect="none">
+      <Flex h="100vh" align="center" justify="center" userSelect="none" bg="black">
         <Flex position="relative" h="min-content">
           <ChessProvider orientation="w" {...setting}>
             <Box flex="1">

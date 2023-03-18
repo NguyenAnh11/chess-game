@@ -1,20 +1,16 @@
 import { Box } from "@chakra-ui/react";
 import React, { CSSProperties } from "react";
 import { useChess } from "../contexts/ChessContext";
-import { getSquareInfo } from "../utils";
 import "../index.css";
 
 type HighlightSquaresProps = {};
 
 export default function HighlightSquares(_: HighlightSquaresProps) {
-  const { orientation, squareStyle, highlightSquares, kingUnderAttack } =
-    useChess();
+  const { squareStyle, highlightSquares, kingUnderAttack } = useChess();
 
   return (
     <React.Fragment>
       {highlightSquares.map((hq, index) => {
-        const { row, col, color } = getSquareInfo(hq.square, orientation);
-
         const style: CSSProperties = {};
         switch (hq.type) {
           case "left":
@@ -23,7 +19,7 @@ export default function HighlightSquares(_: HighlightSquaresProps) {
           case "premove":
           case "right":
             style.background =
-              color === "b"
+              hq.color === "b"
                 ? squareStyle["premove:dark"]
                 : squareStyle["premove:light"];
             break;
@@ -33,7 +29,7 @@ export default function HighlightSquares(_: HighlightSquaresProps) {
           <Box
             key={index}
             style={style}
-            className={`highlight square square-${col + 1}${8 - row}`}
+            className={`highlight square square-${hq.col + 1}${8 - hq.row}`}
           />
         );
       })}

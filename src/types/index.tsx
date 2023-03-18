@@ -66,11 +66,16 @@ export type Premove = {
 export type HighlightSquare = {
   square: Square;
   type: "left" | "right" | "premove" | "king:check";
+  row: number;
+  col: number;
+  color: "w" | "b";
 };
 
 export type HintMove = {
   square: Square;
   type: "hint" | "capture";
+  row: number;
+  col: number;
 };
 
 export type KingSquare = {

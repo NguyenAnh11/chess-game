@@ -1,5 +1,10 @@
 import { Square } from "chess.js";
-import { BoardPosition, Piece, BoardOrientation, SquareInfo } from "../types";
+import {
+  BoardPosition,
+  Piece,
+  BoardOrientation,
+  SquareInfo,
+} from "../types";
 import {
   BLACK_COLUMNS,
   BLACK_ROWS,
@@ -8,7 +13,10 @@ import {
   COLUMNS,
 } from "./consts";
 
-export function getSquareInfo(square: Square, orientation: BoardOrientation): SquareInfo  {
+export function getSquareInfo(
+  square: Square,
+  orientation: BoardOrientation
+): SquareInfo {
   const rows = orientation === "w" ? WHITE_ROWS : BLACK_ROWS;
   const row = rows[parseInt(square[1]) - 1];
   const cols = orientation === "w" ? WHITE_COLUMNS : BLACK_COLUMNS;
@@ -16,7 +24,6 @@ export function getSquareInfo(square: Square, orientation: BoardOrientation): Sq
   const color = (row + col) % 2 === 0 ? "w" : "b";
   return { row, col, color };
 }
-
 
 export function convertFen(fen: string | BoardPosition): BoardPosition {
   if (typeof fen === "string") {

@@ -15,8 +15,8 @@ import {
   Premove,
   SquareColor as Sc,
   SquareStyle,
-  KingSquare,
   HintMove,
+  KingSquare,
 } from "../types";
 import { SQUARE_STYLE, convertFen, getSquareInfo } from "../utils";
 
@@ -84,13 +84,9 @@ const ChessProvider = ({
     if (game.isGameOver() || game.isDraw() || (!leftClick && !position[square]))
       return;
 
-    if (!leftClick) {
-      setLeftClick(square);
-      return;
-    }
-
-    if (leftClick === square) {
-      setLeftClick(undefined);
+    const sq = !leftClick ? square : leftClick === square ? undefined : null;
+    if (sq !== null) {
+      setLeftClick(sq);
       return;
     }
 
@@ -101,15 +97,27 @@ const ChessProvider = ({
       setGame(newGame);
     } catch {
       if (game.inCheck()) {
+        const king = game
+          .board()
+          .flatMap((rows) =>
+            rows.filter(
+              (col) =>
+                col !== null && col.type === "k" && col.color === game.turn()
+            )
+          )[0];
+
+        if (king && !kingUnderAttack) {
+          const { row, col } = getSquareInfo(king.square, orientation);
+          setKingUnderAttack({ square: king.square, row, col });
+        }
+
         setLeftClick(undefined);
         return;
       }
 
-      if (showHintMove && position[square]) {
-        setLeftClick(square);
-      } else {
-        setLeftClick(undefined);
-      }
+      showHintMove && position[square]
+        ? setLeftClick(square)
+        : setLeftClick(undefined);
     }
   };
 
@@ -138,32 +146,9 @@ const ChessProvider = ({
     try {
       const move = game.move({ from: source, to: target });
       setHistory((prev) => [...prev, move]);
-
       setPosition(convertFen(game.fen()));
       setTurn(game.turn());
-
-      if (!game.inCheck()) {
-        setKingUnderAttack(undefined);
-      }
-    } catch (e) {
-      if (game.inCheck()) {
-        if (kingUnderAttack) return;
-        const king = game
-          .board()
-          .flatMap((rows) =>
-            rows.filter(
-              (col) =>
-                col !== null && col.type === "k" && col.color === game.turn()
-            )
-          )[0];
-
-        if (king) {
-          const { row, col } = getSquareInfo(king.square, orientation);
-          setKingUnderAttack({ square: king.square, row, col });
-          return;
-        }
-      }
-    }
+    } catch (e) {}
   };
 
   const lastMove = useMemo(
@@ -179,6 +164,7 @@ const ChessProvider = ({
         ...(rightClicks.map((square) => ({
           square,
           type: "right",
+          ...getSquareInfo(square, orientation),
         })) as HighlightSquare[])
       );
     }
@@ -194,7 +180,11 @@ const ChessProvider = ({
 
       for (const left of [...new Set(lefts)]) {
         if (!rightClicks.includes(left)) {
-          squares.push({ square: left, type: "left" });
+          squares.push({
+            square: left,
+            type: "left",
+            ...getSquareInfo(left, orientation),
+          });
         }
       }
     }
@@ -210,6 +200,7 @@ const ChessProvider = ({
         const move: HintMove = {
           square: to,
           type: !position[to] ? "hint" : "capture",
+          ...getSquareInfo(to, orientation),
         };
         hintMoves.push(move);
       }
