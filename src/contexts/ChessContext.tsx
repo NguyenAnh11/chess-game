@@ -17,8 +17,9 @@ import {
   SquareStyle,
   HintMove,
   KingSquare,
+  GameStatus,
 } from "../types";
-import { SQUARE_STYLE, convertFen, getSquareInfo } from "../utils";
+import { SQUARE_STYLE, convertFen, getCoord, getColor } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ type ChessboardProviderProps = {
 
 type ChessContext = {
   game: Chess;
+  gameStatus: GameStatus;
   position: BoardPosition;
   turn: string;
   enablePremove: boolean;
@@ -51,6 +53,8 @@ type ChessContext = {
   onRightClickDown: (square: Square) => void;
   onClearRightClicks: () => void;
   onDragPieceBegin: (square: Square) => void;
+  onResign: () => void;
+  onNewGame: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -68,7 +72,11 @@ const ChessProvider = ({
   showHighlightMove,
 }: ChessboardProviderProps) => {
   const [game, setGame] = useState(new Chess());
-  const [turn, setTurn] = useState<"w" | "b">("w");
+  const [gameStatus, setGameStatus] = useState<GameStatus>({
+    draw: false,
+    over: false,
+  });
+  const [turn, setTurn] = useState<"w" | "b">(game.turn());
   const [position, setPosition] = useState(convertFen(game.fen()));
   const [history, setHistory] = useState<Move[]>([]);
   const [premoves, setPrremoves] = useState<Premove[]>([]);
@@ -77,6 +85,15 @@ const ChessProvider = ({
   const [kingUnderAttack, setKingUnderAttack] = useState<
     KingSquare | undefined
   >();
+
+  const onResign = () => {
+    setGameStatus((prev) => ({ ...prev, over: true }));
+  };
+
+  const onNewGame = () => {
+    setHistory([]);
+    setGame(new Chess());
+  }
 
   const onClearLeftClick = () => setLeftClick(undefined);
 
@@ -94,6 +111,7 @@ const ChessProvider = ({
       const newGame = new Chess(game.fen());
       const move = newGame.move({ from: leftClick!, to: square });
       setHistory((prev) => [...prev, move]);
+      setLeftClick(undefined);
       setGame(newGame);
     } catch {
       if (game.inCheck()) {
@@ -107,8 +125,10 @@ const ChessProvider = ({
           )[0];
 
         if (king && !kingUnderAttack) {
-          const { row, col } = getSquareInfo(king.square, orientation);
-          setKingUnderAttack({ square: king.square, row, col });
+          setKingUnderAttack({
+            square: king.square,
+            ...getCoord(king.square, orientation),
+          });
         }
 
         setLeftClick(undefined);
@@ -159,31 +179,40 @@ const ChessProvider = ({
 
   const highlightSquares = useMemo((): HighlightSquare[] => {
     const squares: HighlightSquare[] = [];
+
     if (rightClicks.length > 0) {
-      squares.push(
-        ...(rightClicks.map((square) => ({
-          square,
+      for (const right of rightClicks) {
+        const { row, col } = getCoord(right, orientation);
+        const square: HighlightSquare = {
+          square: right,
           type: "right",
-          ...getSquareInfo(square, orientation),
-        })) as HighlightSquare[])
-      );
+          row,
+          col,
+          color: getColor(row, col),
+        };
+
+        squares.push(square);
+      }
     }
 
     if (showHighlightMove) {
-      const lefts: Square[] = [];
+      const leftClicks: Square[] = [];
 
-      if (leftClick) lefts.push(leftClick);
+      if (leftClick) leftClicks.push(leftClick);
 
       const lastMove =
         history.length === 0 ? undefined : history[history.length - 1];
-      if (lastMove) lefts.push(lastMove.from, lastMove.to);
+      if (lastMove) leftClicks.push(lastMove.from, lastMove.to);
 
-      for (const left of [...new Set(lefts)]) {
+      for (const left of [...new Set(leftClicks)]) {
         if (!rightClicks.includes(left)) {
+          const { row, col } = getCoord(left, orientation);
           squares.push({
             square: left,
             type: "left",
-            ...getSquareInfo(left, orientation),
+            row,
+            col,
+            color: getColor(row, col),
           });
         }
       }
@@ -200,7 +229,7 @@ const ChessProvider = ({
         const move: HintMove = {
           square: to,
           type: !position[to] ? "hint" : "capture",
-          ...getSquareInfo(to, orientation),
+          ...getCoord(to, orientation),
         };
         hintMoves.push(move);
       }
@@ -210,19 +239,27 @@ const ChessProvider = ({
   }, [leftClick, showHintMove]);
 
   useEffect(() => {
+    //update board
     setPosition(convertFen(game.fen()));
-    setLeftClick(undefined);
+    //update turn
     setTurn(game.turn());
 
-    if (!game.inCheck()) {
+    if (!game.inCheck()) 
       setKingUnderAttack(undefined);
-    }
+    //update game status
+    const status: GameStatus = {
+      draw: game.isDraw(),
+      over: game.isGameOver() && game.isCheckmate(),
+    };
+
+    setGameStatus(status);
   }, [game]);
 
   return (
     <ChessContext.Provider
       value={{
         game,
+        gameStatus,
         position,
         turn,
         enablePremove,
@@ -241,6 +278,8 @@ const ChessProvider = ({
         onRightClickDown,
         onClearRightClicks,
         onDragPieceBegin,
+        onResign,
+        onNewGame
       }}
     >
       {children}

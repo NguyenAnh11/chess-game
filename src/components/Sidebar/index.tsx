@@ -1,6 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import { useChess } from "../../contexts/ChessContext";
-import GameControls from "./GameControls";
+import GameControls from "./Controls";
+import MoveContainer from "./Moves";
 
 export default function BoardSidebar() {
   const {} = useChess();
@@ -9,11 +10,12 @@ export default function BoardSidebar() {
     <Flex
       direction="column"
       ml="5"
-      w="400px"
+      w="350px"
       h="full"
       bg="white"
       borderRadius="lg"
     >
+      <MoveContainer/>
       <GameControls/>
     </Flex>
   );

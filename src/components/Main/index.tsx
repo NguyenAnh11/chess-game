@@ -8,12 +8,13 @@ import HintMoves from "./HintMoves";
 export default function BoardMain() {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { onClearLeftClick } = useChess();
+  const { onClearLeftClick, onClearRightClicks } = useChess();
 
   useOutsideClick({
     ref: ref,
     handler: () => {
       onClearLeftClick();
+      onClearRightClicks();
     },
   });
 

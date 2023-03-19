@@ -81,6 +81,11 @@ export type KingSquare = {
   col: number;
 };
 
+export type GameStatus = {
+  draw: boolean;
+  over: boolean;
+}
+
 export type Setting = {
   squareColor: SquareColor;
   coordinate: Coordinate;

@@ -10,7 +10,7 @@ import './index.css';
 
 const App = () => {
   const [setting, setSetting] = useState<Setting>({
-    squareColor: "bases",
+    squareColor: "green",
     coordinate: "inside",
     moveMethod: "dc",
     enablePremove: false,
