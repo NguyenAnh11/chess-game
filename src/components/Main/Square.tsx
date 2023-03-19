@@ -6,10 +6,9 @@ import React, {
   useMemo,
 } from "react";
 import { Flex } from "@chakra-ui/react";
-import { useChess } from "../contexts/ChessContext";
+import { useChess } from "../../contexts/ChessContext";
 import { useDrop } from "react-dnd";
 import { Square as Sq } from "chess.js";
-import "../index.css";
 import Notation from "./Notation";
 
 type SquareProps = {

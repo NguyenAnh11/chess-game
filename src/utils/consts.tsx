@@ -37,9 +37,14 @@ export const SQUARE_STYLE: { [color in Sc]: SquareStyle } = {
     highlight: "#ffff00",
     "premove:dark": "#d46c51",
     "premove:light": "#ec7e6a",
-    "legal:dark": "#6a874d",
-    "legal:light": "#d6d6bd",
-    "king:check": "#FF0000"
+  },
+  bases: {
+    "default.dark": "#c7703c",
+    "default.light": "#f0cba0",
+    over: "inset 0 0 1px 6px rgba(255,255,255,0.75)",
+    highlight: "#f0c963",
+    "premove:dark": "#e3634b",
+    "premove:light": "#ec7761",
   },
 };
 

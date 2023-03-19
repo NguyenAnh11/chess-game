@@ -1,10 +1,10 @@
 import { Box } from "@chakra-ui/react";
 import { CSSProperties, ReactNode, useMemo } from "react";
 import { useDrag } from "react-dnd";
-import { useChess } from "../contexts/ChessContext";
+import { useChess } from "../../contexts/ChessContext";
 import { Square } from "chess.js";
-import { Piece as Pc } from "../types";
-import { PIECES } from "../utils";
+import { Piece as Pc } from "../../types";
+import { PIECES } from "../../utils";
 
 type PieceProps = {
   piece: Pc;

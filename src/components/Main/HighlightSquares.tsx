@@ -1,11 +1,8 @@
 import { Box } from "@chakra-ui/react";
 import React, { CSSProperties } from "react";
-import { useChess } from "../contexts/ChessContext";
-import "../index.css";
+import { useChess } from "../../contexts/ChessContext";
 
-type HighlightSquaresProps = {};
-
-export default function HighlightSquares(_: HighlightSquaresProps) {
+export default function HighlightSquares() {
   const { squareStyle, highlightSquares, kingUnderAttack } = useChess();
 
   return (
@@ -35,7 +32,7 @@ export default function HighlightSquares(_: HighlightSquaresProps) {
       })}
       {kingUnderAttack && (
         <Box
-          bg={squareStyle["king:check"]}
+          bg="#FF0000"
           className={`king square square-${kingUnderAttack.col + 1}${
             8 - kingUnderAttack.row
           }`}

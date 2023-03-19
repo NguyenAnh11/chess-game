@@ -32,7 +32,7 @@ export type MoveMethod = "dc" | "d" | "c";
 
 export type Coordinate = "none" | "inside" | "outside";
 
-export type SquareColor = "green";
+export type SquareColor = "green" | "bases";
 
 export type SquareInfo = Coord & { color: "w" | "b" };
 
@@ -51,10 +51,7 @@ export type SquareStyle = {
     | "over"
     | "highlight"
     | "premove:light"
-    | "premove:dark"
-    | "legal:light"
-    | "legal:dark"
-    | "king:check"]: string;
+    | "premove:dark"]: string;
 };
 
 export type Premove = {

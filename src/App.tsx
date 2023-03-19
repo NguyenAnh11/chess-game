@@ -4,12 +4,13 @@ import ChessProvider from "./contexts/ChessContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Setting } from "./types";
-import BoardSidebar from "./components/Board.Sidebar";
-import BoardMain from "./components/Board.Main";
+import BoardSidebar from "./components/Sidebar";
+import BoardMain from "./components/Main";
+import './index.css';
 
 const App = () => {
   const [setting, setSetting] = useState<Setting>({
-    squareColor: "green",
+    squareColor: "bases",
     coordinate: "inside",
     moveMethod: "dc",
     enablePremove: false,

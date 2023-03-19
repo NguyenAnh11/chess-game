@@ -1,13 +1,11 @@
 import React, { useRef } from "react";
 import { Box, Flex, useOutsideClick } from "@chakra-ui/react";
-import { useChess } from "../contexts/ChessContext";
+import { useChess } from "../../contexts/ChessContext";
 import Squares from "./Squares";
 import HighlightSquares from "./HighlightSquares";
 import HintMoves from "./HintMoves";
 
-type BoardMainProps = {};
-
-export default function BoardMain(_: BoardMainProps) {
+export default function BoardMain() {
   const ref = useRef<HTMLDivElement>(null);
 
   const { onClearLeftClick } = useChess();

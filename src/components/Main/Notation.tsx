@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { CSSProperties, useMemo } from "react";
-import { useChess } from "../contexts/ChessContext";
-import { BLACK_ROWS, COLUMNS, WHITE_ROWS } from "../utils";
+import { useChess } from "../../contexts/ChessContext";
+import { BLACK_ROWS, COLUMNS, WHITE_ROWS } from "../../utils";
 
 type NotationProps = {
   r: number;

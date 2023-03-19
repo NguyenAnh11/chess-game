@@ -1,6 +1,6 @@
 import React, { CSSProperties } from "react";
 import { Box } from "@chakra-ui/react";
-import { useChess } from "../contexts/ChessContext";
+import { useChess } from "../../contexts/ChessContext";
 
 export default function HintSquares() {
   const { hintMoves } = useChess();
@@ -9,7 +9,6 @@ export default function HintSquares() {
     <React.Fragment>
       {hintMoves.map((move, index) => {
         const style: CSSProperties = {};
-
         switch (move.type) {
           case "hint":
             style.padding = "4.2%";

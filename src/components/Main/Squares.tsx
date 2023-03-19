@@ -1,7 +1,7 @@
 import { Box, Wrap, WrapItem } from "@chakra-ui/react";
-import { useChess } from "../contexts/ChessContext";
+import { useChess } from "../../contexts/ChessContext";
 import { Square as Sq } from "chess.js";
-import { COLUMNS } from "../utils";
+import { COLUMNS } from "../../utils";
 import Piece from "./Piece";
 import Square from "./Square";
 
