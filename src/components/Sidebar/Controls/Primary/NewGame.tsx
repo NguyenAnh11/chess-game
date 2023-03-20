@@ -1,11 +1,12 @@
 import { Box, Icon, Button, Tooltip } from "@chakra-ui/react";
-import { IoChevronBack } from "react-icons/io5";
+import { IoAdd } from "react-icons/io5";
+import { useChess } from "../../../../contexts/ChessContext";
 
-export default function MoveBackControl() {
-  const onMoveBack = () => {};
+export default function NewGame() {
+  const { onNewGame } = useChess();
 
   return (
-    <Tooltip placement="top" label="Move Back" openDelay={500}>
+    <Tooltip placement="top" label="New Game" openDelay={500}>
       <Button
         mb="1px"
         px="5"
@@ -16,10 +17,10 @@ export default function MoveBackControl() {
         boxShadow="0 0.1rem 0 0 #bdbcb8, 0 0.7rem 0.95rem 0.05rem transparent"
         fontSize="3xl"
         sx={{ _hover: { bg: "transparent" } }}
-        onClick={onMoveBack}
+        onClick={onNewGame}
       >
         <Box color="#666463" sx={{ _hover: { color: "#504f4f" } }}>
-          <Icon as={IoChevronBack} />
+          <Icon as={IoAdd} />
         </Box>
       </Button>
     </Tooltip>

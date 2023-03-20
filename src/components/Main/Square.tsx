@@ -28,7 +28,6 @@ export default function Square({
 }: SquareProps) {
   const {
     moveMethod,
-    orientation,
     squareStyle,
     lastMove,
     leftClick,
@@ -74,15 +73,9 @@ export default function Square({
       //clear right click
       onClearRightClicks();
 
-      if (
-        lastMove &&
-        leftClick &&
-        lastMove.to === square &&
-        lastMove.color !== orientation
-      ) {
-        setStyle((prev) => ({ ...prev, boxShadow: squareStyle["over"] }));
-        return;
-      }
+      if (!leftClick && !children) return;
+
+      if (!leftClick && lastMove && lastMove.to === square) return;
 
       if (moveMethod === "d") {
         if (!children) return;
@@ -109,10 +102,7 @@ export default function Square({
 
   const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
     if (e.button === 0) {
-      if (
-        moveMethod === "d" ||
-        (lastMove && lastMove.color !== orientation && lastMove.to === square)
-      ) {
+      if (moveMethod === "d") {
         setStyle(initialStyle);
         return;
       }

@@ -6,7 +6,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { Setting } from "./types";
 import BoardSidebar from "./components/Sidebar";
 import BoardMain from "./components/Main";
-import './index.css';
+import "./index.css";
 
 const App = () => {
   const [setting, setSetting] = useState<Setting>({
@@ -20,7 +20,13 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <Flex h="100vh" align="center" justify="center" userSelect="none" bg="black">
+      <Flex
+        h="100vh"
+        bg="black"
+        align="center"
+        justify="center"
+        userSelect="none"
+      >
         <Flex position="relative" h="min-content">
           <ChessProvider orientation="w" {...setting}>
             <Box flex="1">

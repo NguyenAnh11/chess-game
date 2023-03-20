@@ -1,11 +1,12 @@
 import { Box, Button, Icon, Tooltip } from "@chakra-ui/react";
-import { HiLightBulb } from "react-icons/hi";
+import { IoChevronForward } from "react-icons/io5";
+import { useChess } from "../../../../contexts/ChessContext";
 
-export default function ShowHintControl() {
-  const onShowHint = () => {};
+export default function MoveFoward() {
+  const { onMoveFoward } = useChess();
 
   return (
-    <Tooltip placement="top" label="Show Hint" openDelay={500}>
+    <Tooltip placement="top" label="Move Foward" openDelay={500}>
       <Button
         mb="1px"
         px="5"
@@ -16,10 +17,10 @@ export default function ShowHintControl() {
         boxShadow="0 0.1rem 0 0 #bdbcb8, 0 0.7rem 0.95rem 0.05rem transparent"
         fontSize="3xl"
         sx={{ _hover: { bg: "transparent" } }}
-        onClick={onShowHint}
+        onClick={onMoveFoward}
       >
         <Box color="#666463" sx={{ _hover: { color: "#504f4f" } }}>
-          <Icon as={HiLightBulb} />
+          <Icon as={IoChevronForward} />
         </Box>
       </Button>
     </Tooltip>

@@ -1,5 +1,12 @@
-import { Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+import Resign from "./Resign";
+import Setting from "./Setting";
 
 export default function BottomControls(){
-    return <Box></Box>
+    return (
+        <Flex w="full" justify="space-between">
+            <Setting/>
+            <Resign/>
+        </Flex>
+    )
 }

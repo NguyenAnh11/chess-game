@@ -1,12 +1,12 @@
-import { Box, Icon, Button, Tooltip } from "@chakra-ui/react";
-import { IoAdd } from "react-icons/io5";
+import { Box, Button, Icon, Tooltip } from "@chakra-ui/react";
+import { HiLightBulb } from "react-icons/hi";
 import { useChess } from "../../../../contexts/ChessContext";
 
-export default function NewGameControl() {
-  const { onNewGame } = useChess();
+export default function ShowHint() {
+  const { onShowHint } = useChess();
 
   return (
-    <Tooltip placement="top" label="New Game" openDelay={500}>
+    <Tooltip placement="top" label="Show Hint" openDelay={500}>
       <Button
         mb="1px"
         px="5"
@@ -17,10 +17,10 @@ export default function NewGameControl() {
         boxShadow="0 0.1rem 0 0 #bdbcb8, 0 0.7rem 0.95rem 0.05rem transparent"
         fontSize="3xl"
         sx={{ _hover: { bg: "transparent" } }}
-        onClick={onNewGame}
+        onClick={onShowHint}
       >
         <Box color="#666463" sx={{ _hover: { color: "#504f4f" } }}>
-          <Icon as={IoAdd} />
+          <Icon as={HiLightBulb} />
         </Box>
       </Button>
     </Tooltip>

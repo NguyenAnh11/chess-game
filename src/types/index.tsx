@@ -60,31 +60,22 @@ export type Premove = {
   piece: Piece;
 };
 
-export type HighlightSquare = {
+export type CustomSquare = {
   square: Square;
-  type: "left" | "right" | "premove" | "king:check";
   row: number;
   col: number;
+};
+
+export type HighlightSquare = CustomSquare & {
+  type: "left" | "right" | "premove" | "king:check";
   color: "w" | "b";
 };
 
-export type HintMove = {
-  square: Square;
+export type HintMove = CustomSquare & {
   type: "hint" | "capture";
-  row: number;
-  col: number;
 };
 
-export type KingSquare = {
-  square: Square;
-  row: number;
-  col: number;
-};
-
-export type GameStatus = {
-  draw: boolean;
-  over: boolean;
-}
+export type KingSquare = CustomSquare;
 
 export type Setting = {
   squareColor: SquareColor;
