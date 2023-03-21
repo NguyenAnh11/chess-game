@@ -17,14 +17,14 @@ export const WHITE_COLUMNS: { [col: string]: number } = {
 };
 
 export const BLACK_COLUMNS: { [col: string]: number } = {
-  a: 8,
-  b: 7,
-  c: 6,
-  d: 5,
-  e: 4,
-  f: 3,
-  g: 2,
-  h: 1,
+  a: 7,
+  b: 6,
+  c: 5,
+  d: 4,
+  e: 3,
+  f: 2,
+  g: 1,
+  h: 0,
 };
 
 export const COLUMNS = "abcdefgh".split("");

@@ -21,6 +21,7 @@
 
 
 .hint {
+  z-index: 3;
   pointer-events: none;
   box-sizing: border-box;
   border-radius: 50%;

@@ -1,9 +1,9 @@
-import { Flex} from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { useChess } from "../../../../contexts/ChessContext";
 
 export default function Resign() {
+    const { onResign } = useChess();
     return (
-        <Flex align="center">
-
-        </Flex>
+        <Box onClick={onResign}></Box>
     )
 }

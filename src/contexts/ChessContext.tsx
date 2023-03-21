@@ -57,6 +57,7 @@ type ChessContext = {
   onMoveBack: () => void;
   onMoveFoward: () => void;
   onShowHint: () => void;
+  onDownload: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -113,7 +114,6 @@ const ChessProvider = ({
 
     try {
       const move = game.current.move({ from: leftClick!, to: square });
-      console.log(game.current.history({ verbose: true }));
       setMoves((prev) => [...prev, move]);
       setLeftClick(undefined);
     } catch {
@@ -204,6 +204,7 @@ const ChessProvider = ({
   const onMoveBack = () => {
     if (orientation === "w") {
       if (breakIndex === 0 || breakIndex % 2 !== 0) return;
+      setBreakIndex((prev) => prev - 2);
       game.current.undo();
       game.current.undo();
     }
@@ -215,6 +216,10 @@ const ChessProvider = ({
   const onMoveFoward = () => {
     if (orientation === "w") {
       if (breakIndex + 2 > lastestIndex || breakIndex % 2 !== 0) return;
+      const nextMoves = moves.slice(breakIndex, breakIndex + 2);
+      for (const { from, to } of nextMoves) {
+        game.current.move({ from, to });
+      }
       setBreakIndex((prev) => prev + 2);
     }
 
@@ -223,6 +228,8 @@ const ChessProvider = ({
   };
 
   const onShowHint = () => {};
+
+  const onDownload = () => {};
 
   const viewHistory = useMemo(
     (): Move[] => moves.slice(0, breakIndex),
@@ -336,6 +343,7 @@ const ChessProvider = ({
         onMoveBack,
         onMoveFoward,
         onShowHint,
+        onDownload
       }}
     >
       {children}
