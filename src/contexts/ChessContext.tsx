@@ -193,37 +193,56 @@ const ChessProvider = ({
   };
 
   const onResign = () => {
-    setMoves([]);
     setGameOver(true);
   };
 
   const onNewGame = () => {
+    setMoves([]);
+    setBreakIndex(0);
     game.current = new Chess();
+  };
+
+  const undo = (num: number) => {
+    while (num > 0) {
+      game.current.undo();
+      num -= 1;
+    }
   };
 
   const onMoveBack = () => {
     if (orientation === "w") {
-      if (breakIndex === 0 || breakIndex % 2 !== 0) return;
+      if (lastestIndex % 2 !== 0 || breakIndex === 1) return;
       setBreakIndex((prev) => prev - 2);
-      game.current.undo();
-      game.current.undo();
+      undo(2);
     }
 
     if (orientation === "b") {
+      const num = breakIndex === 1 ? 1 : 2;
+      if (lastestIndex % 2 !== 1 || breakIndex - num < 0) return;
+      setBreakIndex((prev) => prev - num);
+      undo(num);
+    }
+  };
+
+  const move = (startIndex: number, endIndex: number) => {
+    const nextMoves = moves.slice(startIndex, endIndex);
+    for (const { from, to } of nextMoves) {
+      game.current.move({ from, to });
     }
   };
 
   const onMoveFoward = () => {
     if (orientation === "w") {
-      if (breakIndex + 2 > lastestIndex || breakIndex % 2 !== 0) return;
-      const nextMoves = moves.slice(breakIndex, breakIndex + 2);
-      for (const { from, to } of nextMoves) {
-        game.current.move({ from, to });
-      }
+      if (lastestIndex % 2 !== 0 || breakIndex === lastestIndex) return;
       setBreakIndex((prev) => prev + 2);
+      move(breakIndex, breakIndex + 2);
     }
 
     if (orientation === "b") {
+      const num = breakIndex === 0 ? 1 : 2;
+      if (lastestIndex % 2 !== 1 || breakIndex + num > lastestIndex) return;
+      setBreakIndex((prev) => prev + num);
+      move(breakIndex, breakIndex + num);
     }
   };
 
@@ -343,7 +362,7 @@ const ChessProvider = ({
         onMoveBack,
         onMoveFoward,
         onShowHint,
-        onDownload
+        onDownload,
       }}
     >
       {children}
