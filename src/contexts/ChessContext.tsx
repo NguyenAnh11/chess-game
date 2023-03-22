@@ -108,7 +108,20 @@ const ChessProvider = ({
 
     try {
       const move = game.current.move({ from: leftClick!, to: square });
-      setMoves((prev) => [...prev, move]);
+
+      let cloneMoves = [...moves];
+      if (orientation === "w") {
+        if (lastestIndex >= 2 && breakIndex !== lastestIndex) {
+          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        }
+      }
+
+      if (orientation === "b") {
+      }
+
+      
+      setMoves([...cloneMoves, move]);
+
       setLeftClick(undefined);
     } catch {
       if (game.current.inCheck()) {
@@ -249,7 +262,7 @@ const ChessProvider = ({
   const onDownload = () => {};
 
   const onSetting = () => {
-    setIsEditSetting(prev => !prev);
+    setIsEditSetting((prev) => !prev);
   };
 
   const viewHistory = useMemo(
@@ -332,7 +345,14 @@ const ChessProvider = ({
 
   useEffect(() => {
     const index = moves.length;
-    if (breakIndex === lastestIndex) setBreakIndex(index);
+    
+    if (breakIndex + 1 === index) {
+      setBreakIndex(index);
+    }
+    
+    if (breakIndex === lastestIndex) {
+      setBreakIndex(index);
+    }
     setLastestIndex(index);
   }, [moves]);
 
@@ -364,7 +384,7 @@ const ChessProvider = ({
         onShowHint,
         onDownload,
         onSetting,
-        isEditSetting
+        isEditSetting,
       }}
     >
       {children}
