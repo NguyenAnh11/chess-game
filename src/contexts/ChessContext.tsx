@@ -209,7 +209,7 @@ const ChessProvider = ({
 
   const onMoveBack = () => {
     if (orientation === "w") {
-      if (lastestIndex % 2 !== 0 || breakIndex === 1) return;
+      if (lastestIndex % 2 !== 0 || breakIndex <= 1) return;
       setBreakIndex((prev) => prev - 2);
       undo(2);
     }
