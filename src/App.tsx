@@ -28,7 +28,7 @@ const App = () => {
         userSelect="none"
       >
         <Flex position="relative" h="min-content">
-          <ChessProvider orientation="w" {...setting}>
+          <ChessProvider orientation="w" setting={setting}>
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>
                 <BoardMain />

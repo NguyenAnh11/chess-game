@@ -13,22 +13,17 @@ import {
   Coordinate,
   HighlightSquare,
   MoveMethod,
-  SquareColor as Sc,
   SquareStyle,
   HintMove,
   KingSquare,
+  Setting,
 } from "../types";
 import { SQUARE_STYLE, convertFen, getCoord, getColor } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
-  squareColor: Sc;
-  coordinate: Coordinate;
+  setting: Setting;
   orientation: BoardOrientation;
-  moveMethod: MoveMethod;
-  enablePremove: boolean;
-  showHintMove: boolean;
-  showHighlightMove: boolean;
 };
 
 type ChessContext = {
@@ -58,6 +53,8 @@ type ChessContext = {
   onMoveFoward: () => void;
   onShowHint: () => void;
   onDownload: () => void;
+  isEditSetting: boolean;
+  onSetting: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -66,13 +63,8 @@ export const useChess = () => useContext(ChessContext);
 
 const ChessProvider = ({
   children,
-  squareColor,
-  coordinate,
   orientation,
-  moveMethod,
-  enablePremove,
-  showHintMove,
-  showHighlightMove,
+  setting,
 }: ChessboardProviderProps) => {
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
@@ -86,11 +78,13 @@ const ChessProvider = ({
   >();
   const [breakIndex, setBreakIndex] = useState(0);
   const [lastestIndex, setLastestIndex] = useState(0);
+  const [isEditSetting, setIsEditSetting] = useState(false);
 
   const turn = useMemo(
     (): "w" | "b" => game.current.turn(),
     [game.current.fen()]
   );
+
   const position = useMemo(
     (): BoardPosition => convertFen(game.current.fen()),
     [game.current.fen()]
@@ -137,7 +131,11 @@ const ChessProvider = ({
         return;
       }
 
-      if (showHintMove && position[square] && position[square]![0] === turn) {
+      if (
+        setting.showHintMove &&
+        position[square] &&
+        position[square]![0] === turn
+      ) {
         setLeftClick(square);
       } else {
         setLeftClick(undefined);
@@ -250,6 +248,10 @@ const ChessProvider = ({
 
   const onDownload = () => {};
 
+  const onSetting = () => {
+    setIsEditSetting(prev => !prev);
+  };
+
   const viewHistory = useMemo(
     (): Move[] => moves.slice(0, breakIndex),
     [moves, breakIndex]
@@ -279,7 +281,7 @@ const ChessProvider = ({
       }
     }
 
-    if (showHighlightMove) {
+    if (setting.showHighlightMove) {
       const leftClicks: Square[] = [];
 
       if (leftClick) leftClicks.push(leftClick);
@@ -300,13 +302,13 @@ const ChessProvider = ({
     }
 
     return squares;
-  }, [leftClick, lastMove, showHighlightMove, rightClicks]);
+  }, [leftClick, lastMove, setting.showHighlightMove, rightClicks]);
 
   const hintMoves = useMemo((): HintMove[] => {
     const hintMoves: HintMove[] = [];
 
     if (
-      showHintMove &&
+      setting.showHintMove &&
       leftClick &&
       position[leftClick] &&
       position[leftClick]![0] === turn
@@ -322,7 +324,7 @@ const ChessProvider = ({
     }
 
     return hintMoves;
-  }, [leftClick, showHintMove]);
+  }, [leftClick, setting.showHintMove]);
 
   useEffect(() => {
     setGameOver(game.current.isCheckmate() || game.current.isGameOver());
@@ -340,11 +342,9 @@ const ChessProvider = ({
         gameOver,
         position,
         turn,
-        enablePremove,
         orientation,
-        moveMethod,
-        coordinate,
-        squareStyle: SQUARE_STYLE[squareColor],
+        ...setting,
+        squareStyle: SQUARE_STYLE[setting.squareColor],
         moves,
         lastMove,
         highlightSquares,
@@ -363,6 +363,8 @@ const ChessProvider = ({
         onMoveFoward,
         onShowHint,
         onDownload,
+        onSetting,
+        isEditSetting
       }}
     >
       {children}
