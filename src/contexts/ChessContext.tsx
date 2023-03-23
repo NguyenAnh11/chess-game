@@ -117,9 +117,11 @@ const ChessProvider = ({
       }
 
       if (orientation === "b") {
+        if (lastestIndex >= 3  && breakIndex !== lastestIndex) {
+          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        }
       }
 
-      
       setMoves([...cloneMoves, move]);
 
       setLeftClick(undefined);
@@ -179,7 +181,22 @@ const ChessProvider = ({
 
     try {
       const move = game.current.move({ from: source, to: target });
-      setMoves((prev) => [...prev, move]);
+
+      let cloneMoves = [...moves];
+      if (orientation === "w") {
+        if (lastestIndex >= 2 && breakIndex !== lastestIndex) {
+          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        }
+      }
+
+      if (orientation === "b") {
+        if (lastestIndex >= 3 && breakIndex !== lastestIndex) {
+          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        }
+      }
+
+      setMoves([...cloneMoves, move]);
+      
     } catch {
       if (game.current.inCheck()) {
         console.log(turn);

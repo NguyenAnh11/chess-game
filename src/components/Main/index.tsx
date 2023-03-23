@@ -4,6 +4,7 @@ import { useChess } from "../../contexts/ChessContext";
 import Squares from "./Squares";
 import HighlightSquares from "./HighlightSquares";
 import HintMoves from "./HintMoves";
+import Arrows from "./Arrows";
 
 export default function BoardMain() {
   const ref = useRef<HTMLDivElement>(null);
@@ -25,6 +26,7 @@ export default function BoardMain() {
           <HighlightSquares />
           <Squares />
           <HintMoves />
+          <Arrows/>
         </Box>
       </Flex>
     </React.Fragment>
