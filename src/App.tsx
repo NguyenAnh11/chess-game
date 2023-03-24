@@ -14,6 +14,7 @@ const App = () => {
     coordinate: "inside",
     moveMethod: "dc",
     enablePremove: false,
+    showArrow: true,
     showHintMove: true,
     showHighlightMove: true,
   });

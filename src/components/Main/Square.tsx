@@ -10,6 +10,7 @@ import { useChess } from "../../contexts/ChessContext";
 import { useDrop } from "react-dnd";
 import { Square as Sq } from "chess.js";
 import Notation from "./Notation";
+import { ArrowColor } from "../../types";
 
 type SquareProps = {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export default function Square({
     leftClick,
     onLeftClickDown,
     onClearLeftClick,
+    onRightClickUp,
     onRightClickDown,
     onClearRightClicks,
     onDropPiece,
@@ -109,6 +111,11 @@ export default function Square({
     }
 
     if (e.button === 2) {
+      let color: ArrowColor = "arrow:default";
+      if (e.ctrlKey) color = "arrow:ctrl";
+      if (e.altKey) color = "arrow:alt";
+      if (e.shiftKey) color = "arrow:shift";
+      onRightClickUp(square, color);
     }
   };
 

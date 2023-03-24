@@ -6,7 +6,15 @@ import {
   WHITE_COLUMNS,
   WHITE_ROWS,
   COLUMNS,
+  BOARD_WIDTH
 } from "./consts";
+
+export function getRelativeCoord(coord: Coord): Coord {
+  const squareWidth = BOARD_WIDTH / 8;
+  const row = coord.row * squareWidth + squareWidth / 2;
+  const col = coord.col * squareWidth + squareWidth / 2;
+  return { row, col }
+}
 
 export function getCoord(square: Square, orientation: BoardOrientation): Coord {
   const rows = orientation === "w" ? WHITE_ROWS : BLACK_ROWS;
@@ -18,6 +26,30 @@ export function getCoord(square: Square, orientation: BoardOrientation): Coord {
 
 export function getColor(row: number, col: number): Color {
   return (row + col) % 2 === 0 ? "w" : "b";
+}
+
+export function getDifferentPosition(
+  current: BoardPosition,
+  next: BoardPosition
+): { added: BoardPosition; removed: BoardPosition } {
+  const difference: { added: BoardPosition; removed: BoardPosition } = {
+    added: {},
+    removed: {},
+  };
+
+  (Object.keys(current) as Array<keyof BoardPosition>).forEach((square) => {
+    if (current[square] !== next[square]) {
+      difference.removed[square] = current[square];
+    }
+  });
+
+  (Object.keys(next) as Array<keyof BoardPosition>).forEach((square) => {
+    if (current[square] !== next[square]) {
+      difference.added[square] = next[square];
+    }
+  });
+
+  return difference;
 }
 
 export function convertFen(fen: string | BoardPosition): BoardPosition {

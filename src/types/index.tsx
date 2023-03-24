@@ -51,7 +51,11 @@ export type SquareStyle = {
     | "over"
     | "highlight"
     | "premove:light"
-    | "premove:dark"]: string;
+    | "premove:dark"
+    | "arrow:shift"
+    | "arrow:alt"
+    | "arrow:ctrl"
+    | "arrow:default" ]: string;
 };
 
 export type Premove = {
@@ -59,6 +63,14 @@ export type Premove = {
   target: Square;
   piece: Piece;
 };
+
+export type ArrowColor = "arrow:shift" | "arrow:alt" | "arrow:ctrl" | "arrow:default"
+
+export type Arrow = {
+  source: Square;
+  target: Square;
+  color: ArrowColor
+}
 
 export type CustomSquare = {
   square: Square;
@@ -82,6 +94,7 @@ export type Setting = {
   coordinate: Coordinate;
   moveMethod: MoveMethod;
   enablePremove: boolean;
+  showArrow: boolean;
   showHintMove: boolean;
   showHighlightMove: boolean;
 };

@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { SquareStyle, SquareColor as Sc, Piece } from "../types";
 
+export const BOARD_WIDTH = 576;
+
 export const WHITE_ROWS = [7, 6, 5, 4, 3, 2, 1, 0];
 
 export const BLACK_ROWS = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -37,6 +39,10 @@ export const SQUARE_STYLE: { [color in Sc]: SquareStyle } = {
     highlight: "#ffff00",
     "premove:dark": "#d46c51",
     "premove:light": "#ec7e6a",
+    "arrow:ctrl": "#ca6c47",
+    "arrow:alt": "#84d2eb",
+    "arrow:shift": "#91ba47",
+    "arrow:default": "#cea31f",
   },
   bases: {
     "default.dark": "#c7703c",
@@ -45,6 +51,10 @@ export const SQUARE_STYLE: { [color in Sc]: SquareStyle } = {
     highlight: "#f0c963",
     "premove:dark": "#e3634b",
     "premove:light": "#ec7761",
+    "arrow:ctrl": "#ca6c47",
+    "arrow:alt": "#84d2eb",
+    "arrow:shift": "#91ba47",
+    "arrow:default": "#cea31f",
   },
 };
 

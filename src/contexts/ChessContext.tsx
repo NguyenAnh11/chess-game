@@ -17,6 +17,8 @@ import {
   HintMove,
   KingSquare,
   Setting,
+  ArrowColor,
+  Arrow,
 } from "../types";
 import { SQUARE_STYLE, convertFen, getCoord, getColor } from "../utils";
 
@@ -36,6 +38,7 @@ type ChessContext = {
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
   moves: Move[];
+  arrows: Arrow[];
   lastMove: Move | undefined;
   highlightSquares: HighlightSquare[];
   hintMoves: HintMove[];
@@ -44,6 +47,7 @@ type ChessContext = {
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
   onDropPiece: (source: Square, target: Square) => void;
+  onRightClickUp: (square: Square, color: ArrowColor) => void;
   onRightClickDown: (square: Square) => void;
   onClearRightClicks: () => void;
   onDragPieceBegin: (square: Square) => void;
@@ -70,7 +74,11 @@ const ChessProvider = ({
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()
   );
+  const [arrows, setArrows] = useState<Arrow[]>([]);
   const [moves, setMoves] = useState<Move[]>([]);
+  const [currentRightClickDown, setCurrentRightClickDown] = useState<
+    Square | undefined
+  >(undefined);
   const [rightClicks, setRightClicks] = useState<Square[]>([]);
   const [leftClick, setLeftClick] = useState<Square | undefined>(undefined);
   const [kingUnderAttack, setKingUnderAttack] = useState<
@@ -117,7 +125,7 @@ const ChessProvider = ({
       }
 
       if (orientation === "b") {
-        if (lastestIndex >= 3  && breakIndex !== lastestIndex) {
+        if (lastestIndex >= 3 && breakIndex !== lastestIndex) {
           cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
         }
       }
@@ -160,12 +168,55 @@ const ChessProvider = ({
 
   const onClearRightClicks = () => setRightClicks([]);
 
-  const onRightClickDown = (square: Square) => {
-    if (rightClicks.some((p) => p === square)) {
-      setRightClicks((prev) => prev.filter((p) => p !== square));
-    } else {
+  const addToRightClicks = (square: Square) => {
+    if (!rightClicks.some((p) => p === square)) {
       setRightClicks((prev) => [...prev, square]);
+    } else {
+      setRightClicks((prev) => prev.filter((p) => p !== square));
     }
+  };
+
+  const onRightClickUp = (square: Square, color: ArrowColor) => {
+    if (!setting.showArrow) {
+      addToRightClicks(square);
+    }
+
+    if (setting.showArrow) {
+      if (currentRightClickDown === square) {
+        addToRightClicks(square);
+      } else {
+        let index = -1;
+        for (let i = 0; i < arrows.length; i++) {
+          if (
+            arrows[i].source === currentRightClickDown &&
+            arrows[i].target === square
+          ) {
+            index = i;
+            break;
+          }
+        }
+
+        const arrow: Arrow = {
+          source: currentRightClickDown!,
+          target: square,
+          color,
+        };
+
+        if (index !== -1 && arrows[index].color !== color) {
+          setArrows((prev) => prev.splice(index, 1, arrow));
+        }
+
+        if (index === -1) {
+          setArrows((prev) => [...prev, arrow]);
+        }
+      }
+    }
+
+    setCurrentRightClickDown(undefined);
+  };
+
+  const onRightClickDown = (square: Square) => {
+    setCurrentRightClickDown(square);
   };
 
   const onDragPieceBegin = (square: Square) => {
@@ -196,7 +247,6 @@ const ChessProvider = ({
       }
 
       setMoves([...cloneMoves, move]);
-      
     } catch {
       if (game.current.inCheck()) {
         console.log(turn);
@@ -362,11 +412,11 @@ const ChessProvider = ({
 
   useEffect(() => {
     const index = moves.length;
-    
+
     if (breakIndex + 1 === index) {
       setBreakIndex(index);
     }
-    
+
     if (breakIndex === lastestIndex) {
       setBreakIndex(index);
     }
@@ -383,6 +433,7 @@ const ChessProvider = ({
         ...setting,
         squareStyle: SQUARE_STYLE[setting.squareColor],
         moves,
+        arrows,
         lastMove,
         highlightSquares,
         hintMoves,
@@ -391,6 +442,7 @@ const ChessProvider = ({
         onLeftClickDown,
         onClearLeftClick,
         onDropPiece,
+        onRightClickUp,
         onRightClickDown,
         onClearRightClicks,
         onDragPieceBegin,
