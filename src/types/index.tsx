@@ -34,7 +34,7 @@ export type Coordinate = "none" | "inside" | "outside";
 
 export type SquareColor = "green" | "bases";
 
-export type SquareInfo = Coord & { color: "w" | "b" };
+export type PieceColor =  "neo"
 
 export type SquareStatus =
   | "default"
@@ -57,6 +57,8 @@ export type SquareStyle = {
     | "arrow:ctrl"
     | "arrow:default" ]: string;
 };
+
+export type PieceStyle = { [p in Piece]: string }
 
 export type Premove = {
   source: Square;
@@ -90,6 +92,7 @@ export type HintMove = CustomSquare & {
 export type KingSquare = CustomSquare;
 
 export type Setting = {
+  pieceColor: PieceColor;
   squareColor: SquareColor;
   coordinate: Coordinate;
   moveMethod: MoveMethod;

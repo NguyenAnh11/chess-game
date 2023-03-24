@@ -37,7 +37,7 @@ export default function Arrows() {
               >
                 <polygon
                   points="0 0, 2 1.25, 0 2.5"
-                  style={{ fill: squareStyle[arrow.color] }}
+                  style={{ fill: squareStyle[arrow.color], opacity: 0.8 }}
                 />
               </marker>
             </defs>

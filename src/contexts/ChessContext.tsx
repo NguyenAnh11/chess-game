@@ -19,8 +19,9 @@ import {
   Setting,
   ArrowColor,
   Arrow,
+  PieceStyle,
 } from "../types";
-import { SQUARE_STYLE, convertFen, getCoord, getColor } from "../utils";
+import { SQUARE_STYLE, convertFen, getCoord, getColor, PIECE_STYLE } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
@@ -37,9 +38,11 @@ type ChessContext = {
   coordinate: Coordinate;
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
+  pieceStyle: PieceStyle;
   moves: Move[];
   arrows: Arrow[];
   lastMove: Move | undefined;
+  viewHistory: Move[];
   highlightSquares: HighlightSquare[];
   hintMoves: HintMove[];
   leftClick: Square | undefined;
@@ -59,6 +62,7 @@ type ChessContext = {
   onDownload: () => void;
   isEditSetting: boolean;
   onSetting: () => void;
+  onClearArrows: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -97,6 +101,8 @@ const ChessProvider = ({
     (): BoardPosition => convertFen(game.current.fen()),
     [game.current.fen()]
   );
+
+  const onClearArrows = () => setArrows([]);
 
   const onClearLeftClick = () => setLeftClick(undefined);
 
@@ -432,9 +438,11 @@ const ChessProvider = ({
         orientation,
         ...setting,
         squareStyle: SQUARE_STYLE[setting.squareColor],
+        pieceStyle: PIECE_STYLE[setting.pieceColor],
         moves,
         arrows,
         lastMove,
+        viewHistory,
         highlightSquares,
         hintMoves,
         leftClick,
@@ -454,6 +462,7 @@ const ChessProvider = ({
         onDownload,
         onSetting,
         isEditSetting,
+        onClearArrows
       }}
     >
       {children}

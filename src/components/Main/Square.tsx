@@ -37,6 +37,7 @@ export default function Square({
     onRightClickUp,
     onRightClickDown,
     onClearRightClicks,
+    onClearArrows,
     onDropPiece,
   } = useChess();
 
@@ -74,6 +75,8 @@ export default function Square({
     if (e.button === 0) {
       //clear right click
       onClearRightClicks();
+
+      onClearArrows();
 
       if (!leftClick && !children) return;
 
