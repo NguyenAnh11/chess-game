@@ -34,7 +34,7 @@ export type Coordinate = "none" | "inside" | "outside";
 
 export type SquareColor = "green" | "bases";
 
-export type PieceColor =  "neo"
+export type PieceColor =  "neo" | "wood" | "neo_wood"
 
 export type SquareStatus =
   | "default"
