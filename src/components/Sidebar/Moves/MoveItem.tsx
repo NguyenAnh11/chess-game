@@ -5,11 +5,12 @@ import { useChess } from "../../../contexts/ChessContext";
 import { Piece } from "../../../types";
 
 type MoveItemProps = {
+  index: number;
   move: Move;
 };
 
-export default function MoveItem({ move }: MoveItemProps) {
-  const { lastMove, pieceStyle } = useChess();
+export default function MoveItem({ move, index }: MoveItemProps) {
+  const { lastMove, pieceStyle, onStep } = useChess();
 
   const className = useMemo((): string => {
     let name = "node ";
@@ -21,9 +22,11 @@ export default function MoveItem({ move }: MoveItemProps) {
   const piece = (move.color + move.piece.toUpperCase()) as Piece;
 
   return move.piece === "p" ? (
-    <Box className={className}>{move.san}</Box>
+    <Box className={className} onClick={() => onStep(index)}>
+      {move.san}
+    </Box>
   ) : (
-    <Box className={className}>
+    <Box className={className} onClick={() => onStep(index)}>
       <Image className="icon-font-chess" src={pieceStyle[piece]} />
       {move.san}
     </Box>

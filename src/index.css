@@ -323,7 +323,6 @@
   border-color: rgba(0, 0, 0, 0.05);
   border-radius: 2px;
   color: #262421;
-  cursor: pointer;
 }
 
 .move .node:not(.selected) {
@@ -337,7 +336,7 @@
 }
 
 .move .node .icon-font-chess {
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
   margin-right: 1.5px;
 }

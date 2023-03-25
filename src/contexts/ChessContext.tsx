@@ -21,7 +21,13 @@ import {
   Arrow,
   PieceStyle,
 } from "../types";
-import { SQUARE_STYLE, convertFen, getCoord, getColor, PIECE_STYLE } from "../utils";
+import {
+  SQUARE_STYLE,
+  convertFen,
+  getCoord,
+  getColor,
+  PIECE_STYLE,
+} from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
@@ -42,7 +48,6 @@ type ChessContext = {
   moves: Move[];
   arrows: Arrow[];
   lastMove: Move | undefined;
-  viewHistory: Move[];
   highlightSquares: HighlightSquare[];
   hintMoves: HintMove[];
   leftClick: Square | undefined;
@@ -63,6 +68,7 @@ type ChessContext = {
   isEditSetting: boolean;
   onSetting: () => void;
   onClearArrows: () => void;
+  onStep: (index: number) => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -149,7 +155,7 @@ const ChessProvider = ({
             )
           )[0];
 
-        if (king && !kingUnderAttack) {
+        if (king && !kingUnderAttack && position[leftClick]![0] === turn) {
           setKingUnderAttack({
             square: king.square,
             ...getCoord(king.square, orientation),
@@ -255,7 +261,6 @@ const ChessProvider = ({
       setMoves([...cloneMoves, move]);
     } catch {
       if (game.current.inCheck()) {
-        console.log(turn);
         const king = game.current
           .board()
           .flatMap((rows) =>
@@ -264,7 +269,7 @@ const ChessProvider = ({
             )
           )[0];
 
-        if (king && !kingUnderAttack) {
+        if (king && !kingUnderAttack && position[source]![0] === turn) {
           setKingUnderAttack({
             square: king.square,
             ...getCoord(king.square, orientation),
@@ -294,17 +299,29 @@ const ChessProvider = ({
   };
 
   const onMoveBack = () => {
-    if (orientation === "w") {
-      if (lastestIndex % 2 !== 0 || breakIndex <= 1) return;
-      setBreakIndex((prev) => prev - 2);
-      undo(2);
+    if (orientation === "w" && lastestIndex % 2 === 0) {
+      if (breakIndex % 2 === 0 && breakIndex > 0) {
+        setBreakIndex((prev) => prev - 2);
+        undo(2);
+      }
+
+      if (breakIndex % 2 === 1 && breakIndex >= 1) {
+        setBreakIndex((prev) => prev - 1);
+        undo(1);
+      }
     }
 
-    if (orientation === "b") {
+    if (orientation === "b" && lastestIndex % 2 === 1) {
       const num = breakIndex === 1 ? 1 : 2;
-      if (lastestIndex % 2 !== 1 || breakIndex - num < 0) return;
-      setBreakIndex((prev) => prev - num);
-      undo(num);
+      if (breakIndex % 2 === 1 && breakIndex - num >= 0) {
+        setBreakIndex((prev) => prev - num);
+        undo(num);
+      }
+
+      if (breakIndex % 2 === 0) {
+        setBreakIndex((prev) => prev - 1);
+        undo(1);
+      }
     }
   };
 
@@ -316,17 +333,29 @@ const ChessProvider = ({
   };
 
   const onMoveFoward = () => {
-    if (orientation === "w") {
-      if (lastestIndex % 2 !== 0 || breakIndex === lastestIndex) return;
-      setBreakIndex((prev) => prev + 2);
-      move(breakIndex, breakIndex + 2);
+    if (orientation === "w" && lastestIndex % 2 === 0) {
+      if (breakIndex % 2 === 0 && breakIndex < lastestIndex) {
+        setBreakIndex((prev) => prev + 2);
+        move(breakIndex, breakIndex + 2);
+      }
+
+      if (breakIndex % 2 === 1 && breakIndex < lastestIndex) {
+        setBreakIndex((prev) => prev + 1);
+        move(breakIndex, breakIndex + 1);
+      }
     }
 
-    if (orientation === "b") {
+    if (orientation === "b" && lastestIndex % 2 === 1) {
       const num = breakIndex === 0 ? 1 : 2;
-      if (lastestIndex % 2 !== 1 || breakIndex + num > lastestIndex) return;
-      setBreakIndex((prev) => prev + num);
-      move(breakIndex, breakIndex + num);
+      if (breakIndex % 2 === 1 && breakIndex + num <= lastestIndex) {
+        setBreakIndex((prev) => prev + num);
+        move(breakIndex, breakIndex + num);
+      }
+
+      if (breakIndex % 2 === 0 && breakIndex < lastestIndex) {
+        setBreakIndex((prev) => prev + 1);
+        move(breakIndex, breakIndex + 1);
+      }
     }
   };
 
@@ -334,21 +363,35 @@ const ChessProvider = ({
 
   const onDownload = () => {};
 
+  const onStep = (index: number) => {
+    if (orientation === "w" && lastestIndex % 2 !== 0) 
+      return;
+
+    if (orientation === "b" && lastestIndex % 2 !== 1) 
+      return;
+
+    setBreakIndex(index + 1);
+    const actualIndex = index + 1;
+    if (actualIndex < breakIndex) {
+      undo(breakIndex - actualIndex);
+    } else {
+      move(breakIndex, actualIndex);
+    }
+  };
+
   const onSetting = () => {
     setIsEditSetting((prev) => !prev);
   };
 
-  const viewHistory = useMemo(
+  const viewSteps = useMemo(
     (): Move[] => moves.slice(0, breakIndex),
     [moves, breakIndex]
   );
 
   const lastMove = useMemo(
     (): Move | undefined =>
-      viewHistory.length === 0
-        ? undefined
-        : viewHistory[viewHistory.length - 1],
-    [viewHistory]
+      viewSteps.length === 0 ? undefined : viewSteps[viewSteps.length - 1],
+    [viewSteps]
   );
 
   const highlightSquares = useMemo((): HighlightSquare[] => {
@@ -426,6 +469,7 @@ const ChessProvider = ({
     if (breakIndex === lastestIndex) {
       setBreakIndex(index);
     }
+
     setLastestIndex(index);
   }, [moves]);
 
@@ -442,7 +486,6 @@ const ChessProvider = ({
         moves,
         arrows,
         lastMove,
-        viewHistory,
         highlightSquares,
         hintMoves,
         leftClick,
@@ -462,7 +505,8 @@ const ChessProvider = ({
         onDownload,
         onSetting,
         isEditSetting,
-        onClearArrows
+        onClearArrows,
+        onStep,
       }}
     >
       {children}
