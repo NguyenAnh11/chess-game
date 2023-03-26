@@ -6,6 +6,8 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import {
   BoardOrientation,
@@ -31,8 +33,9 @@ import {
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
-  setting: Setting;
   orientation: BoardOrientation;
+  setting: Setting;
+  onSetting: Dispatch<SetStateAction<Setting>>
 };
 
 type ChessContext = {
@@ -65,10 +68,11 @@ type ChessContext = {
   onMoveFoward: () => void;
   onShowHint: () => void;
   onDownload: () => void;
-  isEditSetting: boolean;
-  onSetting: () => void;
   onClearArrows: () => void;
   onStep: (index: number) => void;
+  isEditSetting: boolean;
+  onOpenEditSetting: () => void;
+  onSetting: Dispatch<SetStateAction<Setting>>
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -79,6 +83,7 @@ const ChessProvider = ({
   children,
   orientation,
   setting,
+  onSetting
 }: ChessboardProviderProps) => {
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
@@ -379,7 +384,7 @@ const ChessProvider = ({
     }
   };
 
-  const onSetting = () => {
+  const onOpenEditSetting = () => {
     setIsEditSetting((prev) => !prev);
   };
 
@@ -503,10 +508,11 @@ const ChessProvider = ({
         onMoveFoward,
         onShowHint,
         onDownload,
-        onSetting,
-        isEditSetting,
         onClearArrows,
         onStep,
+        isEditSetting,
+        onOpenEditSetting,
+        onSetting
       }}
     >
       {children}
