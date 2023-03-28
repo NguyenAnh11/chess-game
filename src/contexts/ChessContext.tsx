@@ -54,7 +54,6 @@ type ChessContext = {
   hintMoves: HintMove[];
   leftClick: Square | undefined;
   breakIndex: number;
-  lastestIndex: number;
   kingUnderAttack: KingSquare | undefined;
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
@@ -102,7 +101,6 @@ const ChessProvider = ({
     KingSquare | undefined
   >();
   const [breakIndex, setBreakIndex] = useState(0);
-  const [lastestIndex, setLastestIndex] = useState(0);
   const [isEditSetting, setIsEditSetting] = useState(false);
 
   const turn = useMemo(
@@ -126,17 +124,16 @@ const ChessProvider = ({
     onErrorEnd?: () => void
   ) => {
     try {
-      debugger;
       const move = game.current.move({ from, to });
 
       let cloneMoves = [...moves];
       if (orientation === "w") {
-        if (lastestIndex >= 2 && breakIndex !== lastestIndex) {
-          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        if (moves.length >= 2 && breakIndex !== moves.length) {
+          cloneMoves.splice(breakIndex, moves.length - breakIndex);
         }
       } else {
-        if (lastestIndex >= 3 && breakIndex !== lastestIndex) {
-          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        if (moves.length >= 3 && breakIndex !== moves.length) {
+          cloneMoves.splice(breakIndex, moves.length - breakIndex);
         }
       }
 
@@ -286,7 +283,7 @@ const ChessProvider = ({
   };
 
   const onMoveBack = () => {
-    if (orientation === "w" && lastestIndex % 2 === 0) {
+    if (orientation === "w" && moves.length % 2 === 0) {
       if (breakIndex % 2 === 0 && breakIndex > 0) {
         setBreakIndex((prev) => prev - 2);
         undo(2);
@@ -298,7 +295,7 @@ const ChessProvider = ({
       }
     }
 
-    if (orientation === "b" && lastestIndex % 2 === 1) {
+    if (orientation === "b" && moves.length % 2 === 1) {
       const num = breakIndex === 1 ? 1 : 2;
       if (breakIndex % 2 === 1 && breakIndex - num >= 0) {
         setBreakIndex((prev) => prev - num);
@@ -320,26 +317,26 @@ const ChessProvider = ({
   };
 
   const onMoveFoward = () => {
-    if (orientation === "w" && lastestIndex % 2 === 0) {
-      if (breakIndex % 2 === 0 && breakIndex < lastestIndex) {
+    if (orientation === "w" && moves.length % 2 === 0) {
+      if (breakIndex % 2 === 0 && breakIndex < moves.length) {
         setBreakIndex((prev) => prev + 2);
         move(breakIndex, breakIndex + 2);
       }
 
-      if (breakIndex % 2 === 1 && breakIndex < lastestIndex) {
+      if (breakIndex % 2 === 1 && breakIndex < moves.length) {
         setBreakIndex((prev) => prev + 1);
         move(breakIndex, breakIndex + 1);
       }
     }
 
-    if (orientation === "b" && lastestIndex % 2 === 1) {
+    if (orientation === "b" && moves.length % 2 === 1) {
       const num = breakIndex === 0 ? 1 : 2;
-      if (breakIndex % 2 === 1 && breakIndex + num <= lastestIndex) {
+      if (breakIndex % 2 === 1 && breakIndex + num <= moves.length) {
         setBreakIndex((prev) => prev + num);
         move(breakIndex, breakIndex + num);
       }
 
-      if (breakIndex % 2 === 0 && breakIndex < lastestIndex) {
+      if (breakIndex % 2 === 0 && breakIndex < moves.length) {
         setBreakIndex((prev) => prev + 1);
         move(breakIndex, breakIndex + 1);
       }
@@ -351,9 +348,9 @@ const ChessProvider = ({
   const onDownload = () => {};
 
   const onStep = (index: number) => {
-    if (orientation === "w" && lastestIndex % 2 !== 0) return;
+    if (orientation === "w" && moves.length % 2 !== 0) return;
 
-    if (orientation === "b" && lastestIndex % 2 !== 1) return;
+    if (orientation === "b" && moves.length % 2 !== 1) return;
 
     setBreakIndex(index + 1);
     const actualIndex = index + 1;
@@ -451,11 +448,9 @@ const ChessProvider = ({
       setBreakIndex(index);
     }
 
-    if (breakIndex === lastestIndex) {
+    if (breakIndex === moves.length) {
       setBreakIndex(index);
     }
-
-    setLastestIndex(index);
   }, [moves]);
 
   return (
@@ -474,7 +469,6 @@ const ChessProvider = ({
         highlightSquares,
         hintMoves,
         leftClick,
-        lastestIndex,
         breakIndex,
         kingUnderAttack,
         onLeftClickDown,

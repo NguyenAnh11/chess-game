@@ -35,7 +35,6 @@ export default function Square({
     lastMove,
     leftClick,
     breakIndex,
-    lastestIndex,
     onLeftClickDown,
     onClearLeftClick,
     onRightClickUp,
@@ -57,7 +56,7 @@ export default function Square({
         isOver: monitor.isOver(),
       }),
     }),
-    [moves, lastestIndex, breakIndex]
+    [moves, breakIndex]
   );
 
   const initialStyle = useMemo(
