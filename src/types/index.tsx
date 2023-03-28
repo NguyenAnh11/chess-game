@@ -34,7 +34,7 @@ export type Coordinate = "none" | "inside" | "outside";
 
 export type SquareColor = "green" | "bases";
 
-export type PieceColor =  "neo" | "wood" | "neo_wood"
+export type PieceColor = "neo" | "wood" | "neo_wood";
 
 export type SquareStatus =
   | "default"
@@ -55,10 +55,10 @@ export type SquareStyle = {
     | "arrow:shift"
     | "arrow:alt"
     | "arrow:ctrl"
-    | "arrow:default" ]: string;
+    | "arrow:default"]: string;
 };
 
-export type PieceStyle = { [p in Piece]: string }
+export type PieceImages = { [p in Piece]: string };
 
 export type Premove = {
   source: Square;
@@ -66,13 +66,17 @@ export type Premove = {
   piece: Piece;
 };
 
-export type ArrowColor = "arrow:shift" | "arrow:alt" | "arrow:ctrl" | "arrow:default"
+export type ArrowColor =
+  | "arrow:shift"
+  | "arrow:alt"
+  | "arrow:ctrl"
+  | "arrow:default";
 
 export type Arrow = {
   source: Square;
   target: Square;
-  color: ArrowColor
-}
+  color: ArrowColor;
+};
 
 export type CustomSquare = {
   square: Square;
@@ -96,6 +100,7 @@ export type Setting = {
   squareColor: SquareColor;
   coordinate: Coordinate;
   moveMethod: MoveMethod;
+  playSound: boolean;
   enablePremove: boolean;
   showArrow: boolean;
   showHintMove: boolean;

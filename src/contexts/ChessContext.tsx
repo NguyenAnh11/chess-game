@@ -21,39 +21,40 @@ import {
   Setting,
   ArrowColor,
   Arrow,
-  PieceStyle,
+  PieceImages,
 } from "../types";
 import {
   SQUARE_STYLE,
   convertFen,
   getCoord,
   getColor,
-  PIECE_STYLE,
+  PIECE_COLOR_IMAGES,
 } from "../utils";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
   orientation: BoardOrientation;
   setting: Setting;
-  onSetting: Dispatch<SetStateAction<Setting>>
+  onSetting: Dispatch<SetStateAction<Setting>>;
 };
 
 type ChessContext = {
   gameOver: boolean;
   position: BoardPosition;
   turn: string;
-  enablePremove: boolean;
   orientation: "w" | "b";
   coordinate: Coordinate;
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
-  pieceStyle: PieceStyle;
+  pieceImages: PieceImages;
   moves: Move[];
   arrows: Arrow[];
   lastMove: Move | undefined;
   highlightSquares: HighlightSquare[];
   hintMoves: HintMove[];
   leftClick: Square | undefined;
+  breakIndex: number;
+  lastestIndex: number;
   kingUnderAttack: KingSquare | undefined;
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
@@ -71,8 +72,8 @@ type ChessContext = {
   onClearArrows: () => void;
   onStep: (index: number) => void;
   isEditSetting: boolean;
-  onOpenEditSetting: () => void;
-  onSetting: Dispatch<SetStateAction<Setting>>
+  onEditSetting: (open: boolean) => void;
+  onSetting: Dispatch<SetStateAction<Setting>>;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -83,12 +84,13 @@ const ChessProvider = ({
   children,
   orientation,
   setting,
-  onSetting
+  onSetting,
 }: ChessboardProviderProps) => {
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()
   );
+
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [moves, setMoves] = useState<Move[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
@@ -117,6 +119,57 @@ const ChessProvider = ({
 
   const onClearLeftClick = () => setLeftClick(undefined);
 
+  const onUpdatePosition = (
+    from: Square,
+    to: Square,
+    onMoveEnd?: () => void,
+    onErrorEnd?: () => void
+  ) => {
+    try {
+      debugger;
+      const move = game.current.move({ from, to });
+
+      let cloneMoves = [...moves];
+      if (orientation === "w") {
+        if (lastestIndex >= 2 && breakIndex !== lastestIndex) {
+          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        }
+      } else {
+        if (lastestIndex >= 3 && breakIndex !== lastestIndex) {
+          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
+        }
+      }
+
+      setMoves([...cloneMoves, move]);
+
+      setLeftClick(undefined);
+
+      if (onMoveEnd) onMoveEnd();
+    } catch {
+      if (game.current.inCheck()) {
+        const king = game.current
+          .board()
+          .flatMap((rows) =>
+            rows.filter(
+              (col) => col !== null && col.type === "k" && col.color === turn
+            )
+          )[0];
+
+        if (king && !kingUnderAttack && position[from]![0] === turn) {
+          setKingUnderAttack({
+            square: king.square,
+            ...getCoord(king.square, orientation),
+          });
+        }
+
+        setLeftClick(undefined);
+        return;
+      }
+
+      if (onErrorEnd) onErrorEnd();
+    }
+  };
+
   const onLeftClickDown = (square: Square) => {
     if (game.current.isGameOver() || game.current.isDraw()) return;
 
@@ -131,46 +184,7 @@ const ChessProvider = ({
       return;
     }
 
-    try {
-      const move = game.current.move({ from: leftClick!, to: square });
-
-      let cloneMoves = [...moves];
-      if (orientation === "w") {
-        if (lastestIndex >= 2 && breakIndex !== lastestIndex) {
-          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
-        }
-      }
-
-      if (orientation === "b") {
-        if (lastestIndex >= 3 && breakIndex !== lastestIndex) {
-          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
-        }
-      }
-
-      setMoves([...cloneMoves, move]);
-
-      setLeftClick(undefined);
-    } catch {
-      if (game.current.inCheck()) {
-        const king = game.current
-          .board()
-          .flatMap((rows) =>
-            rows.filter(
-              (col) => col !== null && col.type === "k" && col.color === turn
-            )
-          )[0];
-
-        if (king && !kingUnderAttack && position[leftClick]![0] === turn) {
-          setKingUnderAttack({
-            square: king.square,
-            ...getCoord(king.square, orientation),
-          });
-        }
-
-        setLeftClick(undefined);
-        return;
-      }
-
+    onUpdatePosition(leftClick!, square, undefined, () => {
       if (
         setting.showHintMove &&
         position[square] &&
@@ -180,7 +194,7 @@ const ChessProvider = ({
       } else {
         setLeftClick(undefined);
       }
-    }
+    });
   };
 
   const onClearRightClicks = () => setRightClicks([]);
@@ -237,53 +251,21 @@ const ChessProvider = ({
   };
 
   const onDragPieceBegin = (square: Square) => {
-    if (leftClick) return;
+    if (game.current.isGameOver() || game.current.isCheckmate() || leftClick)
+      return;
+
     setLeftClick(square);
   };
 
   const onDropPiece = (source: Square, target: Square) => {
+    if (setting.moveMethod === "c") return;
+
     if (source === target) {
       setLeftClick(undefined);
       return;
     }
 
-    try {
-      const move = game.current.move({ from: source, to: target });
-
-      let cloneMoves = [...moves];
-      if (orientation === "w") {
-        if (lastestIndex >= 2 && breakIndex !== lastestIndex) {
-          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
-        }
-      }
-
-      if (orientation === "b") {
-        if (lastestIndex >= 3 && breakIndex !== lastestIndex) {
-          cloneMoves.splice(breakIndex, lastestIndex - breakIndex);
-        }
-      }
-
-      setMoves([...cloneMoves, move]);
-    } catch {
-      if (game.current.inCheck()) {
-        const king = game.current
-          .board()
-          .flatMap((rows) =>
-            rows.filter(
-              (col) => col !== null && col.type === "k" && col.color === turn
-            )
-          )[0];
-
-        if (king && !kingUnderAttack && position[source]![0] === turn) {
-          setKingUnderAttack({
-            square: king.square,
-            ...getCoord(king.square, orientation),
-          });
-        }
-      }
-    } finally {
-      setLeftClick(undefined);
-    }
+    onUpdatePosition(source, target);
   };
 
   const onResign = () => {
@@ -369,11 +351,9 @@ const ChessProvider = ({
   const onDownload = () => {};
 
   const onStep = (index: number) => {
-    if (orientation === "w" && lastestIndex % 2 !== 0) 
-      return;
+    if (orientation === "w" && lastestIndex % 2 !== 0) return;
 
-    if (orientation === "b" && lastestIndex % 2 !== 1) 
-      return;
+    if (orientation === "b" && lastestIndex % 2 !== 1) return;
 
     setBreakIndex(index + 1);
     const actualIndex = index + 1;
@@ -384,8 +364,8 @@ const ChessProvider = ({
     }
   };
 
-  const onOpenEditSetting = () => {
-    setIsEditSetting((prev) => !prev);
+  const onEditSetting = (open: boolean) => {
+    setIsEditSetting(open);
   };
 
   const viewSteps = useMemo(
@@ -462,7 +442,7 @@ const ChessProvider = ({
 
   useEffect(() => {
     setGameOver(game.current.isCheckmate() || game.current.isGameOver());
-  }, [game]);
+  }, [game.current.isCheckmate(), game.current.isGameOver()]);
 
   useEffect(() => {
     const index = moves.length;
@@ -487,13 +467,15 @@ const ChessProvider = ({
         orientation,
         ...setting,
         squareStyle: SQUARE_STYLE[setting.squareColor],
-        pieceStyle: PIECE_STYLE[setting.pieceColor],
+        pieceImages: PIECE_COLOR_IMAGES[setting.pieceColor],
         moves,
         arrows,
         lastMove,
         highlightSquares,
         hintMoves,
         leftClick,
+        lastestIndex,
+        breakIndex,
         kingUnderAttack,
         onLeftClickDown,
         onClearLeftClick,
@@ -511,8 +493,8 @@ const ChessProvider = ({
         onClearArrows,
         onStep,
         isEditSetting,
-        onOpenEditSetting,
-        onSetting
+        onEditSetting,
+        onSetting,
       }}
     >
       {children}

@@ -1,5 +1,5 @@
-import { Box, Image } from "@chakra-ui/react";
-import { CSSProperties, useMemo } from "react";
+import { Image } from "@chakra-ui/react";
+import { CSSProperties, useEffect, useState } from "react";
 import { useDrag } from "react-dnd";
 import { useChess } from "../../contexts/ChessContext";
 import { Square } from "chess.js";
@@ -11,7 +11,13 @@ type PieceProps = {
 };
 
 export default function Piece({ piece, square }: PieceProps) {
-  const { moveMethod, onDragPieceBegin, pieceStyle } = useChess();
+  const { pieceImages, moveMethod, onDragPieceBegin } = useChess();
+
+  const [pieceStyle, setPieceStyle] = useState<CSSProperties>({
+    zIndex: 5,
+    opacity: 1,
+    cursor: moveMethod === "c" ? "default" : "-webkit-grab",
+  });
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -30,17 +36,9 @@ export default function Piece({ piece, square }: PieceProps) {
     []
   );
 
-  const style = useMemo(
-    (): CSSProperties => ({
-      opacity: isDragging ? 0 : 1,
-      cursor: moveMethod === "c" ? "default" : "grab",
-    }),
-    [moveMethod, isDragging]
-  );
+  useEffect(() => {
+    setPieceStyle((prev) => ({ ...prev, opacity: isDragging ? 0 : 1 }));
+  }, [isDragging]);
 
-  return (
-    <Box ref={drag} w="full" h="full" zIndex="5" style={style}>
-      <Image src={pieceStyle[piece]}/>
-    </Box>
-  );
+  return <Image ref={drag} style={pieceStyle} src={pieceImages[piece]} />;
 }

@@ -1,5 +1,9 @@
-import { ReactNode } from "react";
-import { SquareStyle, SquareColor as Sc, Piece, PieceColor,  } from "../types";
+import {
+  SquareStyle,
+  SquareColor as Sc,
+  Piece,
+  PieceColor,
+} from "../types";
 
 export const BOARD_WIDTH = 576;
 
@@ -58,47 +62,47 @@ export const SQUARE_STYLE: { [color in Sc]: SquareStyle } = {
   },
 };
 
-export const PIECE_STYLE : { [pc in PieceColor]: { [p in Piece]: string }}  = {
+export const PIECE_COLOR_IMAGES: { [pc in PieceColor]: { [p in Piece]: string } } = {
   neo: {
-    "bB": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bb.png",
-    "bK": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bk.png",
-    "bN": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bn.png",
-    "bP": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bp.png",
-    "bQ": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bq.png",
-    "bR": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/br.png",
-    "wB": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wb.png",
-    "wK": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wk.png",
-    "wN": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wn.png",
-    "wP": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wp.png",
-    "wQ": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wq.png",
-    "wR": import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wr.png",
+    bB: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bb.png",
+    bK: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bk.png",
+    bN: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bn.png",
+    bP: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bp.png",
+    bQ: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bq.png",
+    bR: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/br.png",
+    wB: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wb.png",
+    wK: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wk.png",
+    wN: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wn.png",
+    wP: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wp.png",
+    wQ: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wq.png",
+    wR: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/wr.png",
   },
-  "neo_wood": {
-    "bB": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bb.png",
-    "bK": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bk.png",
-    "bN": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bn.png",
-    "bP": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bp.png",
-    "bQ": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bq.png",
-    "bR": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/br.png",
-    "wB": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wb.png",
-    "wK": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wk.png",
-    "wN": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wn.png",
-    "wP": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wp.png",
-    "wQ": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wq.png",
-    "wR": import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wr.png",
+  neo_wood: {
+    bB: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bb.png",
+    bK: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bk.png",
+    bN: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bn.png",
+    bP: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bp.png",
+    bQ: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/bq.png",
+    bR: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/br.png",
+    wB: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wb.png",
+    wK: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wk.png",
+    wN: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wn.png",
+    wP: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wp.png",
+    wQ: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wq.png",
+    wR: import.meta.env.VITE_IMAGE_PIECES_URL + "neo_wood/150/wr.png",
   },
-  "wood": {
-    "bB": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bb.png",
-    "bK": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bk.png",
-    "bN": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bn.png",
-    "bP": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bp.png",
-    "bQ": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bq.png",
-    "bR": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/br.png",
-    "wB": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wb.png",
-    "wK": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wk.png",
-    "wN": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wn.png",
-    "wP": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wp.png",
-    "wQ": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wq.png",
-    "wR": import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wr.png",
+  wood: {
+    bB: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bb.png",
+    bK: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bk.png",
+    bN: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bn.png",
+    bP: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bp.png",
+    bQ: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/bq.png",
+    bR: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/br.png",
+    wB: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wb.png",
+    wK: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wk.png",
+    wN: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wn.png",
+    wP: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wp.png",
+    wQ: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wq.png",
+    wR: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wr.png",
   },
-}
+};

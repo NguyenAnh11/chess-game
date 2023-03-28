@@ -10,7 +10,7 @@ type MoveItemProps = {
 };
 
 export default function MoveItem({ move, index }: MoveItemProps) {
-  const { lastMove, pieceStyle, onStep } = useChess();
+  const { lastMove, pieceImages: pieceStyle, onStep } = useChess();
 
   const boxClass = classNames(
     "node",

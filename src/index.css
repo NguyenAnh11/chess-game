@@ -4,17 +4,17 @@
   left: 0;
   width: 72px;
   height: 72px;
-  touch-action: "none";
+  z-index: 1;
 }
 
 .highlight {
-  z-index: 1;
+  z-index: 3;
   opacity: 0.5;
   pointer-events: none;
 }
 
 .king {
-  z-index: 1;
+  z-index: 3;
   opacity: 0.5;
   pointer-events: none;
 }

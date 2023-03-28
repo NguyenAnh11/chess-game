@@ -3,7 +3,13 @@ import { useChess } from "../../../../contexts/ChessContext";
 import SmallControl from "../Bases/SmallControl";
 
 export default function Setting() {
-  const { onSetting } = useChess();
+  const { onEditSetting } = useChess();
 
-  return <SmallControl label="Setting" icon={FiSettings} onClick={onSetting} />;
+  return (
+    <SmallControl
+      label="Setting"
+      icon={FiSettings}
+      onClick={() => onEditSetting(true)}
+    />
+  );
 }

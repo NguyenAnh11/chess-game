@@ -1,19 +1,25 @@
 import { Color, Square } from "chess.js";
-import { BoardPosition, Piece, BoardOrientation, Coord } from "../types";
+import {
+  BoardPosition,
+  Piece,
+  BoardOrientation,
+  BoardPositionDifference,
+  Coord,
+} from "../types";
 import {
   BLACK_COLUMNS,
   BLACK_ROWS,
   WHITE_COLUMNS,
   WHITE_ROWS,
   COLUMNS,
-  BOARD_WIDTH
+  BOARD_WIDTH,
 } from "./consts";
 
 export function getRelativeCoord(coord: Coord): Coord {
   const squareWidth = BOARD_WIDTH / 8;
   const row = coord.row * squareWidth + squareWidth / 2;
   const col = coord.col * squareWidth + squareWidth / 2;
-  return { row, col }
+  return { row, col };
 }
 
 export function getCoord(square: Square, orientation: BoardOrientation): Coord {
@@ -28,23 +34,23 @@ export function getColor(row: number, col: number): Color {
   return (row + col) % 2 === 0 ? "w" : "b";
 }
 
-export function getDifferentPosition(
+export function getPositionDifference(
   current: BoardPosition,
   next: BoardPosition
-): { added: BoardPosition; removed: BoardPosition } {
-  const difference: { added: BoardPosition; removed: BoardPosition } = {
+): BoardPositionDifference {
+  const difference: BoardPositionDifference = {
     added: {},
     removed: {},
   };
 
   (Object.keys(current) as Array<keyof BoardPosition>).forEach((square) => {
-    if (current[square] !== next[square]) {
+    if (current[square] && current[square] !== next[square]) {
       difference.removed[square] = current[square];
     }
   });
 
   (Object.keys(next) as Array<keyof BoardPosition>).forEach((square) => {
-    if (current[square] !== next[square]) {
+    if (next[square] && next[square] !== current[square]) {
       difference.added[square] = next[square];
     }
   });

@@ -4,8 +4,9 @@ import React, {
   MouseEvent,
   useState,
   useMemo,
+  useRef,
 } from "react";
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { useChess } from "../../contexts/ChessContext";
 import { useDrop } from "react-dnd";
 import { Square as Sq } from "chess.js";
@@ -28,10 +29,13 @@ export default function Square({
   squareColor,
 }: SquareProps) {
   const {
+    moves,
     moveMethod,
     squareStyle,
     lastMove,
     leftClick,
+    breakIndex,
+    lastestIndex,
     onLeftClickDown,
     onClearLeftClick,
     onRightClickUp,
@@ -53,7 +57,7 @@ export default function Square({
         isOver: monitor.isOver(),
       }),
     }),
-    []
+    [moves, lastestIndex, breakIndex]
   );
 
   const initialStyle = useMemo(
@@ -134,7 +138,6 @@ export default function Square({
       }}
     >
       <Flex
-        position="relative"
         w="full"
         h="full"
         align="center"

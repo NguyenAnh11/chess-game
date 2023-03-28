@@ -14,6 +14,8 @@ const App = () => {
     squareColor: "green",
     coordinate: "inside",
     moveMethod: "dc",
+    animation: "slow",
+    playSound: true,
     enablePremove: false,
     showArrow: true,
     showHintMove: true,
@@ -30,7 +32,11 @@ const App = () => {
         userSelect="none"
       >
         <Flex position="relative" h="min-content">
-          <ChessProvider orientation="w" setting={setting} onSetting={setSetting}>
+          <ChessProvider
+            orientation="w"
+            setting={setting}
+            onSetting={setSetting}
+          >
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>
                 <BoardMain />
