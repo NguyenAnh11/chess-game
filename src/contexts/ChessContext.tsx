@@ -6,19 +6,15 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  Dispatch,
-  SetStateAction,
 } from "react";
 import {
   BoardOrientation,
   BoardPosition,
-  Coordinate,
   HighlightSquare,
   MoveMethod,
   SquareStyle,
   HintMove,
   KingSquare,
-  Setting,
   ArrowColor,
   Arrow,
   PieceImages,
@@ -26,24 +22,22 @@ import {
 import {
   SQUARE_STYLE,
   convertFen,
-  getCoord,
+  getPosition,
   getColor,
   PIECE_COLOR_IMAGES,
 } from "../utils";
+import { useSetting } from "./SettingContext";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
   orientation: BoardOrientation;
-  setting: Setting;
-  onSetting: Dispatch<SetStateAction<Setting>>;
 };
 
 type ChessContext = {
   gameOver: boolean;
   position: BoardPosition;
   turn: string;
-  orientation: "w" | "b";
-  coordinate: Coordinate;
+  orientation: BoardOrientation;
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
   pieceImages: PieceImages;
@@ -70,21 +64,14 @@ type ChessContext = {
   onDownload: () => void;
   onClearArrows: () => void;
   onStep: (index: number) => void;
-  isEditSetting: boolean;
-  onEditSetting: (open: boolean) => void;
-  onSetting: Dispatch<SetStateAction<Setting>>;
 };
 
 export const ChessContext = createContext({} as ChessContext);
 
 export const useChess = () => useContext(ChessContext);
 
-const ChessProvider = ({
-  children,
-  orientation,
-  setting,
-  onSetting,
-}: ChessboardProviderProps) => {
+const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
+  const { setting } = useSetting();
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()
@@ -101,7 +88,6 @@ const ChessProvider = ({
     KingSquare | undefined
   >();
   const [breakIndex, setBreakIndex] = useState(0);
-  const [isEditSetting, setIsEditSetting] = useState(false);
 
   const turn = useMemo(
     (): "w" | "b" => game.current.turn(),
@@ -155,7 +141,7 @@ const ChessProvider = ({
         if (king && !kingUnderAttack && position[from]![0] === turn) {
           setKingUnderAttack({
             square: king.square,
-            ...getCoord(king.square, orientation),
+            ...getPosition(king.square, orientation),
           });
         }
 
@@ -183,7 +169,7 @@ const ChessProvider = ({
 
     onUpdatePosition(leftClick!, square, undefined, () => {
       if (
-        setting.showHintMove &&
+        setting.board.showHintMove &&
         position[square] &&
         position[square]![0] === turn
       ) {
@@ -205,11 +191,11 @@ const ChessProvider = ({
   };
 
   const onRightClickUp = (square: Square, color: ArrowColor) => {
-    if (!setting.showArrow) {
+    if (!setting.board.showArrow) {
       addToRightClicks(square);
     }
 
-    if (setting.showArrow) {
+    if (setting.board.showArrow) {
       if (currentRightClickDown === square) {
         addToRightClicks(square);
       } else {
@@ -255,7 +241,7 @@ const ChessProvider = ({
   };
 
   const onDropPiece = (source: Square, target: Square) => {
-    if (setting.moveMethod === "c") return;
+    if (setting.board.moveMethod === "c") return;
 
     if (source === target) {
       setLeftClick(undefined);
@@ -361,10 +347,6 @@ const ChessProvider = ({
     }
   };
 
-  const onEditSetting = (open: boolean) => {
-    setIsEditSetting(open);
-  };
-
   const viewSteps = useMemo(
     (): Move[] => moves.slice(0, breakIndex),
     [moves, breakIndex]
@@ -381,7 +363,7 @@ const ChessProvider = ({
 
     if (rightClicks.length > 0) {
       for (const right of rightClicks) {
-        const { row, col } = getCoord(right, orientation);
+        const { row, col } = getPosition(right, orientation);
         squares.push({
           square: right,
           type: "right",
@@ -392,7 +374,7 @@ const ChessProvider = ({
       }
     }
 
-    if (setting.showHighlightMove) {
+    if (setting.board.highlightMove) {
       const leftClicks: Square[] = [];
 
       if (leftClick) leftClicks.push(leftClick);
@@ -400,7 +382,7 @@ const ChessProvider = ({
 
       for (const left of leftClicks) {
         if (!rightClicks.includes(left)) {
-          const { row, col } = getCoord(left, orientation);
+          const { row, col } = getPosition(left, orientation);
           squares.push({
             square: left,
             type: "left",
@@ -413,13 +395,13 @@ const ChessProvider = ({
     }
 
     return squares;
-  }, [leftClick, lastMove, setting.showHighlightMove, rightClicks]);
+  }, [leftClick, lastMove, setting.board.highlightMove, rightClicks]);
 
   const hintMoves = useMemo((): HintMove[] => {
     const hintMoves: HintMove[] = [];
 
     if (
-      setting.showHintMove &&
+      setting.board.showHintMove &&
       leftClick &&
       position[leftClick] &&
       position[leftClick]![0] === turn
@@ -429,13 +411,13 @@ const ChessProvider = ({
         hintMoves.push({
           square: to,
           type: !position[to] ? "hint" : "capture",
-          ...getCoord(to, orientation),
+          ...getPosition(to, orientation),
         });
       }
     }
 
     return hintMoves;
-  }, [leftClick, setting.showHintMove]);
+  }, [leftClick, setting.board.showHintMove]);
 
   useEffect(() => {
     setGameOver(game.current.isCheckmate() || game.current.isGameOver());
@@ -460,9 +442,9 @@ const ChessProvider = ({
         position,
         turn,
         orientation,
-        ...setting,
-        squareStyle: SQUARE_STYLE[setting.squareColor],
-        pieceImages: PIECE_COLOR_IMAGES[setting.pieceColor],
+        moveMethod: setting.board.moveMethod,
+        squareStyle: SQUARE_STYLE[setting.board.squareColor],
+        pieceImages: PIECE_COLOR_IMAGES[setting.board.pieceColor],
         moves,
         arrows,
         lastMove,
@@ -486,9 +468,6 @@ const ChessProvider = ({
         onDownload,
         onClearArrows,
         onStep,
-        isEditSetting,
-        onEditSetting,
-        onSetting,
       }}
     >
       {children}

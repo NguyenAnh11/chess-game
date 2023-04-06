@@ -1,27 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Flex, Box } from "@chakra-ui/react";
+import SettingProvider from "./contexts/SettingContext";
 import ChessProvider from "./contexts/ChessContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Setting } from "./types";
 import BoardSidebar from "./components/Sidebar";
 import BoardMain from "./components/Main";
+import GameSetting from "./components/Setting/";
 import "./index.css";
 
 const App = () => {
-  const [setting, setSetting] = useState<Setting>({
-    pieceColor: "neo",
-    squareColor: "green",
-    coordinate: "inside",
-    moveMethod: "dc",
-    animation: "slow",
-    playSound: true,
-    enablePremove: false,
-    showArrow: true,
-    showHintMove: true,
-    showHighlightMove: true,
-  });
-
   return (
     <React.Fragment>
       <Flex
@@ -32,20 +20,19 @@ const App = () => {
         userSelect="none"
       >
         <Flex position="relative" h="min-content">
-          <ChessProvider
-            orientation="w"
-            setting={setting}
-            onSetting={setSetting}
-          >
-            <Box flex="1">
-              <DndProvider backend={HTML5Backend}>
-                <BoardMain />
-              </DndProvider>
-            </Box>
-            <Box flex="1">
-              <BoardSidebar />
-            </Box>
-          </ChessProvider>
+          <SettingProvider mode="Multiplayer">
+            <ChessProvider orientation="w">
+              <Box flex="1">
+                <DndProvider backend={HTML5Backend}>
+                  <BoardMain />
+                  <GameSetting />
+                </DndProvider>
+              </Box>
+              <Box flex="1">
+                <BoardSidebar />
+              </Box>
+            </ChessProvider>
+          </SettingProvider>
         </Flex>
       </Flex>
     </React.Fragment>

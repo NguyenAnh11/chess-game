@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { Box, Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { useChess } from "../../contexts/ChessContext";
 import { useDrop } from "react-dnd";
 import { Square as Sq } from "chess.js";
@@ -19,6 +19,7 @@ type SquareProps = {
   col: number;
   square: Sq;
   squareColor: "w" | "b";
+  onSetRect: (sq: Sq, rect: DOMRect) => void;
 };
 
 export default function Square({
@@ -27,6 +28,7 @@ export default function Square({
   col,
   square,
   squareColor,
+  onSetRect,
 }: SquareProps) {
   const {
     moves,
@@ -45,6 +47,8 @@ export default function Square({
   } = useChess();
 
   const [style, setStyle] = useState<CSSProperties>();
+
+  const squareRef = useRef<HTMLDivElement>(null);
 
   const [{ isOver }, drop] = useDrop(
     () => ({
@@ -67,12 +71,19 @@ export default function Square({
           : squareStyle["default.light"],
       boxShadow: isOver ? squareStyle["over"] : "none",
     }),
-    [isOver]
+    [isOver, squareStyle]
   );
 
   useEffect(() => {
     setStyle(initialStyle);
-  }, [isOver]);
+  }, [isOver, squareStyle]);
+
+  useEffect(() => {
+    if (squareRef.current) {
+      const rect = squareRef.current.getBoundingClientRect();
+      onSetRect(square, rect);
+    }
+  }, [squareRef.current]);
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if (e.button === 0) {
@@ -136,12 +147,7 @@ export default function Square({
         e.preventDefault();
       }}
     >
-      <Flex
-        w="full"
-        h="full"
-        align="center"
-        justify="center"
-      >
+      <Flex ref={squareRef} w="full" h="full" align="center" justify="center">
         {children}
       </Flex>
       <Notation r={row} c={col} isBlack={squareColor === "b"} />

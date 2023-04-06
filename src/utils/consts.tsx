@@ -1,8 +1,10 @@
 import {
   SquareStyle,
   SquareColor as Sc,
-  Piece,
   PieceColor,
+  PieceImages,
+  Animation,
+  BoardPosition,
 } from "../types";
 
 export const BOARD_WIDTH = 576;
@@ -62,7 +64,9 @@ export const SQUARE_STYLE: { [color in Sc]: SquareStyle } = {
   },
 };
 
-export const PIECE_COLOR_IMAGES: { [pc in PieceColor]: { [p in Piece]: string } } = {
+export const PIECE_COLOR_IMAGES: {
+  [pc in PieceColor]: PieceImages;
+} = {
   neo: {
     bB: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bb.png",
     bK: import.meta.env.VITE_IMAGE_PIECES_URL + "neo/150/bk.png",
@@ -106,3 +110,45 @@ export const PIECE_COLOR_IMAGES: { [pc in PieceColor]: { [p in Piece]: string } 
     wR: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wr.png",
   },
 };
+
+export const ANIMATIONS: { [a in Animation]: number } = {
+  none: 0,
+  slow: 500,
+  medium: 300,
+  fast: 200,
+};
+
+export const INITIAL_BOARD_POSITION: BoardPosition = {
+  a8: "bR",
+  b8: "bN",
+  c8: "bB",
+  d8: "bQ",
+  e8: "bK",
+  f8: "bB",
+  g8: "bN",
+  h8: "bR",
+  a7: "bP",
+  b7: "bP",
+  c7: "bP",
+  d7: "bP",
+  e7: "bP",
+  f7: "bP",
+  g7: "bP",
+  h7: "bP",
+  a2: "wP",
+  b2: "wP",
+  c2: "wP",
+  d2: "wP",
+  e2: "wP",
+  f2: "wP",
+  g2: "wP",
+  h2: "wP",
+  a1: "wR",
+  b1: "wN",
+  c1: "wB",
+  d1: "wQ",
+  e1: "wK",
+  f1: "wB",
+  g1: "wN",
+  h1: "wR",
+}

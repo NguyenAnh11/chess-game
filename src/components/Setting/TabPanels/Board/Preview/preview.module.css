@@ -1,0 +1,16 @@
+.preview {
+    position: relative;
+    width: full;
+    max-height: 145px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    aspect-ratio: 16/5;
+}
+
+.preview_content {
+    position: relative;
+    width: 480px;
+    height: 0;
+    padding-bottom: 100%;
+    background-size: 100% 100%;
+}

@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { Box, Grid } from "@chakra-ui/react";
 import { useChess } from "../../contexts/ChessContext";
 import { Square as Sq } from "chess.js";
@@ -8,6 +8,12 @@ import Square from "./Square";
 
 export default function Squares() {
   const { orientation, position } = useChess();
+
+  const [rects, setRects] = useState<{ [sq in Sq]?: DOMRect }>({});
+
+  const onSetRect = (sq: Sq, rect: DOMRect) => {
+    setRects((prev) => ({ ...prev, [sq]: rect }));
+  };
 
   const _render = (): ReactElement[] => {
     const squares: ReactElement[] = [];
@@ -26,9 +32,14 @@ export default function Squares() {
             col={col}
             square={square}
             squareColor={squareColor}
+            onSetRect={onSetRect}
           >
             {position[square] && (
-              <Piece piece={position[square]!} square={square} />
+              <Piece
+                piece={position[square]!}
+                square={square}
+                rect={rects[square]}
+              />
             )}
           </Square>
         );

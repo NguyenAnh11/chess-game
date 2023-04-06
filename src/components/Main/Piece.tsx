@@ -8,6 +8,7 @@ import { Piece as Pc } from "../../types";
 type PieceProps = {
   piece: Pc;
   square: Square;
+  rect: DOMRect | undefined;
 };
 
 export default function Piece({ piece, square }: PieceProps) {

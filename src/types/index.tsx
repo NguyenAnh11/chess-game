@@ -1,4 +1,6 @@
 import { Square } from "chess.js";
+import { ReactNode } from "react";
+import { IconType } from "react-icons/lib";
 
 export type Piece =
   | "bN"
@@ -16,14 +18,9 @@ export type Piece =
 
 export type BoardPosition = { [sq in Square]?: Piece };
 
-export type Coord = {
+export type Position = {
   row: number;
   col: number;
-};
-
-export type Dimession = {
-  width: number;
-  height: number;
 };
 
 export type BoardOrientation = "w" | "b";
@@ -34,15 +31,7 @@ export type Coordinate = "none" | "inside" | "outside";
 
 export type SquareColor = "green" | "bases";
 
-export type PieceColor = "neo" | "wood" | "neo_wood";
-
-export type SquareStatus =
-  | "default"
-  | "over"
-  | "highlight"
-  | "premove"
-  | "legal"
-  | "check";
+export type Animation = "none" | "slow" | "medium" | "fast";
 
 export type SquareStyle = {
   [prop in
@@ -57,6 +46,8 @@ export type SquareStyle = {
     | "arrow:ctrl"
     | "arrow:default"]: string;
 };
+
+export type PieceColor = "neo" | "wood" | "neo_wood";
 
 export type PieceImages = { [p in Piece]: string };
 
@@ -95,14 +86,100 @@ export type HintMove = CustomSquare & {
 
 export type KingSquare = CustomSquare;
 
-export type Setting = {
+export type Mode = "AI" | "Multiplayer";
+
+export type TabContent = {
+  icon: IconType;
+  label: string;
+  component: ReactNode;
+}
+
+export type BaseSetting = {};
+
+export type BoardSetting = BaseSetting & {
   pieceColor: PieceColor;
   squareColor: SquareColor;
-  coordinate: Coordinate;
   moveMethod: MoveMethod;
-  playSound: boolean;
-  enablePremove: boolean;
-  showArrow: boolean;
-  showHintMove: boolean;
-  showHighlightMove: boolean;
+  animation: Animation;
+  playSound: number;
+  showArrow: number;
+  showHintMove: number;
+  highlightMove: number;
 };
+
+export type PlaySetting = BaseSetting & {
+  enablePremove: number;
+};
+
+export type Setting = {
+  board: BoardSetting;
+  play: PlaySetting;
+};
+
+export type SettingProps<T extends BaseSetting> = {
+  setting: T;
+  onChange: (key: keyof T, value: ControlValue) => void;
+};
+
+export type ControlValue = string | number;
+
+export type ControlProps<T> = {
+  name: keyof T;
+  label: string;
+  value: ControlValue;
+  onChange: (name: keyof T, value: ControlValue) => void;
+};
+
+export type ControlSelectProps<T> = ControlProps<T> & {
+  options: Option<ControlValue>[];
+};
+
+export type Option<T extends ControlValue> = {
+  label: string;
+  value: T;
+};
+
+export class FieldControl<T> {
+  name: keyof T;
+  label: string;
+  value: ControlValue;
+  onChange: (name: keyof T, value: ControlValue) => void;
+
+  constructor(
+    name: keyof T,
+    label: string,
+    value: ControlValue,
+    onChange: (name: keyof T, value: ControlValue) => void
+  ) {
+    this.name = name;
+    this.label = label;
+    this.value = value;
+    this.onChange = onChange;
+  }
+}
+
+export class FieldSelectControl<T> extends FieldControl<T> {
+  options: Option<ControlValue>[];
+
+  constructor(
+    name: keyof T,
+    label: string,
+    value: ControlValue,
+    onChange: (name: keyof T, value: ControlValue) => void,
+    options: Option<ControlValue>[]
+  ) {
+    super(name, label, value, onChange);
+    this.options = options;
+  }
+}
+
+export class FieldSwitchControl<T> extends FieldControl<T> {
+  constructor(
+    name: keyof T,
+    label: string,
+    value: ControlValue,
+    onChange: (name: keyof T, value: ControlValue) => void
+  ) {
+    super(name, label, value, onChange);
+  }
+}

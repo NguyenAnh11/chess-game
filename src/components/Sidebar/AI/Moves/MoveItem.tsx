@@ -1,8 +1,8 @@
 import { Box, Image } from "@chakra-ui/react";
 import classNames from "classnames";
 import { Move } from "chess.js";
-import { useChess } from "../../../contexts/ChessContext";
-import { Piece } from "../../../types";
+import { useChess } from "../../../../contexts/ChessContext";
+import { Piece } from "../../../../types";
 
 type MoveItemProps = {
   index: number;
