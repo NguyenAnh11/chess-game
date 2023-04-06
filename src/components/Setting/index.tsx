@@ -7,12 +7,12 @@ import Button from "../Common/Button";
 import { TabList } from "../Common/Tab";
 import BoardPanel from "./TabPanels/Board";
 import PlayPanel from "./TabPanels/Play";
-import { isDifference } from "../../utils";
+import { isEqual } from "lodash";
 
 export default function GameSetting() {
   const { setting, onSetting, isOpenEditSetting, onOpenEditSetting } =
     useSetting();
-    
+
   const [tabIndex, setTabIndex] = useState(0);
   const [data, setData] = useState<Setting>(setting);
 
@@ -63,7 +63,7 @@ export default function GameSetting() {
   };
 
   const isDisabledSaveBtn = useMemo(
-    (): boolean => isDifference(data, setting),
+    (): boolean => isEqual(data, setting),
     [data, setting]
   );
 

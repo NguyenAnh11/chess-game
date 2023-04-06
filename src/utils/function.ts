@@ -88,9 +88,3 @@ function toPiece(piece: string): Piece {
 function toColumn(index: number): string {
   return COLUMNS[index];
 }
-
-export function isDifference<T>(obj1: T, obj2: T) :boolean {
-  
-
-  return false
-}
