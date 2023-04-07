@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { Move } from "chess.js";
 import { useChess } from "../../../../contexts/ChessContext";
 import { Piece } from "../../../../types";
+import css from "./move.module.css";
 
 type MoveItemProps = {
   index: number;
@@ -12,11 +13,11 @@ type MoveItemProps = {
 export default function MoveItem({ move, index }: MoveItemProps) {
   const { lastMove, pieceImages: pieceStyle, onStep } = useChess();
 
-  const boxClass = classNames(
-    "node",
-    { white: move.color === "w", black: move.color !== "w" },
-    { selected: move === lastMove }
-  );
+  const boxClass = classNames(css.node, {
+    [css.white]: move.color === "w",
+    [css.black]: move.color !== "w",
+    [css.selected]: move === lastMove,
+  });
 
   const piece = (move.color + move.piece.toUpperCase()) as Piece;
 
@@ -26,7 +27,9 @@ export default function MoveItem({ move, index }: MoveItemProps) {
     </Box>
   ) : (
     <Box className={boxClass} onClick={() => onStep(index)}>
-      <Image className="icon-font-chess" src={pieceStyle[piece]} />
+      <Box w="4" h="4" mr="0.5">
+        <Image src={pieceStyle[piece]} />
+      </Box>
       {move.san}
     </Box>
   );

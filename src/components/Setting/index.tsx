@@ -10,7 +10,7 @@ import PlayPanel from "./TabPanels/Play";
 import { isEqual } from "lodash";
 
 export default function GameSetting() {
-  const { setting, onSetting, isOpenEditSetting, onOpenEditSetting } =
+  const { mode, setting, onSetting, isOpenEditSetting, onOpenEditSetting } =
     useSetting();
 
   const [tabIndex, setTabIndex] = useState(0);
@@ -72,10 +72,18 @@ export default function GameSetting() {
       isOpen={isOpenEditSetting}
       onClose={() => onOpenEditSetting(false)}
       content={
-        <>
-          <TabList tabIndex={tabIndex} tabs={tabs} onChangeTab={onChangeTab} />
-          {tabs[tabIndex].component}
-        </>
+        mode === "AI" ? (
+          tabs[tabIndex].component
+        ) : (
+          <>
+            <TabList
+              tabIndex={tabIndex}
+              tabs={tabs}
+              onChangeTab={onChangeTab}
+            />
+            {tabs[tabIndex].component}
+          </>
+        )
       }
       footer={
         <>

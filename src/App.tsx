@@ -20,7 +20,7 @@ const App = () => {
         userSelect="none"
       >
         <Flex position="relative" h="min-content">
-          <SettingProvider mode="Multiplayer">
+          <SettingProvider mode="AI">
             <ChessProvider orientation="w">
               <Box flex="1">
                 <DndProvider backend={HTML5Backend}>
