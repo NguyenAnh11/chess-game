@@ -47,7 +47,7 @@ export type SquareStyle = {
     | "arrow:default"]: string;
 };
 
-export type PieceColor = "neo" | "wood" | "neo_wood";
+export type PieceColor = "neo" | "wood" | "neo_wood" | "book";
 
 export type PieceImages = { [p in Piece]: string };
 

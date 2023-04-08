@@ -109,6 +109,20 @@ export const PIECE_COLOR_IMAGES: {
     wQ: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wq.png",
     wR: import.meta.env.VITE_IMAGE_PIECES_URL + "wood/150/wr.png",
   },
+  book: {
+    bB: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/bb.png",
+    bK: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/bk.png",
+    bN: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/bn.png",
+    bP: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/bp.png",
+    bQ: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/bq.png",
+    bR: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/br.png",
+    wB: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wb.png",
+    wK: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wk.png",
+    wN: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wn.png",
+    wP: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wp.png",
+    wQ: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wq.png",
+    wR: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wr.png",
+  }
 };
 
 export const ANIMATIONS: { [a in Animation]: number } = {

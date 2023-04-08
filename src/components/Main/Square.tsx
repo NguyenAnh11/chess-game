@@ -102,7 +102,7 @@ export default function Square({
           ...prev,
           opacity: 0.5,
           boxShadow: squareStyle["over"],
-          backgroundColor: squareStyle["highlight"],
+          background: squareStyle["highlight"],
         }));
         return;
       }

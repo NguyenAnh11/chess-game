@@ -20,6 +20,7 @@ export const getFieldControls = ({
         { label: "Neo", value: "neo" },
         { label: "Wood", value: "wood" },
         { label: "Neo Wood", value: "neo_wood" },
+        { label: "Book", value: "book" }
       ]
     ),
     new FieldSelectControl<BoardSetting>(

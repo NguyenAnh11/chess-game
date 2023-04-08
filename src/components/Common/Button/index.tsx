@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 import css from "./button.module.css";
 import cn from "classnames";
 
@@ -11,22 +11,24 @@ type ButtonProps = {
   onClick: () => void;
 };
 
-export default function Button({
-  label,
-  disabled,
-  variant,
-  size = "md",
-  children,
-  onClick,
-}: ButtonProps) {
-  return (
-    <button
-      aria-label={label}
-      disabled={disabled}
-      className={cn(css[size], variant && css[variant], disabled && css["disabled"] )}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  );
-}
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ label, disabled, size = "md", variant, onClick, children }, ref) => {
+    return (
+      <button
+        ref={ref}
+        aria-label={label}
+        disabled={disabled}
+        className={cn(
+          css[size],
+          variant && css[variant],
+          disabled && css["disabled"]
+        )}
+        onClick={onClick}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+export default Button;
