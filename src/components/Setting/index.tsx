@@ -55,11 +55,15 @@ export default function GameSetting() {
     [data]
   );
 
-  const onCancel = () => onOpenEditSetting(false);
+  const onCancel = () => {
+    onOpenEditSetting(false);
+    setTabIndex(0);
+  }
 
   const onSave = () => {
     onSetting(data);
     onOpenEditSetting(false);
+    setTabIndex(0);
   };
 
   const isDisabledSaveBtn = useMemo(

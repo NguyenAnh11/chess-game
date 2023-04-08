@@ -18,6 +18,16 @@ export type Piece =
 
 export type BoardPosition = { [sq in Square]?: Piece };
 
+export type BoardIndex = {
+  break: number;
+  step: number;
+};
+
+export type BoardDifference = {
+  added: BoardPosition;
+  removed: BoardPosition;
+};
+
 export type Position = {
   row: number;
   col: number;
@@ -92,7 +102,7 @@ export type TabContent = {
   icon: IconType;
   label: string;
   component: ReactNode;
-}
+};
 
 export type BaseSetting = {};
 
@@ -109,6 +119,10 @@ export type BoardSetting = BaseSetting & {
 
 export type PlaySetting = BaseSetting & {
   enablePremove: number;
+  alwaysPromoteToQueen: number;
+  showTimestamps: number;
+  confirmResignDraw: number;
+
 };
 
 export type Setting = {

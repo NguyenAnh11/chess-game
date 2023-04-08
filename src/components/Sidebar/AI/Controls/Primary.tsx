@@ -5,7 +5,102 @@ import { IoChevronBack, IoChevronForward, IoAdd } from "react-icons/io5";
 import { useChess } from "../../../../contexts/ChessContext";
 
 export default function PrimaryControls() {
-  const { onNewGame, onMoveBack, onMoveFoward, onShowHint } = useChess();
+  const {
+    orientation,
+    moves,
+    boardIndex,
+    onNewGame,
+    onShowHint,
+    setBoardIndex,
+    undo,
+    move,
+  } = useChess();
+
+  const onMoveBack = () => {
+    if (orientation === "w") {
+      if (boardIndex.step !== boardIndex.break) {
+        if (boardIndex.step > 0) {
+          const num = boardIndex.step % 2 === 0 ? 2 : 1;
+          setBoardIndex((pre) => ({ ...pre, step: pre.step - num }));
+          undo(num);
+        }
+      }
+
+      if (
+        boardIndex.step === boardIndex.break &&
+        moves.length % 2 === 0 &&
+        boardIndex.break > 0
+      ) {
+        setBoardIndex((pre) => ({ break: pre.break - 2, step: pre.step - 2 }));
+        undo(2);
+      }
+    }
+
+    if (orientation === "b") {
+      if (
+        boardIndex.step === boardIndex.break &&
+        moves.length % 2 === 1 &&
+        boardIndex.break > 0
+      ) {
+        const num = boardIndex.break === 1 ? 1 : 2;
+        setBoardIndex((pre) => ({
+          break: pre.break - num,
+          step: pre.step - num,
+        }));
+        undo(num);
+      }
+
+      if (boardIndex.step !== boardIndex.break) {
+        if (boardIndex.step > 0) {
+          const num =
+            boardIndex.step > 1 ? (boardIndex.step % 2 === 1 ? 2 : 1) : 1;
+          setBoardIndex((pre) => ({ ...pre, step: pre.step - num }));
+          undo(num);
+        }
+      }
+    }
+  };
+
+  const onMoveFoward = () => {
+    if (orientation === "w") {
+      if (
+        boardIndex.step === boardIndex.break &&
+        moves.length % 2 === 0 &&
+        boardIndex.break < moves.length
+      ) {
+        setBoardIndex((pre) => ({ break: pre.break + 2, step: pre.step + 2 }));
+        move(boardIndex.break, boardIndex.break + 2);
+      }
+
+      if (boardIndex.step !== boardIndex.break) {
+        const num = boardIndex.step % 2 === 0 ? 2 : 1;
+        setBoardIndex((pre) => ({ ...pre, step: pre.step + num }));
+        move(boardIndex.step, boardIndex.step + 2);
+      }
+    }
+
+    if (orientation === "b") {
+      if (
+        boardIndex.step === boardIndex.break &&
+        moves.length % 2 === 1 &&
+        boardIndex.break < moves.length
+      ) {
+        const num = boardIndex.break === 0 ? 1 : 2;
+        setBoardIndex((pre) => ({
+          break: pre.break + num,
+          step: pre.step + num,
+        }));
+        move(boardIndex.break, boardIndex.break + num);
+      }
+
+      if (boardIndex.step !== boardIndex.break) {
+        const num =
+          boardIndex.step > 1 ? (boardIndex.step % 2 === 1 ? 2 : 1) : 1;
+        setBoardIndex((pre) => ({ ...pre, step: pre.step + num }));
+        move(boardIndex.step, boardIndex.step + num);
+      }
+    }
+  };
 
   return (
     <Grid
@@ -15,7 +110,7 @@ export default function PrimaryControls() {
       gap="2"
       templateColumns="repeat(auto-fit, minmax(4rem, 1fr))"
     >
-      <Tooltip label="New Game">
+      <Tooltip label="New Game" >
         <Button label="New Game" variant="basic" onClick={onNewGame}>
           <Icon as={IoAdd} fontSize="3xl" color="#666463" />
         </Button>

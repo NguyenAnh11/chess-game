@@ -1,5 +1,11 @@
 import { Color, Square } from "chess.js";
-import { BoardPosition, Piece, BoardOrientation, Position } from "../types";
+import {
+  BoardPosition,
+  Piece,
+  BoardOrientation,
+  Position,
+  BoardDifference,
+} from "../types";
 import {
   BLACK_COLUMNS,
   BLACK_ROWS,
@@ -9,15 +15,42 @@ import {
   BOARD_WIDTH,
 } from "./consts";
 
-export function getRelativePosition(square: Square, orientation: BoardOrientation): Position {
+export function getPositionDifference(
+  current: BoardPosition,
+  next: BoardPosition
+): BoardDifference {
+  const difference: BoardDifference = { added: {}, removed: {} };
+
+  (Object.keys(current) as Array<keyof typeof current>).forEach(sq => {
+    if (current[sq] && next[sq] !== current[sq]) {
+      difference.removed[sq] = current[sq]
+    }
+  });
+
+  (Object.keys(next) as Array<keyof typeof next>).forEach(sq => {
+    if (next[sq] && next[sq] !== current[sq]) {
+      difference.added[sq] = next[sq];
+    }
+  });
+
+  return difference
+}
+
+export function getRelativePosition(
+  square: Square,
+  orientation: BoardOrientation
+): Position {
   const squareWidth = BOARD_WIDTH / 8;
-  const coord = getPosition(square, orientation);
-  const row = coord.row * squareWidth + squareWidth / 2;
-  const col = coord.col * squareWidth + squareWidth / 2;
+  const pos = getPosition(square, orientation);
+  const row = pos.row * squareWidth + squareWidth / 2;
+  const col = pos.col * squareWidth + squareWidth / 2;
   return { row, col };
 }
 
-export function getPosition(square: Square, orientation: BoardOrientation = "w"): Position {
+export function getPosition(
+  square: Square,
+  orientation: BoardOrientation = "w"
+): Position {
   const rows = orientation === "w" ? WHITE_ROWS : BLACK_ROWS;
   const row = rows[parseInt(square[1]) - 1];
   const cols = orientation === "w" ? WHITE_COLUMNS : BLACK_COLUMNS;

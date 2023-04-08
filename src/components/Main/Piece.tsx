@@ -8,11 +8,18 @@ import { Piece as Pc } from "../../types";
 type PieceProps = {
   piece: Pc;
   square: Square;
-  rect: DOMRect | undefined;
+  rects: { [sq in Square]?: DOMRect };
 };
 
-export default function Piece({ piece, square }: PieceProps) {
-  const { pieceImages, moveMethod, onDragPieceBegin } = useChess();
+export default function Piece({ piece, square, rects }: PieceProps) {
+  const {
+    animationDuration,
+    pieceImages,
+    moveMethod,
+    isWaitingForAnimation,
+    positionDifference,
+    onDragPieceBegin,
+  } = useChess();
 
   const [pieceStyle, setPieceStyle] = useState<CSSProperties>({
     zIndex: 5,
@@ -40,6 +47,35 @@ export default function Piece({ piece, square }: PieceProps) {
   useEffect(() => {
     setPieceStyle((prev) => ({ ...prev, opacity: isDragging ? 0 : 1 }));
   }, [isDragging]);
+
+  useEffect(() => {
+    const removedPiece = positionDifference.removed?.[square];
+
+    if (!positionDifference.added) return;
+
+    const newSquare = (
+      Object.entries(positionDifference.added) as [Square, Pc][]
+    ).find(
+      ([s, p]) =>
+        p === removedPiece ||
+        (removedPiece?.[1] === "P" && (s[1] === "1" || s[1] === "8"))
+    );
+
+    if (isWaitingForAnimation && removedPiece && newSquare) {
+      const source = rects[square],
+        target = rects[newSquare[0]];
+      if (source && target) {
+        setPieceStyle((prev) => ({
+          ...prev,
+          zIndex: 6,
+          transition: `transform ${animationDuration}ms`,
+          transform: `translate(${target.x - source.x}px, ${
+            target.y - source.y
+          }px)`,
+        }));
+      }
+    }
+  }, [isWaitingForAnimation, positionDifference]);
 
   return <Image ref={drag} style={pieceStyle} src={pieceImages[piece]} />;
 }

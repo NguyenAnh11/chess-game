@@ -42,6 +42,9 @@ const SettingProvider = ({ mode, children }: SettingContextProps) => {
     },
     play: {
       enablePremove: 1,
+      alwaysPromoteToQueen: 1,
+      showTimestamps: 1,
+      confirmResignDraw: 1,
     },
   });
 

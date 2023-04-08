@@ -38,7 +38,7 @@ export default function Squares() {
               <Piece
                 piece={position[square]!}
                 square={square}
-                rect={rects[square]}
+                rects={rects}
               />
             )}
           </Square>

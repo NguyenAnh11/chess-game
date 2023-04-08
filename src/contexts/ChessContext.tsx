@@ -6,6 +6,8 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import {
   BoardOrientation,
@@ -18,6 +20,9 @@ import {
   ArrowColor,
   Arrow,
   PieceImages,
+  BoardIndex,
+  Premove,
+  BoardDifference,
 } from "../types";
 import {
   SQUARE_STYLE,
@@ -25,6 +30,8 @@ import {
   getPosition,
   getColor,
   PIECE_COLOR_IMAGES,
+  ANIMATIONS,
+  getPositionDifference,
 } from "../utils";
 import { useSetting } from "./SettingContext";
 
@@ -36,18 +43,22 @@ type ChessboardProviderProps = {
 type ChessContext = {
   gameOver: boolean;
   position: BoardPosition;
+  positionDifference: BoardDifference;
   turn: string;
   orientation: BoardOrientation;
   moveMethod: MoveMethod;
   squareStyle: SquareStyle;
   pieceImages: PieceImages;
+  animationDuration: number;
   moves: Move[];
   arrows: Arrow[];
   lastMove: Move | undefined;
   highlightSquares: HighlightSquare[];
   hintMoves: HintMove[];
   leftClick: Square | undefined;
-  breakIndex: number;
+  boardIndex: BoardIndex;
+  setBoardIndex: Dispatch<SetStateAction<BoardIndex>>;
+  isWaitingForAnimation: boolean;
   kingUnderAttack: KingSquare | undefined;
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
@@ -58,8 +69,8 @@ type ChessContext = {
   onDragPieceBegin: (square: Square) => void;
   onResign: () => void;
   onNewGame: () => void;
-  onMoveBack: () => void;
-  onMoveFoward: () => void;
+  undo: (num: number) => void;
+  move: (start: number, end: number) => void;
   onShowHint: () => void;
   onDownload: () => void;
   onClearArrows: () => void;
@@ -76,9 +87,15 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()
   );
-
-  const [arrows, setArrows] = useState<Arrow[]>([]);
+  const [position, setPosition] = useState<BoardPosition>(
+    convertFen(game.current.fen())
+  );
+  const [positionDifference, setPositionDifference] = useState<BoardDifference>(
+    { added: {}, removed: {} }
+  );
   const [moves, setMoves] = useState<Move[]>([]);
+  const [premoves, setPremoves] = useState<Premove[]>([]);
+  const [arrows, setArrows] = useState<Arrow[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
     Square | undefined
   >(undefined);
@@ -87,15 +104,16 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
   const [kingUnderAttack, setKingUnderAttack] = useState<
     KingSquare | undefined
   >();
-  const [breakIndex, setBreakIndex] = useState(0);
+  const [boardIndex, setBoardIndex] = useState<BoardIndex>({
+    break: 0,
+    step: 0,
+  });
+  const [wasManualDrop, setWasManualDrop] = useState(false);
+  const [previousTimeout, setPreviousTimeout] = useState<NodeJS.Timeout>();
+  const [isWaitingForAnimation, setIsWaitingForAnimation] = useState(false);
 
   const turn = useMemo(
     (): "w" | "b" => game.current.turn(),
-    [game.current.fen()]
-  );
-
-  const position = useMemo(
-    (): BoardPosition => convertFen(game.current.fen()),
     [game.current.fen()]
   );
 
@@ -104,6 +122,7 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
   const onClearLeftClick = () => setLeftClick(undefined);
 
   const onUpdatePosition = (
+    type: "drop" | "click",
     from: Square,
     to: Square,
     onMoveEnd?: () => void,
@@ -114,18 +133,24 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
 
       let cloneMoves = [...moves];
       if (orientation === "w") {
-        if (moves.length >= 2 && breakIndex !== moves.length) {
-          cloneMoves.splice(breakIndex, moves.length - breakIndex);
+        if (moves.length >= 2 && boardIndex.step !== moves.length) {
+          cloneMoves.splice(boardIndex.step, moves.length - boardIndex.step);
         }
       } else {
-        if (moves.length >= 3 && breakIndex !== moves.length) {
-          cloneMoves.splice(breakIndex, moves.length - breakIndex);
+        if (moves.length >= 3 && boardIndex.step !== moves.length) {
+          cloneMoves.splice(boardIndex.step, moves.length - boardIndex.step);
         }
       }
 
       setMoves([...cloneMoves, move]);
 
       setLeftClick(undefined);
+
+      if (type === "click") {
+        setWasManualDrop(false);
+      } else {
+        setWasManualDrop(true);
+      }
 
       if (onMoveEnd) onMoveEnd();
     } catch {
@@ -167,7 +192,7 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
       return;
     }
 
-    onUpdatePosition(leftClick!, square, undefined, () => {
+    onUpdatePosition("click", leftClick!, square, undefined, () => {
       if (
         setting.board.showHintMove &&
         position[square] &&
@@ -248,7 +273,7 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
       return;
     }
 
-    onUpdatePosition(source, target);
+    onUpdatePosition("drop", source, target);
   };
 
   const onResign = () => {
@@ -257,7 +282,7 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
 
   const onNewGame = () => {
     setMoves([]);
-    setBreakIndex(0);
+    setBoardIndex({ break: 0, step: 0 });
     game.current = new Chess();
   };
 
@@ -268,64 +293,10 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
     }
   };
 
-  const onMoveBack = () => {
-    if (orientation === "w" && moves.length % 2 === 0) {
-      if (breakIndex % 2 === 0 && breakIndex > 0) {
-        setBreakIndex((prev) => prev - 2);
-        undo(2);
-      }
-
-      if (breakIndex % 2 === 1 && breakIndex >= 1) {
-        setBreakIndex((prev) => prev - 1);
-        undo(1);
-      }
-    }
-
-    if (orientation === "b" && moves.length % 2 === 1) {
-      const num = breakIndex === 1 ? 1 : 2;
-      if (breakIndex % 2 === 1 && breakIndex - num >= 0) {
-        setBreakIndex((prev) => prev - num);
-        undo(num);
-      }
-
-      if (breakIndex % 2 === 0) {
-        setBreakIndex((prev) => prev - 1);
-        undo(1);
-      }
-    }
-  };
-
   const move = (startIndex: number, endIndex: number) => {
     const nextMoves = moves.slice(startIndex, endIndex);
     for (const { from, to } of nextMoves) {
       game.current.move({ from, to });
-    }
-  };
-
-  const onMoveFoward = () => {
-    if (orientation === "w" && moves.length % 2 === 0) {
-      if (breakIndex % 2 === 0 && breakIndex < moves.length) {
-        setBreakIndex((prev) => prev + 2);
-        move(breakIndex, breakIndex + 2);
-      }
-
-      if (breakIndex % 2 === 1 && breakIndex < moves.length) {
-        setBreakIndex((prev) => prev + 1);
-        move(breakIndex, breakIndex + 1);
-      }
-    }
-
-    if (orientation === "b" && moves.length % 2 === 1) {
-      const num = breakIndex === 0 ? 1 : 2;
-      if (breakIndex % 2 === 1 && breakIndex + num <= moves.length) {
-        setBreakIndex((prev) => prev + num);
-        move(breakIndex, breakIndex + num);
-      }
-
-      if (breakIndex % 2 === 0 && breakIndex < moves.length) {
-        setBreakIndex((prev) => prev + 1);
-        move(breakIndex, breakIndex + 1);
-      }
     }
   };
 
@@ -334,22 +305,22 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
   const onDownload = () => {};
 
   const onStep = (index: number) => {
-    if (orientation === "w" && moves.length % 2 !== 0) return;
+    const newStepIndex = index + 1;
 
-    if (orientation === "b" && moves.length % 2 !== 1) return;
+    if (newStepIndex === boardIndex.step) return;
 
-    setBreakIndex(index + 1);
-    const actualIndex = index + 1;
-    if (actualIndex < breakIndex) {
-      undo(breakIndex - actualIndex);
+    if (newStepIndex < boardIndex.step) {
+      undo(boardIndex.step - newStepIndex);
     } else {
-      move(breakIndex, actualIndex);
+      move(boardIndex.step, newStepIndex);
     }
+
+    setBoardIndex((pre) => ({ ...pre, step: newStepIndex }));
   };
 
   const viewSteps = useMemo(
-    (): Move[] => moves.slice(0, breakIndex),
-    [moves, breakIndex]
+    (): Move[] => moves.slice(0, boardIndex.step),
+    [moves, boardIndex.step]
   );
 
   const lastMove = useMemo(
@@ -424,14 +395,46 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
   }, [game.current.isCheckmate(), game.current.isGameOver()]);
 
   useEffect(() => {
-    const index = moves.length;
+    const nextPosition = convertFen(game.current.fen());
+    const difference = getPositionDifference(position, nextPosition);
 
-    if (breakIndex + 1 === index) {
-      setBreakIndex(index);
+    if (
+      wasManualDrop ||
+      Object.keys(difference.added).length > 2 ||
+      setting.board.animation === "none"
+    ) {
+      setPosition(nextPosition);
+      setIsWaitingForAnimation(false);
+    } else {
+      setPositionDifference(difference);
+      setIsWaitingForAnimation(true);
+
+      const timeout = setTimeout(() => {
+        setPosition(nextPosition);
+        setIsWaitingForAnimation(false);
+      }, ANIMATIONS[setting.board.animation]);
+
+      setPreviousTimeout(timeout);
     }
 
-    if (breakIndex === moves.length) {
-      setBreakIndex(index);
+    setWasManualDrop(false);
+
+    return () => clearTimeout(previousTimeout);
+  }, [game.current.fen()]);
+
+  useEffect(() => {
+    const index = moves.length;
+
+    const cloneBoardIndex = { ...boardIndex };
+
+    if (boardIndex.break + 1 === index) {
+      if (boardIndex.step === boardIndex.break) {
+        cloneBoardIndex.step = index;
+      }
+
+      cloneBoardIndex.break = index;
+
+      setBoardIndex(cloneBoardIndex);
     }
   }, [moves]);
 
@@ -440,18 +443,22 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
       value={{
         gameOver,
         position,
+        positionDifference,
         turn,
         orientation,
         moveMethod: setting.board.moveMethod,
         squareStyle: SQUARE_STYLE[setting.board.squareColor],
         pieceImages: PIECE_COLOR_IMAGES[setting.board.pieceColor],
+        animationDuration: ANIMATIONS[setting.board.animation],
         moves,
         arrows,
         lastMove,
         highlightSquares,
         hintMoves,
         leftClick,
-        breakIndex,
+        boardIndex,
+        setBoardIndex,
+        isWaitingForAnimation,
         kingUnderAttack,
         onLeftClickDown,
         onClearLeftClick,
@@ -462,8 +469,8 @@ const ChessProvider = ({ children, orientation }: ChessboardProviderProps) => {
         onDragPieceBegin,
         onResign,
         onNewGame,
-        onMoveBack,
-        onMoveFoward,
+        undo,
+        move,
         onShowHint,
         onDownload,
         onClearArrows,

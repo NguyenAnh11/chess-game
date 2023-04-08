@@ -11,7 +11,7 @@ type MoveItemProps = {
 };
 
 export default function MoveItem({ move, index }: MoveItemProps) {
-  const { lastMove, pieceImages: pieceStyle, onStep } = useChess();
+  const { lastMove, pieceImages, onStep } = useChess();
 
   const boxClass = classNames(css.node, {
     [css.white]: move.color === "w",
@@ -28,7 +28,7 @@ export default function MoveItem({ move, index }: MoveItemProps) {
   ) : (
     <Box className={boxClass} onClick={() => onStep(index)}>
       <Box w="4" h="4" mr="0.5">
-        <Image src={pieceStyle[piece]} />
+        <Image src={pieceImages[piece]} />
       </Box>
       {move.san}
     </Box>
