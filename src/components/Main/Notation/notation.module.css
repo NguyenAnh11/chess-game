@@ -1,0 +1,17 @@
+.notation {
+    position: absolute;
+    user-select: none;
+    padding: 0px 2px;
+    font-weight: 600;
+    font-size: 576 / 35;
+    z-index: 2;
+}
+
+.alpha {
+    align-self: flex-end;
+    right: 0;
+}
+
+.number {
+    align-self: flex-start;
+}
