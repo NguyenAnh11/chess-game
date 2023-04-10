@@ -28,6 +28,14 @@ export type BoardDifference = {
   removed: BoardPosition;
 };
 
+export type BoardPromotion = {
+  show: boolean;
+  waiting: boolean;
+  square?: Square;
+  color?: "w" | "b";
+  choosedPiece?: string;
+}
+
 export type Position = {
   row: number;
   col: number;
@@ -91,6 +99,7 @@ export type HighlightSquare = CustomSquare & {
 };
 
 export type HintMove = CustomSquare & {
+  square: Square;
   type: "hint" | "capture";
 };
 

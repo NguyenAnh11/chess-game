@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import SettingProvider from "./contexts/SettingContext";
 import ChessProvider from "./contexts/ChessContext";
@@ -10,6 +10,8 @@ import GameSetting from "./components/Setting/";
 import "./index.css";
 
 const App = () => {
+  const boardRef = useRef<HTMLDivElement>(null);
+
   return (
     <React.Fragment>
       <Flex
@@ -21,10 +23,10 @@ const App = () => {
       >
         <Flex position="relative" h="min-content">
           <SettingProvider mode="AI">
-            <ChessProvider orientation="w">
+            <ChessProvider boardRef={boardRef} orientation="w">
               <Box flex="1">
                 <DndProvider backend={HTML5Backend}>
-                  <BoardMain />
+                  <BoardMain ref={boardRef}/>
                   <GameSetting />
                 </DndProvider>
               </Box>

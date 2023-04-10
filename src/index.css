@@ -12,19 +12,19 @@
 }
 
 .highlight {
-  z-index: 3;
+  z-index: 2;
   opacity: 0.5;
   pointer-events: none;
 }
 
 .king {
-  z-index: 3;
+  z-index: 2;
   opacity: 0.5;
   pointer-events: none;
 }
 
 .hint {
-  z-index: 3;
+  z-index: 2;
   pointer-events: none;
   box-sizing: border-box;
   border-radius: 50%;

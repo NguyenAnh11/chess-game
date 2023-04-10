@@ -1,18 +1,19 @@
-import React, { useRef } from "react";
+import React, { forwardRef, RefObject } from "react";
 import { Box, Flex, useOutsideClick } from "@chakra-ui/react";
 import { useChess } from "../../contexts/ChessContext";
 import Squares from "./Squares";
 import HighlightSquares from "./HighlightSquares";
 import HintMoves from "./HintMoves";
 import Arrows from "./Arrows";
+import Promotion from "./Promotion";
 
-export default function BoardMain() {
-  const ref = useRef<HTMLDivElement>(null);
+type BoardMainProps = {};
 
-  const { onClearLeftClick, onClearRightClicks } = useChess();
+const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
+  const { promotion, onClearLeftClick, onClearRightClicks } = useChess();
 
   useOutsideClick({
-    ref: ref,
+    ref: ref as RefObject<HTMLDivElement>,
     handler: () => {
       onClearLeftClick();
       onClearRightClicks();
@@ -26,9 +27,12 @@ export default function BoardMain() {
           <HighlightSquares />
           <Squares />
           <HintMoves />
-          <Arrows/>
+          <Arrows />
+          {promotion.show && <Promotion />}
         </Box>
       </Flex>
     </React.Fragment>
   );
-}
+});
+
+export default BoardMain;

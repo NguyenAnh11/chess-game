@@ -122,7 +122,7 @@ export const PIECE_COLOR_IMAGES: {
     wP: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wp.png",
     wQ: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wq.png",
     wR: import.meta.env.VITE_IMAGE_PIECES_URL + "book/150/wr.png",
-  }
+  },
 };
 
 export const ANIMATIONS: { [a in Animation]: number } = {
@@ -165,4 +165,6 @@ export const INITIAL_BOARD_POSITION: BoardPosition = {
   f1: "wB",
   g1: "wN",
   h1: "wR",
-}
+};
+
+export const PROMOTION_PRICES = ["b", "r", "n", "q"]

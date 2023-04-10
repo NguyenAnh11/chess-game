@@ -100,8 +100,7 @@ export default function Square({
         if (!children) return;
         setStyle((prev) => ({
           ...prev,
-          opacity: 0.5,
-          boxShadow: squareStyle["over"],
+          opacity: 0.8,
           background: squareStyle["highlight"],
         }));
         return;

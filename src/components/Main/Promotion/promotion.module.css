@@ -1,0 +1,45 @@
+.promotion_window {
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, .45);
+    display: flex;
+    flex-direction: column-reverse;
+    height: 56.25%;
+    left: 0;
+    position: absolute;
+    width: 12.5%;
+    z-index: 2;
+}
+
+.top {
+    top: 0;
+    bottom: auto;
+}
+
+.bottom {
+    top: auto;
+    bottom: 0;
+}
+
+.promotion_window .close_button {
+    background: #f1f1f1;
+    align-items: center;
+    color: #8b8987;
+    cursor: pointer;
+    display: flex;
+    flex-grow: 1;
+    font-size: 150%;
+    font-style: normal;
+    justify-content: center;
+    max-height: 12.5%;
+    text-align: center;
+}
+
+.promotion_price {
+    background-size: 100%;
+    cursor: pointer;
+    padding-top: 100%;
+    position: relative;
+    background-repeat: no-repeat;
+    background-position-y: bottom;
+}

@@ -7,8 +7,14 @@ import { useChess } from "../../../../contexts/ChessContext";
 import { useSetting } from "../../../../contexts/SettingContext";
 
 export default function SmallControls() {
-  const { onDownload, onResign } = useChess();
+  const { boardRef, onResign } = useChess();
   const { onOpenEditSetting } = useSetting();
+
+  const onDownload = () => {
+    const element = boardRef.current;
+    if (element) {
+    }
+  };
 
   return (
     <Flex w="full" justify="space-between">
@@ -19,7 +25,11 @@ export default function SmallControls() {
           </Button>
         </Tooltip>
         <Tooltip label="Setting">
-          <Button label="Download" size="sm" onClick={() => onOpenEditSetting(true)}>
+          <Button
+            label="Download"
+            size="sm"
+            onClick={() => onOpenEditSetting(true)}
+          >
             <Icon as={FiSettings} fontSize="2xl" color="#666463" />
           </Button>
         </Tooltip>

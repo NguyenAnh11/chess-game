@@ -16,6 +16,8 @@ export default function Piece({ piece, square, rects }: PieceProps) {
     animationDuration,
     pieceImages,
     moveMethod,
+    leftClick,
+    promotion,
     isWaitingForAnimation,
     positionDifference,
     onDragPieceBegin,
@@ -45,8 +47,11 @@ export default function Piece({ piece, square, rects }: PieceProps) {
   );
 
   useEffect(() => {
-    setPieceStyle((prev) => ({ ...prev, opacity: isDragging ? 0 : 1 }));
-  }, [isDragging]);
+    const isHidePiece =
+      isDragging || (square === leftClick && promotion.waiting);
+
+    setPieceStyle((prev) => ({ ...prev, opacity: isHidePiece ? 0 : 1 }));
+  }, [isDragging, promotion.waiting]);
 
   useEffect(() => {
     const removedPiece = positionDifference.removed?.[square];

@@ -75,7 +75,7 @@ export default function PrimaryControls() {
       if (boardIndex.step !== boardIndex.break) {
         const num = boardIndex.step % 2 === 0 ? 2 : 1;
         setBoardIndex((pre) => ({ ...pre, step: pre.step + num }));
-        move(boardIndex.step, boardIndex.step + 2);
+        move(boardIndex.step, boardIndex.step + num);
       }
     }
 
