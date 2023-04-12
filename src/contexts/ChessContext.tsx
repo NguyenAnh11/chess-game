@@ -115,7 +115,7 @@ const ChessProvider = ({
   const [leftClick, setLeftClick] = useState<Square | undefined>(undefined);
   const [kingUnderAttack, setKingUnderAttack] = useState<
     KingSquare | undefined
-  >();
+  >(undefined);
   const [boardIndex, setBoardIndex] = useState<BoardIndex>({
     break: 0,
     step: 0,
@@ -124,14 +124,17 @@ const ChessProvider = ({
   const [previousTimeout, setPreviousTimeout] = useState<NodeJS.Timeout>();
   const [isWaitingForAnimation, setIsWaitingForAnimation] = useState(false);
 
-  const [promotion, setPromotion] = useState<BoardPromotion>({ show: false, waiting: false });
+  const [promotion, setPromotion] = useState<BoardPromotion>({
+    show: false,
+    waiting: false,
+  });
 
   const onChoosedPiecePromotion = (piece: string) => {
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
   };
 
   const onClosePromotion = () => {
-    setPromotion({ show: false, waiting: true });
+    setPromotion({ show: false, waiting: false });
   };
 
   const onClearArrows = () => setArrows([]);
@@ -318,16 +321,17 @@ const ChessProvider = ({
         (orientation !== color && source[1] === "2");
 
       if (position[source]![1] === "P" && isReachToPromotionRow) {
-        const isMoveToEndRow = hintMoves.find((p) => p.square === target) !== undefined;
-        
-        if (!isMoveToEndRow) throw new Error('Invalid move');
+        const isMoveToEndRow =
+          hintMoves.find((p) => p.square === target) !== undefined;
+
+        if (!isMoveToEndRow) throw new Error("Invalid move");
 
         if (!setting.play.alwaysPromoteToQueen) {
           setPromotion({ show: true, waiting: true, square: target, color });
           return;
         }
 
-        move = game.current.move({ from: source, to: target, promotion: "q" })
+        move = game.current.move({ from: source, to: target, promotion: "q" });
       } else {
         move = game.current.move({ from: source, to: target });
       }
@@ -353,7 +357,6 @@ const ChessProvider = ({
         setLeftClick(undefined);
         return;
       }
-
     } finally {
       setLeftClick(undefined);
     }
