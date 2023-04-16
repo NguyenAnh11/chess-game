@@ -513,7 +513,7 @@ const ChessProvider = ({
     Object.keys(score).forEach((color) => {
       let value = 0;
       const pieces = Object.values(position).filter(
-        (p) => p && p[0] === color && p[1] !== "K"
+        (p) => p && p[0] === color && p[1] !== "k"
       );
       for (const piece of pieces) {
         const pieceSymbol = piece[1].toLowerCase() as Exclude<PieceSymbol, "k">;
