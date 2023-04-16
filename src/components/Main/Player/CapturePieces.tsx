@@ -24,13 +24,18 @@ export default function CapturePieces({
   };
 
   const capturePiecesClassNames = useMemo(() => {
-    const classNames = (
-      Object.entries(piecesInfo) as [Exclude<PieceSymbol, "k">, string][]
-    ).map(([pieceSymbol, pieceName]) => {
-      let num = pieces[pieceSymbol];
-      if (num === 1) return `captured_pieces_${color}_${pieceName}`;
-      return `captured_pieces_${color}_${num}_${pieceName}s`;
-    });
+    const classNames: Array<string> = [];
+
+    (Object.entries(piecesInfo) as [Exclude<PieceSymbol, "k">, string][]).map(
+      ([pieceSymbol, pieceName]) => {
+        let num = pieces[pieceSymbol];
+        if (num === 1) {
+          classNames.push(`captured_pieces_${color}_${pieceName}`);
+        } else if (num > 1) {
+          classNames.push(`captured_pieces_${color}_${num}_${pieceName}s`);
+        }
+      }
+    );
 
     return classNames;
   }, [pieces]);
