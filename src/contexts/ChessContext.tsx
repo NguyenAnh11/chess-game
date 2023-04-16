@@ -1,4 +1,4 @@
-import { Chess, Move, Square } from "chess.js";
+import { Chess, Color, Move, PieceSymbol, Square } from "chess.js";
 import React, {
   createContext,
   useContext,
@@ -24,6 +24,8 @@ import {
   BoardIndex,
   BoardDifference,
   BoardPromotion,
+  Premove,
+  CapturePieces,
 } from "../types";
 import {
   SQUARE_STYLE,
@@ -55,10 +57,13 @@ type ChessContext = {
   pieceImages: PieceImages;
   animationDuration: number;
   moves: Move[];
+  premoves: Premove[];
   arrows: Arrow[];
   lastMove: Move | undefined;
   highlightSquares: HighlightSquare[];
   hintMoves: HintMove[];
+  capturePieces: CapturePieces;
+  capturePiecesScore: { [c in Color]: number };
   leftClick: Square | undefined;
   boardIndex: BoardIndex;
   setBoardIndex: Dispatch<SetStateAction<BoardIndex>>;
@@ -108,6 +113,7 @@ const ChessProvider = ({
   );
   const [moves, setMoves] = useState<Move[]>([]);
   const [arrows, setArrows] = useState<Arrow[]>([]);
+  const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
     Square | undefined
   >(undefined);
@@ -170,7 +176,7 @@ const ChessProvider = ({
     if (game.current.isGameOver() || game.current.isDraw()) return;
 
     if (!leftClick) {
-      setKingUnderAttack(undefined);
+      kingUnderAttack && setKingUnderAttack(undefined);
       setLeftClick(square);
       return;
     }
@@ -180,10 +186,10 @@ const ChessProvider = ({
       return;
     }
 
+    const color = position[leftClick]![0] === "w" ? "w" : "b";
+
     try {
       let move: Move;
-
-      const color = position[leftClick]![0] === "w" ? "w" : "b";
 
       const isReachToPromotionRow =
         (orientation === color && leftClick[1] === "7") ||
@@ -231,14 +237,10 @@ const ChessProvider = ({
         return;
       }
 
-      if (
-        setting.board.showHintMove &&
-        position[square] &&
-        position[square]![0] === turn
-      ) {
-        setLeftClick(square);
-      } else {
+      if (!position[square]) {
         setLeftClick(undefined);
+      } else {
+        setLeftClick(square);
       }
     }
   };
@@ -311,10 +313,10 @@ const ChessProvider = ({
       return;
     }
 
+    const color = position[source]![0] === "w" ? "w" : "b";
+
     try {
       let move: Move;
-
-      const color = position[source]![0] === "w" ? "w" : "b";
 
       const isReachToPromotionRow =
         (orientation === color && source[1] === "7") ||
@@ -460,7 +462,7 @@ const ChessProvider = ({
       setting.board.showHintMove &&
       leftClick &&
       position[leftClick] &&
-      position[leftClick]![0] === turn
+      position[leftClick]![0] === orientation
     ) {
       const moves = game.current.moves({ square: leftClick, verbose: true });
       for (const { to } of moves) {
@@ -475,6 +477,55 @@ const ChessProvider = ({
     return hintMoves;
   }, [leftClick, setting.board.showHintMove]);
 
+  const capturePieces = useMemo((): CapturePieces => {
+    const playerPieces: CapturePieces = {
+      w: { q: 0, b: 0, n: 0, r: 0, p: 0 },
+      b: { q: 0, b: 0, n: 0, r: 0, p: 0 },
+    };
+
+    for (let index = 0; index < viewSteps.length; index += 1) {
+      const step = viewSteps[index];
+      if (step.captured) {
+        const color = index % 2 === 0 ? "b" : "w";
+        const pieceSymbol = step.captured as Exclude<PieceSymbol, "k">;
+        playerPieces[color][pieceSymbol] += 1;
+      }
+
+      if (step.promotion) {
+        playerPieces[step.color].p += 1;
+      }
+    }
+
+    return playerPieces;
+  }, [viewSteps]);
+
+  const capturePiecesScore = useMemo(() => {
+    const score: { [c in Color]: number } = { b: 0, w: 0 };
+
+    const pieceScore: { [p in Exclude<PieceSymbol, "k">]: number } = {
+      q: 9,
+      b: 3,
+      n: 3,
+      r: 5,
+      p: 1,
+    };
+
+    Object.keys(score).forEach((color) => {
+      let value = 0;
+      const pieces = Object.values(position).filter(
+        (p) => p && p[0] === color && p[1] !== "K"
+      );
+      for (const piece of pieces) {
+        const pieceSymbol = piece[1].toLowerCase() as Exclude<PieceSymbol, "k">;
+        value += pieceScore[pieceSymbol];
+      }
+
+      score[color as Color] = value;
+    });
+
+    return score;
+  }, [viewSteps]);
+
   useEffect(() => {
     setGameOver(game.current.isCheckmate() || game.current.isGameOver());
   }, [game.current.isCheckmate(), game.current.isGameOver()]);
@@ -483,23 +534,29 @@ const ChessProvider = ({
     const nextPosition = convertFen(game.current.fen());
     const difference = getPositionDifference(position, nextPosition);
 
-    if (
-      isManualDrop ||
-      Object.keys(difference.added).length > 2 ||
-      setting.board.animation === "none"
-    ) {
+    if (isWaitingForAnimation) {
       setPosition(nextPosition);
       setIsWaitingForAnimation(false);
+      if (previousTimeout) clearTimeout(previousTimeout);
     } else {
-      setPositionDifference(difference);
-      setIsWaitingForAnimation(true);
-
-      const timeout = setTimeout(() => {
+      if (
+        isManualDrop ||
+        Object.keys(difference.added).length > 2 ||
+        setting.board.animation === "none"
+      ) {
         setPosition(nextPosition);
         setIsWaitingForAnimation(false);
-      }, ANIMATIONS[setting.board.animation]);
+      } else {
+        setPositionDifference(difference);
+        setIsWaitingForAnimation(true);
 
-      setPreviousTimeout(timeout);
+        const timeout = setTimeout(() => {
+          setPosition(nextPosition);
+          setIsWaitingForAnimation(false);
+        }, ANIMATIONS[setting.board.animation]);
+
+        setPreviousTimeout(timeout);
+      }
     }
 
     setIsManualDrop(false);
@@ -552,10 +609,13 @@ const ChessProvider = ({
         pieceImages: PIECE_COLOR_IMAGES[setting.board.pieceColor],
         animationDuration: ANIMATIONS[setting.board.animation],
         moves,
+        premoves,
         arrows,
         lastMove,
         highlightSquares,
         hintMoves,
+        capturePieces,
+        capturePiecesScore,
         leftClick,
         boardIndex,
         setBoardIndex,

@@ -5,7 +5,7 @@ import css from "./promotion.module.css";
 import { IoMdClose } from "react-icons/io";
 import { useChess } from "../../../contexts/ChessContext";
 import { Piece } from "../../../types";
-import { BLACK_COLUMNS, WHITE_COLUMNS, PROMOTION_PRICES } from "../../../utils";
+import { BLACK_COLUMNS, WHITE_COLUMNS, PROMOTION_PIECES } from "../../../utils";
 
 export default function Promotion() {
   const {
@@ -39,7 +39,7 @@ export default function Promotion() {
       <button className={css.close_button} onClick={onClosePromotion}>
         <Icon as={IoMdClose} />
       </button>
-      {PROMOTION_PRICES.map((piece, index) => {
+      {PROMOTION_PIECES.map((piece, index) => {
         const pieceImage = pieceImages[(color + piece.toUpperCase()) as Piece];
         return (
           <Box

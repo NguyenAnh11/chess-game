@@ -13,7 +13,6 @@ export default function HighlightSquares() {
           case "left":
             style.background = squareStyle["highlight"];
             break;
-          case "premove":
           case "right":
             style.background =
               hq.color === "b"

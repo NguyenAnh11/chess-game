@@ -34,7 +34,7 @@ const SettingProvider = ({ mode, children }: SettingContextProps) => {
       pieceColor: "neo_wood",
       squareColor: "green",
       moveMethod: "dc",
-      animation: "none",
+      animation: "slow",
       playSound: 1,
       showArrow: 1,
       showHintMove: 1,

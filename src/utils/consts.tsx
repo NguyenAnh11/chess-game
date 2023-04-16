@@ -167,4 +167,4 @@ export const INITIAL_BOARD_POSITION: BoardPosition = {
   h1: "wR",
 };
 
-export const PROMOTION_PRICES = ["b", "r", "n", "q"]
+export const PROMOTION_PIECES = ["b", "r", "n", "q"];

@@ -22,7 +22,7 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
 
   return (
     <React.Fragment>
-      <Flex direction="column">
+      <Flex direction="column" my="2.5">
         <Box ref={ref} position="relative" w="xl" height="xl">
           <HighlightSquares />
           <Squares />

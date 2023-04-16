@@ -7,16 +7,23 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import BoardSidebar from "./components/Sidebar";
 import BoardMain from "./components/Main";
 import GameSetting from "./components/Setting/";
+import BoardPlayer from "./components/Main/Player";
+import { PlayerInfo } from "./types";
 import "./index.css";
 
 const App = () => {
   const boardRef = useRef<HTMLDivElement>(null);
 
+  const players = useRef<PlayerInfo[]>([
+    { id: "1", name: "AI", avatar: "https://images.chesscomfiles.com/uploads/v1/user/245425421.309e579e.200x200o.39adf462b98e.png" },
+    { id: "2", name: "Anh", avatar: "https://images.chesscomfiles.com/uploads/v1/user/71619756.cd8be4a4.50x50o.539eb11f041e.png" },
+  ]);
+
   return (
     <React.Fragment>
       <Flex
         h="100vh"
-        bg="black"
+        bgColor="#312e2b"
         align="center"
         justify="center"
         userSelect="none"
@@ -26,8 +33,10 @@ const App = () => {
             <ChessProvider boardRef={boardRef} orientation="w">
               <Box flex="1">
                 <DndProvider backend={HTML5Backend}>
-                  <BoardMain ref={boardRef}/>
+                  <BoardPlayer color="b" info={players.current[0]} />
+                  <BoardMain ref={boardRef} />
                   <GameSetting />
+                  <BoardPlayer color="w" info={players.current[1]} />
                 </DndProvider>
               </Box>
               <Box flex="1">

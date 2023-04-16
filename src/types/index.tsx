@@ -1,4 +1,4 @@
-import { Square } from "chess.js";
+import { Square, PieceSymbol } from "chess.js";
 import { ReactNode } from "react";
 import { IconType } from "react-icons/lib";
 
@@ -34,7 +34,7 @@ export type BoardPromotion = {
   square?: Square;
   color?: "w" | "b";
   choosedPiece?: string;
-}
+};
 
 export type Position = {
   row: number;
@@ -99,7 +99,6 @@ export type HighlightSquare = CustomSquare & {
 };
 
 export type HintMove = CustomSquare & {
-  square: Square;
   type: "hint" | "capture";
 };
 
@@ -131,7 +130,16 @@ export type PlaySetting = BaseSetting & {
   alwaysPromoteToQueen: number;
   showTimestamps: number;
   confirmResignDraw: number;
+};
 
+export type PlayerInfo = {
+  id: string;
+  name: string;
+  avatar: string;
+};
+
+export type CapturePieces = {
+  [c in "w" | "b"]: { [p in Exclude<PieceSymbol, "k">]: number };
 };
 
 export type Setting = {

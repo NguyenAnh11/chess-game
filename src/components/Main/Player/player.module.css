@@ -1,0 +1,244 @@
+.captured_pieces_b_pawn {
+    background-position: 0 -594px;
+}
+
+.captured_pieces_b_2_pawns {
+    background-position: 0 -569px;
+}
+
+.captured_pieces_b_3_pawns {
+    background-position: 0 -544px;
+}
+
+.captured_pieces_b_4_pawns {
+    background-position: 0 -519px;
+}
+
+.captured_pieces_b_5_pawns {
+    background-position: 0 -494px;
+}
+
+.captured_pieces_b_6_pawns {
+    background-position: 0 -469px;
+}
+
+.captured_pieces_b_7_pawns {
+    background-position: 0 -444px;
+}
+
+.captured_pieces_b_8_pawns {
+    background-position: 0 -419px;
+}
+
+.captured_pieces_b_bishop {
+    background-position: -67px -443px;
+}
+
+.captured_pieces_b_2_bishops {
+    background-position: -67px -417px;
+}
+
+.captured_pieces_b_knight {
+    background-position: -95px -442px;
+}
+
+.captured_pieces_b_2_knights {
+    background-position: -95px -417px;
+}
+
+.captured_pieces_b_rook {
+    background-position: -120px -444px;
+}
+
+.captured_pieces_b_2_rooks {
+    background-position: -120px -419px;
+}
+
+.captured_pieces_b_queen {
+    background-position: -145px -417px;
+}
+
+.captured_pieces_w_pawn {
+    background-position: -360px -594px;
+}
+
+.captured_pieces_w_2_pawns {
+    background-position: -360px -569px;
+}
+
+.captured_pieces_w_3_pawns {
+    background-position: -360px -544px;
+}
+
+.captured_pieces_w_4_pawns {
+    background-position: -360px -519px;
+}
+
+.captured_pieces_w_5_pawns {
+    background-position: -360px -494px;
+}
+
+.captured_pieces_w_6_pawns {
+    background-position: -360px -469px;
+}
+
+.captured_pieces_w_7_pawns {
+    background-position: -360px -444px;
+}
+
+.captured_pieces_w_8_pawns {
+    background-position: -360px -419px;
+}
+
+.captured_pieces_w_bishop {
+    background-position: -427px -443px;
+}
+
+.captured_pieces_w_2_bishops {
+    background-position: -427px -417px;
+}
+
+.captured_pieces_w_knight {
+    background-position: -454px -442px;
+}
+
+.captured_pieces_w_2_knights {
+    background-position: -454px -417px;
+}
+
+.captured_pieces_w_rook {
+    background-position: -480px -444px;
+}
+
+.captured_pieces_w_2_rooks {
+    background-position: -480px -419px;
+}
+
+.captured_pieces_w_queen {
+    background-position: -504px -417px;
+}
+
+.capture_pieces {
+    background-image: url('https://www.chess.com/bundles/web/images/sprites/captured-pieces.png');
+    background-repeat: no-repeat;
+    background-size: 683px 611px;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+.capture_pieces_score {
+    background-color: transparent;
+    background-image: none;
+    color: hsla(0, 0%, 100%, 0.5);
+    line-height: 1.5;
+    margin-left: 2px;
+    padding: 0;
+    vertical-align: top;
+}
+
+.captured_pieces_b_pawn, .captured_pieces_w_pawn {
+    height: 17px;
+    width: 13px;
+}
+
+.captured_pieces_b_2_pawns, .captured_pieces_w_2_pawns {
+    height: 17px;
+    width: 20px;
+}
+
+.captured_pieces_b_3_pawns, .captured_pieces_w_3_pawns {
+    height: 17px;
+    width: 27px;
+}
+
+.captured_pieces_b_4_pawns, .captured_pieces_w_4_pawns {
+    height: 17px;
+    width: 34px;
+}
+
+.captured_pieces_b_5_pawns, .captured_pieces_w_5_pawns {
+    height: 17px;
+    width: 41px;
+}
+
+.captured_pieces_b_6_pawns, .captured_pieces_w_6_pawns {
+    height: 17px;
+    width: 48px;
+}
+
+.captured_pieces_b_7_pawns, .captured_pieces_w_7_pawns {
+    height: 17px;
+    width: 55px;
+}
+
+.captured_pieces_b_8_pawns, .captured_pieces_w_8_pawns {
+    height: 17px;
+    width: 62px;
+}
+
+.captured_pieces_b_knight, .captured_pieces_w_knight {
+    height: 19px;
+    width: 16px;
+}
+
+.captured_pieces_b_2_knights, .captured_pieces_w_2_knights {
+    height: 19px;
+    width: 23px;
+}
+
+.captured_pieces_b_bishop, .captured_pieces_w_bishop {
+    height: 18px;
+    width: 15px;
+}
+
+.captured_pieces_b_2_bishops, .captured_pieces_w_2_bishops {
+    height: 19px;
+    width: 23px;
+}
+
+.captured_pieces_b_rook, .captured_pieces_w_rook {
+    height: 17px;
+    width: 15px;
+}
+
+.captured_pieces_b_2_rooks, .captured_pieces_w_2_rooks {
+    height: 17px;
+    width: 23px;
+}
+
+.captured_pieces_b_queen, .captured_pieces_w_queen {
+    height: 19px;
+    width: 18px;
+}
+
+.board_player {
+    position: relative;
+    margin: 0 0 0 auto;
+    flex-shrink: 0;
+    width: 640px;
+    height: 40px;
+}
+
+.player_row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+    height: 100%;
+    max-width: 100%;
+}
+
+.player_row_avatar {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 3px;
+    margin-right: 10px;
+}
+
+.player_row_name {
+    max-width: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
