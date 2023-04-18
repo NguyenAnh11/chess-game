@@ -1,0 +1,66 @@
+.clock {
+    display: flex;
+    flex: 0 0 25%;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 3px;
+    max-width: 140px;
+    min-width: 120px;
+    position: relative;
+    right: 0;
+    width: 25%;
+    height: 40px;
+    font-size: 24px;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+.turn {
+    opacity: 1;
+}
+
+.clock:not(.turn) {
+    opacity: 0.5;
+}
+
+.black {
+    background-color: #262421;
+    color: #fff;
+}
+
+.white {
+    background-color: #fff;
+    color: #262421;
+}
+
+.clock_icon {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    text-align: center;
+    height: 40px;
+    width: 40px;
+    border-radius: 3px 0 0 3px;
+}   
+
+.clock.turn svg {
+    opacity: 1;
+}
+
+.clocl_icon svg {
+    height: 50%;
+    width: 50%;
+}
+
+.clock.white span {
+    color: #262421;
+}
+
+.clock:not(.turn).white span {
+    opacity: 0.5;
+}

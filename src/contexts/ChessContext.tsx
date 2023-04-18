@@ -94,9 +94,9 @@ export const useChess = () => useContext(ChessContext);
 const ChessProvider = ({
   children,
   boardRef,
-  orientation,
+  orientation
 }: ChessboardProviderProps) => {
-  const { setting } = useSetting();
+  const { mode, setting } = useSetting();
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()
@@ -513,8 +513,9 @@ const ChessProvider = ({
     Object.keys(score).forEach((color) => {
       let value = 0;
       const pieces = Object.values(position).filter(
-        (p) => p && p[0] === color && p[1] !== "k"
+        (p) => p && p[0] === color && p[1] !== "K"
       );
+
       for (const piece of pieces) {
         const pieceSymbol = piece[1].toLowerCase() as Exclude<PieceSymbol, "k">;
         value += pieceScore[pieceSymbol];
@@ -524,7 +525,7 @@ const ChessProvider = ({
     });
 
     return score;
-  }, [viewSteps]);
+  }, [viewSteps, position]);
 
   useEffect(() => {
     setGameOver(game.current.isCheckmate() || game.current.isGameOver());

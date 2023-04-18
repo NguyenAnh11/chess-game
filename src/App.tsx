@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import SettingProvider from "./contexts/SettingContext";
 import ChessProvider from "./contexts/ChessContext";
@@ -15,8 +15,18 @@ const App = () => {
   const boardRef = useRef<HTMLDivElement>(null);
 
   const players = useRef<PlayerInfo[]>([
-    { id: "1", name: "AI", avatar: "https://images.chesscomfiles.com/uploads/v1/user/245425421.309e579e.200x200o.39adf462b98e.png" },
-    { id: "2", name: "Anh", avatar: "https://images.chesscomfiles.com/uploads/v1/user/71619756.cd8be4a4.50x50o.539eb11f041e.png" },
+    {
+      id: "1",
+      name: "AI",
+      avatar:
+        "https://images.chesscomfiles.com/uploads/v1/user/245425421.309e579e.200x200o.39adf462b98e.png",
+    },
+    {
+      id: "2",
+      name: "Anh",
+      avatar:
+        "https://images.chesscomfiles.com/uploads/v1/user/71619756.cd8be4a4.50x50o.539eb11f041e.png",
+    },
   ]);
 
   return (

@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
-import { PieceSymbol } from "chess.js";
+import { PieceSymbol, Color } from "chess.js";
 import css from "./player.module.css";
 import cn from "classnames";
 import { Flex } from "@chakra-ui/react";
 
 type CapturePiecesProps = {
-  color: "w" | "b";
+  color: Color;
   score: number;
   pieces: { [p in Exclude<PieceSymbol, "k">]: number };
 };
