@@ -27,3 +27,6 @@ export type CountdownState = {
   status: "started" | "paused" | "stopped" | "completed";
 }
 
+export type CountdownTimeOptions = {
+  offsetTime: number;
+}

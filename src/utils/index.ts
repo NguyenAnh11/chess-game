@@ -1,3 +1,3 @@
 export * from './consts'
-export * from './function'
+export * from './chessboard'
 export * from './countdown'
