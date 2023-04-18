@@ -94,7 +94,7 @@ export const useChess = () => useContext(ChessContext);
 const ChessProvider = ({
   children,
   boardRef,
-  orientation
+  orientation,
 }: ChessboardProviderProps) => {
   const { mode, setting } = useSetting();
   const game = useRef<Chess>(new Chess());
@@ -568,17 +568,7 @@ const ChessProvider = ({
   useEffect(() => {
     const index = moves.length;
 
-    const cloneBoardIndex = { ...boardIndex };
-
-    if (boardIndex.break + 1 === index) {
-      if (boardIndex.step === boardIndex.break) {
-        cloneBoardIndex.step = index;
-      }
-
-      cloneBoardIndex.break = index;
-
-      setBoardIndex(cloneBoardIndex);
-    }
+    setBoardIndex({ break: index, step: index });
   }, [moves]);
 
   useEffect(() => {
