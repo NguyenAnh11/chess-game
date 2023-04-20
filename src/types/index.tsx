@@ -2,7 +2,7 @@ import { Square, PieceSymbol } from "chess.js";
 import { ReactNode } from "react";
 import { IconType } from "react-icons/lib";
 
-export * from './countdown'
+export * from './timer';
 
 export type Piece =
   | "bN"

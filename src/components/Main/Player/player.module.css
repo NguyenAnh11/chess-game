@@ -46,11 +46,11 @@
     background-position: -95px -417px;
 }
 
-.captured_pieces_b_rook {
+.captured_pieces_b_rock {
     background-position: -120px -444px;
 }
 
-.captured_pieces_b_2_rooks {
+.captured_pieces_b_2_rocks {
     background-position: -120px -419px;
 }
 
@@ -106,11 +106,11 @@
     background-position: -454px -417px;
 }
 
-.captured_pieces_w_rook {
+.captured_pieces_w_rock {
     background-position: -480px -444px;
 }
 
-.captured_pieces_w_2_rooks {
+.captured_pieces_w_2_rocks {
     background-position: -480px -419px;
 }
 
@@ -196,12 +196,12 @@
     width: 23px;
 }
 
-.captured_pieces_b_rook, .captured_pieces_w_rook {
+.captured_pieces_b_rock, .captured_pieces_w_rock {
     height: 17px;
     width: 15px;
 }
 
-.captured_pieces_b_2_rooks, .captured_pieces_w_2_rooks {
+.captured_pieces_b_2_rocks, .captured_pieces_w_2_rocks {
     height: 17px;
     width: 23px;
 }
