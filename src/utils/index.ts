@@ -1,2 +1,2 @@
-export * from './consts'
-export * from './chessboard'
+export * from "./consts";
+export * from "./chessboard";

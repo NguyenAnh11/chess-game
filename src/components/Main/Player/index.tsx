@@ -1,12 +1,11 @@
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
-import css from "./player.module.css";
 import { Color } from "chess.js";
-import dayjs from "dayjs";
 import { PlayerInfo } from "../../../types";
+import { useSetting } from "../../../contexts/SettingContext";
 import { useChess } from "../../../contexts/ChessContext";
 import CapturePieces from "./CapturePieces";
-import { useSetting } from "../../../contexts/SettingContext";
 import Clock from "./Clock";
+import css from "./player.module.css";
 
 type BoardPlayerProp = {
   color: Color;
@@ -46,7 +45,7 @@ export default function BoardPlayer({ color, info }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode === "AI" && <Clock color={color} date={dayjs().add(10, "minute").toDate()} />}
+        {mode === "AI" && <Clock color={color} date={Date.now() + 3 * 60000} />}
       </Box>
     </Box>
   );
