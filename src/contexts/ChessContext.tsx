@@ -96,7 +96,7 @@ const ChessProvider = ({
   boardRef,
   orientation,
 }: ChessboardProviderProps) => {
-  const { mode, setting } = useSetting();
+  const { setting } = useSetting();
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()

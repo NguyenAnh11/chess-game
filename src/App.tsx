@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import SettingProvider from "./contexts/SettingContext";
 import ChessProvider from "./contexts/ChessContext";

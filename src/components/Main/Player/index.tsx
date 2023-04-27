@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import { Color } from "chess.js";
 import { PlayerInfo } from "../../../types";
@@ -45,7 +46,7 @@ export default function BoardPlayer({ color, info }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode === "AI" && <Clock color={color} date={Date.now() + 3 * 60000} />}
+        {mode === "AI" && <Clock color={color} duration={15 * 60000}/>}
       </Box>
     </Box>
   );

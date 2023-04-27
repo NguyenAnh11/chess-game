@@ -33,6 +33,15 @@
     color: #262421;
 }
 
+.clock.white span {
+    color: #262421;
+}
+
+.clock:not(.turn).white span {
+    opacity: 0.5;
+}
+
+
 .clock_icon {
     position: absolute;
     display: flex;
@@ -48,19 +57,7 @@
     border-radius: 3px 0 0 3px;
 }   
 
-.clock.turn svg {
-    opacity: 1;
-}
-
-.clocl_icon svg {
+.clock_icon svg {
     height: 50%;
     width: 50%;
-}
-
-.clock.white span {
-    color: #262421;
-}
-
-.clock:not(.turn).white span {
-    opacity: 0.5;
 }
