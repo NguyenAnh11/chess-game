@@ -26,6 +26,8 @@ import {
   BoardPromotion,
   Premove,
   CapturePieces,
+  PlayerInfo,
+  PlayerInfoGame,
 } from "../types";
 import {
   SQUARE_STYLE,
@@ -42,11 +44,13 @@ type ChessboardProviderProps = {
   children: React.ReactNode;
   boardRef: RefObject<HTMLDivElement>;
   orientation: BoardOrientation;
+  playerInfos: PlayerInfo[];
 };
 
 type ChessContext = {
   boardRef: RefObject<HTMLDivElement>;
   gameOver: boolean;
+  isShowGameOver: boolean;
   position: BoardPosition;
   positionDifference: BoardDifference;
   promotion: BoardPromotion;
@@ -69,6 +73,7 @@ type ChessContext = {
   setBoardIndex: Dispatch<SetStateAction<BoardIndex>>;
   isWaitingForAnimation: boolean;
   kingUnderAttack: KingSquare | undefined;
+  playerGames: PlayerInfoGame[];
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
   onDropPiece: (source: Square, target: Square) => void;
@@ -85,6 +90,7 @@ type ChessContext = {
   onStep: (index: number) => void;
   onChoosedPiecePromotion: (piece: string) => void;
   onClosePromotion: () => void;
+  onCloseModalGameOver: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -95,12 +101,14 @@ const ChessProvider = ({
   children,
   boardRef,
   orientation,
+  playerInfos,
 }: ChessboardProviderProps) => {
   const { setting } = useSetting();
   const game = useRef<Chess>(new Chess());
   const [gameOver, setGameOver] = useState(
     game.current.isGameOver() || game.current.isCheckmate()
   );
+  const [isShowGameOver, setIsShowGameOver] = useState(false)
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
   );
@@ -142,6 +150,10 @@ const ChessProvider = ({
   const onClosePromotion = () => {
     setPromotion({ show: false, waiting: false });
   };
+
+  const onCloseModalGameOver = () => {
+    setIsShowGameOver(false);
+  }
 
   const onClearArrows = () => setArrows([]);
 
@@ -527,8 +539,22 @@ const ChessProvider = ({
     return score;
   }, [viewSteps, position]);
 
+  const playerGames = useMemo((): PlayerInfoGame[] => {
+    const players: PlayerInfoGame[] = playerInfos.map((p) => ({ ...p, isResign: false }))
+    if (gameOver) {
+      const turnPlayer = players.find(p => p.color === turn)!
+      turnPlayer.isResign = true
+    }
+
+    return players
+  }, [gameOver])
+
   useEffect(() => {
-    setGameOver(game.current.isCheckmate() || game.current.isGameOver());
+    const isGameOver = game.current.isCheckmate() || game.current.isGameOver();
+    if (isGameOver) {
+      setGameOver(true);
+      setIsShowGameOver(true);
+    }
   }, [game.current.isCheckmate(), game.current.isGameOver()]);
 
   useEffect(() => {
@@ -590,6 +616,7 @@ const ChessProvider = ({
       value={{
         boardRef,
         gameOver,
+        isShowGameOver,
         position,
         positionDifference,
         promotion,
@@ -612,6 +639,7 @@ const ChessProvider = ({
         setBoardIndex,
         isWaitingForAnimation,
         kingUnderAttack,
+        playerGames,
         onLeftClickDown,
         onClearLeftClick,
         onDropPiece,
@@ -628,6 +656,7 @@ const ChessProvider = ({
         onStep,
         onChoosedPiecePromotion,
         onClosePromotion,
+        onCloseModalGameOver
       }}
     >
       {children}

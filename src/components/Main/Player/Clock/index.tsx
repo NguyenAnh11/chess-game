@@ -23,12 +23,12 @@ export default function Clock({ color, duration }: ClockProps) {
   const clockClass = cn(css.clock, {
     [css.white]: color === "w",
     [css.black]: color === "b",
-    [css.turn]: color === turn && !gameOver && moves.length > 0,
+    [css.turn]: color === turn && !gameOver,
   });
 
   useEffect(() => {
     if (ref) {
-      if (!gameOver) ref.current?.stop();
+      if (gameOver) ref.current?.stop();
       if (turn === color) ref.current?.start();
       if (turn !== color) ref.current?.pause();
     }

@@ -1,4 +1,4 @@
-import { Square, PieceSymbol } from "chess.js";
+import { Square, PieceSymbol, Color } from "chess.js";
 import { ReactNode } from "react";
 import { IconType } from "react-icons/lib";
 
@@ -136,10 +136,15 @@ export type PlayerInfo = {
   id: string;
   name: string;
   avatar: string;
+  color: Color;
+};
+
+export type PlayerInfoGame = PlayerInfo & {
+  isResign: boolean;
 };
 
 export type CapturePieces = {
-  [c in "w" | "b"]: { [p in Exclude<PieceSymbol, "k">]: number };
+  [c in Color]: { [p in Exclude<PieceSymbol, "k">]: number };
 };
 
 export type Setting = {

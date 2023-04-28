@@ -6,6 +6,7 @@ import HighlightSquares from "./HighlightSquares";
 import HintMoves from "./HintMoves";
 import Arrows from "./Arrows";
 import Promotion from "./Promotion";
+import GameOver from "./GameOver";
 
 type BoardMainProps = {};
 
@@ -29,6 +30,7 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
           <HintMoves />
           <Arrows />
           {promotion.show && <Promotion />}
+          <GameOver/>
         </Box>
       </Flex>
     </React.Fragment>
