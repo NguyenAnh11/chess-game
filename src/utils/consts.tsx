@@ -9,6 +9,8 @@ import {
 
 export const BOARD_WIDTH = 576;
 
+export const DEFAULT_DURATION = 15 * 60000;
+
 export const WHITE_ROWS = [7, 6, 5, 4, 3, 2, 1, 0];
 
 export const BLACK_ROWS = [0, 1, 2, 3, 4, 5, 6, 7];

@@ -12,7 +12,7 @@ type ClockProps = {
 
 export default function Clock({ color, duration }: ClockProps) {
   const ref = useRef<Countdown>(null);
-  const time = useRef(Date.now() + duration);
+  const time = useRef(duration);
 
   const { gameOver, moves, onGameOver } = useChess();
 
@@ -33,6 +33,10 @@ export default function Clock({ color, duration }: ClockProps) {
       if (turn !== color) ref.current?.pause();
     }
   }, [ref, turn, color, gameOver]);
+
+  useEffect(() => {
+    time.current = duration
+  }, [duration])
 
   return (
     <div className={clockClass}>

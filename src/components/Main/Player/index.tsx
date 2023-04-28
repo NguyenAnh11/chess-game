@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import { Color } from "chess.js";
 import { PlayerInfo } from "../../../types";
@@ -15,7 +14,7 @@ type BoardPlayerProp = {
 
 export default function BoardPlayer({ color, info }: BoardPlayerProp) {
   const { mode } = useSetting();
-  const { capturePieces, capturePiecesScore } = useChess();
+  const { duration, capturePieces, capturePiecesScore } = useChess();
 
   const captureColor = color === "w" ? "b" : "w";
 
@@ -46,7 +45,7 @@ export default function BoardPlayer({ color, info }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode === "AI" && <Clock color={color} duration={15 * 60000}/>}
+        {mode === "AI" && <Clock color={color} duration={duration}/>}
       </Box>
     </Box>
   );

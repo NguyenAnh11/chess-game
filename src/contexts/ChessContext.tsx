@@ -30,6 +30,7 @@ import {
   PlayerInfoGame,
 } from "../types";
 import {
+  DEFAULT_DURATION,
   SQUARE_STYLE,
   convertFen,
   getPosition,
@@ -50,6 +51,7 @@ type ChessboardProviderProps = {
 type ChessContext = {
   boardRef: RefObject<HTMLDivElement>;
   gameOver: boolean;
+  duration: number;
   isShowGameOver: boolean;
   position: BoardPosition;
   positionDifference: BoardDifference;
@@ -106,10 +108,9 @@ const ChessProvider = ({
 }: ChessboardProviderProps) => {
   const { setting } = useSetting();
   const game = useRef<Chess>(new Chess());
-  const [gameOver, setGameOver] = useState(
-    game.current.isGameOver() || game.current.isCheckmate()
-  );
-  const [isShowGameOver, setIsShowGameOver] = useState(false)
+  const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION)
+  const [gameOver, setGameOver] = useState(false);
+  const [isShowGameOver, setIsShowGameOver] = useState(false);
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
   );
@@ -154,11 +155,11 @@ const ChessProvider = ({
 
   const onCloseModalGameOver = () => {
     setIsShowGameOver(false);
-  }
+  };
 
   const onGameOver = () => {
     setGameOver(true);
-  }
+  };
 
   const onClearArrows = () => setArrows([]);
 
@@ -316,8 +317,7 @@ const ChessProvider = ({
   };
 
   const onDragPieceBegin = (square: Square) => {
-    if (gameOver || game.current.isCheckmate() || leftClick)
-      return;
+    if (gameOver || game.current.isCheckmate() || leftClick) return;
 
     setLeftClick(square);
   };
@@ -387,6 +387,7 @@ const ChessProvider = ({
 
   const onNewGame = () => {
     setMoves([]);
+    setDuration(Date.now() + DEFAULT_DURATION);
     setBoardIndex({ break: 0, step: 0 });
     game.current = new Chess();
   };
@@ -545,21 +546,21 @@ const ChessProvider = ({
   }, [viewSteps, position]);
 
   const playerGames = useMemo((): PlayerInfoGame[] => {
-    const players: PlayerInfoGame[] = playerInfos.map((p) => ({ ...p, lose: false }))
+    const players: PlayerInfoGame[] = playerInfos.map((p) => ({
+      ...p,
+      lose: false,
+    }));
     if (gameOver) {
-      const turnPlayer = players.find(p => p.color === turn)!
-      turnPlayer.lose = true
+      const turnPlayer = players.find((p) => p.color === turn)!;
+      turnPlayer.lose = true;
     }
 
-    return players
-  }, [gameOver])
+    return players;
+  }, [gameOver]);
 
   useEffect(() => {
-    const isGameOver = game.current.isCheckmate() || gameOver;
-    if (isGameOver) {
-      setGameOver(true);
-    }
-  }, [game.current.isCheckmate(), game.current.isGameOver()]);
+    setGameOver(game.current.isCheckmate() || game.current.isGameOver());
+  }, [game.current]);
 
   useEffect(() => {
     const nextPosition = convertFen(game.current.fen());
@@ -619,13 +620,14 @@ const ChessProvider = ({
     if (gameOver) {
       setIsShowGameOver(true);
     }
-  }, [gameOver])
+  }, [gameOver]);
 
   return (
     <ChessContext.Provider
       value={{
         boardRef,
         gameOver,
+        duration,
         isShowGameOver,
         position,
         positionDifference,
@@ -667,7 +669,7 @@ const ChessProvider = ({
         onChoosedPiecePromotion,
         onClosePromotion,
         onCloseModalGameOver,
-        onGameOver
+        onGameOver,
       }}
     >
       {children}
