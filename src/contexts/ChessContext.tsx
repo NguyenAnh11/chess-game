@@ -540,10 +540,10 @@ const ChessProvider = ({
   }, [viewSteps, position]);
 
   const playerGames = useMemo((): PlayerInfoGame[] => {
-    const players: PlayerInfoGame[] = playerInfos.map((p) => ({ ...p, isResign: false }))
+    const players: PlayerInfoGame[] = playerInfos.map((p) => ({ ...p, lose: false }))
     if (gameOver) {
       const turnPlayer = players.find(p => p.color === turn)!
-      turnPlayer.isResign = true
+      turnPlayer.lose = true
     }
 
     return players

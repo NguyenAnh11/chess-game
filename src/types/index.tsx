@@ -140,7 +140,7 @@ export type PlayerInfo = {
 };
 
 export type PlayerInfoGame = PlayerInfo & {
-  isResign: boolean;
+  lose: boolean;
 };
 
 export type CapturePieces = {

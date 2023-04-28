@@ -73,3 +73,60 @@
     top: 0;
     width: 30px;
 }
+
+.modal_game_over_players {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 11px;
+}
+
+.modal_game_over_score {
+    align-self: flex-start;
+    color: #fff;
+    font-weight: 500;
+    line-height: 0;
+    margin-top: 55px;
+    min-width: 44px;
+    text-align: center;
+}
+
+.modal_game_over_player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 17px;
+    width: 30%;
+}
+
+.modal_game_over_player_avatar_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 100px;
+}
+
+.modal_game_over_player_avatar {
+    box-shadow: 0 3px 4px 1px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    cursor: pointer;
+    position: relative;
+}
+
+.modal_game_over_player_avatar > img {
+    width: 80px;
+    height: 80px;
+}
+
+.modal_game_over_player_username {
+    color: #a7a6a2;
+    cursor: pointer;
+    line-height: 1.7rem;
+    margin-top: -.2rem;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    width: 100%;
+}
