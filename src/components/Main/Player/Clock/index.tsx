@@ -14,7 +14,7 @@ export default function Clock({ color, duration }: ClockProps) {
   const ref = useRef<Countdown>(null);
   const time = useRef(Date.now() + duration);
 
-  const { gameOver, moves } = useChess();
+  const { gameOver, moves, onGameOver } = useChess();
 
   const [bow, setBow] = useState(0);
 
@@ -64,6 +64,7 @@ export default function Clock({ color, duration }: ClockProps) {
           time.current -= 1;
           setBow((prev) => prev + 90);
         }}
+        onComplete={() => onGameOver()}
       />
     </div>
   );

@@ -46,7 +46,7 @@ export default function BoardPlayer({ color, info }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode === "Multiplayer" && <Clock color={color} duration={15 * 60000}/>}
+        {mode === "AI" && <Clock color={color} duration={15 * 60000}/>}
       </Box>
     </Box>
   );

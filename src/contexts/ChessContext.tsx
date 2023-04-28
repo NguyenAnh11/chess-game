@@ -91,6 +91,7 @@ type ChessContext = {
   onChoosedPiecePromotion: (piece: string) => void;
   onClosePromotion: () => void;
   onCloseModalGameOver: () => void;
+  onGameOver: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
@@ -155,6 +156,10 @@ const ChessProvider = ({
     setIsShowGameOver(false);
   }
 
+  const onGameOver = () => {
+    setGameOver(true);
+  }
+
   const onClearArrows = () => setArrows([]);
 
   const onClearLeftClick = () => setLeftClick(undefined);
@@ -185,7 +190,7 @@ const ChessProvider = ({
   };
 
   const onLeftClickDown = (square: Square) => {
-    if (game.current.isGameOver() || game.current.isDraw()) return;
+    if (gameOver || game.current.isDraw()) return;
 
     if (!leftClick) {
       kingUnderAttack && setKingUnderAttack(undefined);
@@ -311,7 +316,7 @@ const ChessProvider = ({
   };
 
   const onDragPieceBegin = (square: Square) => {
-    if (game.current.isGameOver() || game.current.isCheckmate() || leftClick)
+    if (gameOver || game.current.isCheckmate() || leftClick)
       return;
 
     setLeftClick(square);
@@ -550,10 +555,9 @@ const ChessProvider = ({
   }, [gameOver])
 
   useEffect(() => {
-    const isGameOver = game.current.isCheckmate() || game.current.isGameOver();
+    const isGameOver = game.current.isCheckmate() || gameOver;
     if (isGameOver) {
       setGameOver(true);
-      setIsShowGameOver(true);
     }
   }, [game.current.isCheckmate(), game.current.isGameOver()]);
 
@@ -611,6 +615,12 @@ const ChessProvider = ({
     }
   }, [promotion.choosedPiece]);
 
+  useEffect(() => {
+    if (gameOver) {
+      setIsShowGameOver(true);
+    }
+  }, [gameOver])
+
   return (
     <ChessContext.Provider
       value={{
@@ -656,7 +666,8 @@ const ChessProvider = ({
         onStep,
         onChoosedPiecePromotion,
         onClosePromotion,
-        onCloseModalGameOver
+        onCloseModalGameOver,
+        onGameOver
       }}
     >
       {children}
