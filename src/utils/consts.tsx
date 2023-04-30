@@ -1,3 +1,4 @@
+import { PieceSymbol } from "chess.js";
 import {
   SquareStyle,
   SquareColor as Sc,
@@ -8,6 +9,8 @@ import {
 } from "../types";
 
 export const BOARD_WIDTH = 576;
+
+export const DEFAULT_WAITTIME = 1000;
 
 export const DEFAULT_DURATION = 15 * 60000;
 
@@ -170,3 +173,12 @@ export const INITIAL_BOARD_POSITION: BoardPosition = {
 };
 
 export const PROMOTION_PIECES = ["b", "r", "n", "q"];
+
+export const PIECE_SCORES: { [p in PieceSymbol]: number } = {
+  q: 9,
+  p: 1,
+  n: 3,
+  b: 3,
+  r: 5,
+  k: 0,
+};

@@ -10,6 +10,7 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
+import { findRandomMove } from "../services/Minmax";
 import {
   BoardOrientation,
   BoardPosition,
@@ -28,6 +29,7 @@ import {
   CapturePieces,
   PlayerInfo,
   PlayerInfoGame,
+  MoveAction,
 } from "../types";
 import {
   DEFAULT_DURATION,
@@ -38,6 +40,9 @@ import {
   PIECE_COLOR_IMAGES,
   ANIMATIONS,
   getPositionDifference,
+  calcTimeExcute,
+  DEFAULT_WAITTIME,
+  PIECE_SCORES,
 } from "../utils";
 import { useSetting } from "./SettingContext";
 
@@ -86,7 +91,6 @@ type ChessContext = {
   onNewGame: () => void;
   undo: (num: number) => void;
   move: (start: number, end: number) => void;
-  onShowHint: () => void;
   onClearArrows: () => void;
   onStep: (index: number) => void;
   onChoosedPiecePromotion: (piece: string) => void;
@@ -105,7 +109,7 @@ const ChessProvider = ({
   orientation,
   playerInfos,
 }: ChessboardProviderProps) => {
-  const { mode, setting } = useSetting();
+  const { setting } = useSetting();
   const game = useRef<Chess>(new Chess());
   const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
   const [gameOver, setGameOver] = useState(false);
@@ -113,14 +117,15 @@ const ChessProvider = ({
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
   );
-  const turn = useMemo(
-    (): "w" | "b" => game.current.turn(),
-    [game.current.fen()]
-  );
+  const [turn, setTurn] = useState(game.current.turn());
   const [positionDifference, setPositionDifference] = useState<BoardDifference>(
     { added: {}, removed: {} }
   );
   const [moves, setMoves] = useState<Move[]>([]);
+  const [readyMove, setReadyMove] = useState<{
+    move: Move;
+    action: MoveAction;
+  }>();
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
@@ -158,7 +163,7 @@ const ChessProvider = ({
 
   const onClearLeftClick = () => setLeftClick(undefined);
 
-  const makeMove = (action: "click" | "drop", move: Move) => {
+  const makeMove = (action: MoveAction, move: Move) => {
     const cloneMoves = [...moves];
     if (
       orientation === "w" &&
@@ -176,9 +181,15 @@ const ChessProvider = ({
       cloneMoves.slice(boardIndex.step, moves.length - boardIndex.step);
     }
 
-    setMoves([...cloneMoves, move]);
+    const newMoves = [...cloneMoves, move];
+    setMoves(newMoves);
+
+    setTurn((prev) => (prev === "w" ? "b" : "w"));
+    setBoardIndex({ break: newMoves.length, step: newMoves.length });
 
     setLeftClick(undefined);
+
+    if (readyMove) setReadyMove(undefined);
 
     setIsManualDrop(action !== "click");
   };
@@ -192,7 +203,7 @@ const ChessProvider = ({
       return;
     }
 
-    if (leftClick === square) {
+    if (leftClick === square || orientation !== turn) {
       setLeftClick(undefined);
       return;
     }
@@ -318,7 +329,7 @@ const ChessProvider = ({
   const onDropPiece = (source: Square, target: Square) => {
     if (setting.board.moveMethod === "c") return;
 
-    if (source === target) {
+    if (source === target || orientation !== turn) {
       setLeftClick(undefined);
       return;
     }
@@ -395,8 +406,6 @@ const ChessProvider = ({
       else game.current.move({ from, to });
     }
   };
-
-  const onShowHint = () => {};
 
   const onStep = (index: number) => {
     const newStepIndex = index + 1;
@@ -509,23 +518,13 @@ const ChessProvider = ({
   const capturePiecesScore = useMemo(() => {
     const score: { [c in Color]: number } = { b: 0, w: 0 };
 
-    const pieceScore: { [p in Exclude<PieceSymbol, "k">]: number } = {
-      q: 9,
-      b: 3,
-      n: 3,
-      r: 5,
-      p: 1,
-    };
-
     Object.keys(score).forEach((color) => {
       let value = 0;
-      const pieces = Object.values(position).filter(
-        (p) => p && p[0] === color && p[1] !== "K"
-      );
+      const pieces = Object.values(position).filter((p) => p && p[0] === color);
 
       for (const piece of pieces) {
-        const pieceSymbol = piece[1].toLowerCase() as Exclude<PieceSymbol, "k">;
-        value += pieceScore[pieceSymbol];
+        const pieceSymbol = piece[1].toLowerCase() as PieceSymbol
+        value += PIECE_SCORES[pieceSymbol];
       }
 
       score[color as Color] = value;
@@ -545,6 +544,12 @@ const ChessProvider = ({
     }
 
     return players;
+  }, [gameOver]);
+
+  useEffect(() => {
+    if (gameOver) {
+      setIsShowGameOver(true);
+    }
   }, [gameOver]);
 
   useEffect(() => {
@@ -586,22 +591,6 @@ const ChessProvider = ({
   }, [game.current.fen()]);
 
   useEffect(() => {
-    const index = moves.length;
-
-    setBoardIndex({ break: index, step: index });
-
-    if (mode === "AI") {
-      if (
-        (orientation === "w" && moves.length % 2 === 0) ||
-        (orientation === "b" && moves.length % 2 === 1)
-      ) {
-        //make ai move
-        const moves = game.current.moves({ verbose: true })
-      }
-    }
-  }, [moves]);
-
-  useEffect(() => {
     if (promotion.choosedPiece) {
       const move = game.current.move({
         from: leftClick!,
@@ -616,10 +605,44 @@ const ChessProvider = ({
   }, [promotion.choosedPiece]);
 
   useEffect(() => {
-    if (gameOver) {
-      setIsShowGameOver(true);
+    if (orientation !== turn) {
+      const { time, value: move } = calcTimeExcute(() =>
+        findRandomMove(game.current)
+      );
+
+      const isReachToPromotionRow =
+        (orientation === move.color && move.from[1] === "7") ||
+        (orientation !== move.color && move.from[1] === "2");
+
+      if (position[move.from]![1] === "P" && isReachToPromotionRow) {
+        move.promotion = move.promotion || "q";
+      }
+
+      const delta = DEFAULT_WAITTIME - time;
+      if (delta > 0) {
+        setTimeout(() => {
+          setReadyMove({ action: "click", move });
+        }, delta);
+      } else {
+        setReadyMove({ action: "click", move });
+      }
     }
-  }, [gameOver]);
+  }, [turn]);
+
+  useEffect(() => {
+    if (orientation !== turn) {
+      if (!readyMove || boardIndex.step !== moves.length) return;
+      //make change
+      game.current.move({
+        from: readyMove.move.from,
+        to: readyMove.move.to,
+        promotion: readyMove.move.promotion,
+      });
+
+      //make move
+      makeMove(readyMove.action, readyMove.move);
+    }
+  }, [turn, readyMove, boardIndex.step]);
 
   return (
     <ChessContext.Provider
@@ -661,7 +684,6 @@ const ChessProvider = ({
         onNewGame,
         undo,
         move,
-        onShowHint,
         onClearArrows,
         onStep,
         onChoosedPiecePromotion,

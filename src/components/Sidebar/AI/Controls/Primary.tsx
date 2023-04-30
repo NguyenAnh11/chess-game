@@ -10,7 +10,6 @@ export default function PrimaryControls() {
     moves,
     boardIndex,
     onNewGame,
-    onShowHint,
     setBoardIndex,
     undo,
     move,
@@ -101,6 +100,10 @@ export default function PrimaryControls() {
       }
     }
   };
+
+  const onShowHint = () => {
+    
+  }
 
   return (
     <Grid

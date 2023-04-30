@@ -21,19 +21,19 @@ export function getPositionDifference(
 ): BoardDifference {
   const difference: BoardDifference = { added: {}, removed: {} };
 
-  (Object.keys(current) as Array<keyof typeof current>).forEach(sq => {
+  (Object.keys(current) as Array<keyof typeof current>).forEach((sq) => {
     if (current[sq] && next[sq] !== current[sq]) {
-      difference.removed[sq] = current[sq]
+      difference.removed[sq] = current[sq];
     }
   });
 
-  (Object.keys(next) as Array<keyof typeof next>).forEach(sq => {
+  (Object.keys(next) as Array<keyof typeof next>).forEach((sq) => {
     if (next[sq] && next[sq] !== current[sq]) {
       difference.added[sq] = next[sq];
     }
   });
 
-  return difference
+  return difference;
 }
 
 export function getRelativePosition(
@@ -120,4 +120,14 @@ function toPiece(piece: string): Piece {
 
 function toColumn(index: number): string {
   return COLUMNS[index];
+}
+
+export function calcTimeExcute<T>(cb: () => T): { time: number; value: T } {
+  const startTime = performance.now();
+
+  const value = cb();
+
+  const endTime = performance.now();
+
+  return { time: endTime - startTime, value };
 }

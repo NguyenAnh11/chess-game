@@ -43,6 +43,8 @@ export type Position = {
 
 export type BoardOrientation = "w" | "b";
 
+export type MoveAction = "drop" | "click";
+
 export type MoveMethod = "dc" | "d" | "c";
 
 export type Coordinate = "none" | "inside" | "outside";

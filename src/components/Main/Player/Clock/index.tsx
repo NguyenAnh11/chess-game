@@ -14,11 +14,9 @@ export default function Clock({ color, duration }: ClockProps) {
   const ref = useRef<Countdown>(null);
   const time = useRef(duration);
 
-  const { gameOver, moves, onGameOver } = useChess();
+  const { turn, gameOver, onGameOver } = useChess();
 
   const [bow, setBow] = useState(0);
-
-  const turn = moves.length % 2 === 0 ? "w" : "b";
 
   const clockClass = cn(css.clock, {
     [css.white]: color === "w",
