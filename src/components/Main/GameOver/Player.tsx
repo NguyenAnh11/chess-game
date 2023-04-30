@@ -1,6 +1,5 @@
 import css from "./gameover.module.css";
 import { PlayerInfoGame } from "../../../types";
-import { Image } from "@chakra-ui/react";
 
 type GameOverPlayerProps = {
   player: PlayerInfoGame;

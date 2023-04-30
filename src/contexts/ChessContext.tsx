@@ -106,9 +106,9 @@ const ChessProvider = ({
   orientation,
   playerInfos,
 }: ChessboardProviderProps) => {
-  const { setting } = useSetting();
+  const { mode, setting } = useSetting();
   const game = useRef<Chess>(new Chess());
-  const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION)
+  const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
   const [gameOver, setGameOver] = useState(false);
   const [isShowGameOver, setIsShowGameOver] = useState(false);
   const [position, setPosition] = useState<BoardPosition>(
@@ -149,17 +149,11 @@ const ChessProvider = ({
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
   };
 
-  const onClosePromotion = () => {
-    setPromotion({ show: false, waiting: false });
-  };
+  const onClosePromotion = () => setPromotion({ show: false, waiting: false });
 
-  const onCloseModalGameOver = () => {
-    setIsShowGameOver(false);
-  };
+  const onCloseModalGameOver = () => setIsShowGameOver(false);
 
-  const onGameOver = () => {
-    setGameOver(true);
-  };
+  const onGameOver = () => setGameOver(true);
 
   const onClearArrows = () => setArrows([]);
 
@@ -600,6 +594,16 @@ const ChessProvider = ({
     const index = moves.length;
 
     setBoardIndex({ break: index, step: index });
+
+    if (mode === "AI") {
+      if (
+        (orientation === "w" && moves.length % 2 === 0) ||
+        (orientation === "b" && moves.length % 2 === 1)
+      ) {
+        //make ai move
+        const moves = game.current.moves({ verbose: true })
+      }
+    }
   }, [moves]);
 
   useEffect(() => {

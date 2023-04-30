@@ -41,7 +41,7 @@ export default function Clock({ color, duration }: ClockProps) {
   return (
     <div className={clockClass}>
       <div
-        style={{ opacity: color === turn ? 1 : 0 }}
+        style={{ opacity: gameOver ? 0 :  color === turn ? 1 : 0 }}
         className={css.clock_icon}
       >
         <svg
