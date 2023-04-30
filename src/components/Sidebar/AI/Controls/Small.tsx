@@ -7,7 +7,7 @@ import { useChess } from "../../../../contexts/ChessContext";
 import { useSetting } from "../../../../contexts/SettingContext";
 
 export default function SmallControls() {
-  const { boardRef, onResign } = useChess();
+  const { boardRef, onGameOver } = useChess();
   const { onOpenEditSetting } = useSetting();
 
   const onDownload = () => {
@@ -15,6 +15,10 @@ export default function SmallControls() {
     if (element) {
     }
   };
+
+  const onResign = () => {
+    onGameOver();
+  }
 
   return (
     <Flex w="full" justify="space-between">

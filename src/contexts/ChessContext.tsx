@@ -83,7 +83,6 @@ type ChessContext = {
   onRightClickDown: (square: Square) => void;
   onClearRightClicks: () => void;
   onDragPieceBegin: (square: Square) => void;
-  onResign: () => void;
   onNewGame: () => void;
   undo: (num: number) => void;
   move: (start: number, end: number) => void;
@@ -375,10 +374,6 @@ const ChessProvider = ({
     }
   };
 
-  const onResign = () => {
-    setGameOver(true);
-  };
-
   const onNewGame = () => {
     setMoves([]);
     setDuration(Date.now() + DEFAULT_DURATION);
@@ -663,7 +658,6 @@ const ChessProvider = ({
         onRightClickDown,
         onClearRightClicks,
         onDragPieceBegin,
-        onResign,
         onNewGame,
         undo,
         move,
