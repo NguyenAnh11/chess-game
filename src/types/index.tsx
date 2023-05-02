@@ -108,6 +108,7 @@ export type HintMove = CustomSquare & {
 export type SuggestMove = {
   move: Move | undefined;
   hidden: boolean;
+  loading: boolean;
 }
 
 export type KingSquare = CustomSquare;

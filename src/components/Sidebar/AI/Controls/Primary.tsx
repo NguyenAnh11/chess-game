@@ -3,11 +3,9 @@ import { Grid, Tooltip, Icon } from "@chakra-ui/react";
 import { HiLightBulb } from "react-icons/hi";
 import { IoChevronBack, IoChevronForward, IoAdd } from "react-icons/io5";
 import { useChess } from "../../../../contexts/ChessContext";
-import { findBestMove } from "../../../../services/Minmax";
 
 export default function PrimaryControls() {
   const {
-    game,
     turn,
     orientation,
     moves,
@@ -17,8 +15,8 @@ export default function PrimaryControls() {
     setBoardIndex,
     undo,
     move,
+    onSuggestMove,
     onHiddenSuggestMove,
-    onSetSuggestMove
   } = useChess();
 
   const onMoveBack = () => {
@@ -110,13 +108,12 @@ export default function PrimaryControls() {
   const onShowHint = () => {
     if (turn === orientation) {
       if (!suggestMove.move) {
-        const move = findBestMove(game);
-        onSetSuggestMove(move);
+        onSuggestMove();
       } else {
         onHiddenSuggestMove();
       }
     }
-  }
+  };
 
   return (
     <Grid
@@ -126,7 +123,7 @@ export default function PrimaryControls() {
       gap="2"
       templateColumns="repeat(auto-fit, minmax(4rem, 1fr))"
     >
-      <Tooltip label="New Game" >
+      <Tooltip label="New Game">
         <Button label="New Game" variant="basic" onClick={onNewGame}>
           <Icon as={IoAdd} fontSize="3xl" color="#666463" />
         </Button>
@@ -142,7 +139,11 @@ export default function PrimaryControls() {
         </Button>
       </Tooltip>
       <Tooltip label="Show Hint">
-        <Button label="Show Hint" variant="basic" onClick={onShowHint}>
+        <Button
+          label="Show Hint"
+          variant="basic"
+          onClick={onShowHint}
+        >
           <Icon as={HiLightBulb} fontSize="3xl" color="#666463" />
         </Button>
       </Tooltip>

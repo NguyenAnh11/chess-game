@@ -4,20 +4,12 @@ import { PIECE_SCORES } from "../utils";
 
 const CHECKMATE = 1000;
 const STALEMATE = 0;
-const DEPTH = 3;
+const DEPTH = 4;
 
-export const findRandomMove = (game: Chess): Move => {
-  const possibleMoves = game.moves({ verbose: true });
-  const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-  return possibleMoves[randomIndex];
-};
+export function findBestMove(game: Chess): Move {
+  const move = minMax(game, DEPTH, game.turn() === "w")[1];
 
-export async function findBestMove(
-  game: Chess
-): Promise<[number, Move | undefined]> {
-  return new Promise((resolve) => {
-    resolve(minMax(game, DEPTH, game.turn() === "w"));
-  });
+  return move!;
 }
 
 function minMax(

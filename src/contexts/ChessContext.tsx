@@ -11,7 +11,7 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
-import { findBestMove } from "../services/Minmax";
+import { createAIWorker, createHintWorker } from "../services/workers";
 import {
   BoardOrientation,
   BoardPosition,
@@ -100,12 +100,10 @@ type ChessContext = {
   onCloseModalGameOver: () => void;
   onGameOver: () => void;
   onHiddenSuggestMove: () => void;
-  onSetSuggestMove: (move: Move) => void;
+  onSuggestMove: () => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
-
-const initialSuggestMoveValue: SuggestMove = { hidden: false, move: undefined };
 
 export const useChess = () => useContext(ChessContext);
 
@@ -132,9 +130,11 @@ const ChessProvider = ({
     move: Move;
     action: MoveAction;
   }>();
-  const [suggestMove, setSuggestMove] = useState<SuggestMove>(
-    initialSuggestMoveValue
-  );
+  const [suggestMove, setSuggestMove] = useState<SuggestMove>({
+    hidden: false,
+    move: undefined,
+    loading: false,
+  });
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
@@ -158,6 +158,10 @@ const ChessProvider = ({
     waiting: false,
   });
 
+  const HintWorker = useRef<Worker>(createHintWorker());
+
+  const AIWorker = useRef<Worker>(createAIWorker());
+
   const onChoosedPiecePromotion = (piece: string) => {
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
   };
@@ -176,12 +180,18 @@ const ChessProvider = ({
     setSuggestMove((prev) => ({ ...prev, hidden: !prev.hidden }));
   };
 
-  const onSetSuggestMove = (move: Move) => {
-    setSuggestMove((prev) => ({ hidden: false, move }));
-  };
+  const onSuggestMove = () => {
+    setSuggestMove((prev) => ({ ...prev, loading: true }));
 
-  const onClearSuggestMove = () => {
-    setSuggestMove(initialSuggestMoveValue);
+    HintWorker.current = createHintWorker(); //create after terminate
+
+    HintWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
+
+    HintWorker.current.onmessage = (e: MessageEvent<Move>) => {
+      const move = e.data;
+      console.log("Move: ", move);
+      setSuggestMove({ loading: false, hidden: false, move });
+    };
   };
 
   const makeMove = (action: MoveAction, move: Move) => {
@@ -411,6 +421,11 @@ const ChessProvider = ({
     setTurn("w");
     setDuration(Date.now() + DEFAULT_DURATION);
     setBoardIndex({ break: 0, step: 0 });
+
+    //terminate worker
+    AIWorker.current.terminate();
+    HintWorker.current.terminate();
+    //reset game state
     game.current = new Chess();
   };
 
@@ -650,22 +665,27 @@ const ChessProvider = ({
   }, [promotion.choosedPiece]);
 
   useEffect(() => {
-    onClearSuggestMove();
-  }, [turn]);
+    if (orientation !== turn && window.Worker) {
+      AIWorker.current = createAIWorker(); //create after terminate
+
+      AIWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
+
+      AIWorker.current.onmessage = (e: MessageEvent<Move>) => {
+        const move = e.data;
+        console.log("Move: ", move);
+        setReadyMove({ action: "click", move });
+      };
+    }
+  }, [position]);
 
   useEffect(() => {
-    if (orientation !== turn) {
-      async function aiMove() {
-        const [score, move] = await findBestMove(game.current)
-        console.log('Score: ', score)
-        if (move) {
-          setReadyMove({ action: "click", move });
-        }
-      }
-
-      aiMove()
+    if (orientation !== turn && suggestMove.loading) {
+      console.log("Terminate hint worker...");
+      HintWorker.current.terminate();
     }
-  }, [position])
+
+    setSuggestMove((prev) => ({ ...prev, move: undefined }));
+  }, [turn, suggestMove.loading]);
 
   useEffect(() => {
     if (orientation !== turn) {
@@ -731,7 +751,7 @@ const ChessProvider = ({
         onCloseModalGameOver,
         onGameOver,
         onHiddenSuggestMove,
-        onSetSuggestMove,
+        onSuggestMove,
       }}
     >
       {children}
