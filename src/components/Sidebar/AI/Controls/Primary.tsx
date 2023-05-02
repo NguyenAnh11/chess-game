@@ -142,6 +142,7 @@ export default function PrimaryControls() {
         <Button
           label="Show Hint"
           variant="basic"
+          loading={suggestMove.loading}
           onClick={onShowHint}
         >
           <Icon as={HiLightBulb} fontSize="3xl" color="#666463" />
