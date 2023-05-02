@@ -158,9 +158,9 @@ const ChessProvider = ({
     waiting: false,
   });
 
-  const HintWorker = useRef<Worker>(createHintWorker());
+  const HintWorker = useRef<Worker>();
 
-  const AIWorker = useRef<Worker>(createAIWorker());
+  const AIWorker = useRef<Worker>();
 
   const onChoosedPiecePromotion = (piece: string) => {
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
@@ -183,7 +183,8 @@ const ChessProvider = ({
   const onSuggestMove = () => {
     setSuggestMove((prev) => ({ ...prev, loading: true }));
 
-    HintWorker.current = createHintWorker(); //create after terminate
+    if (!HintWorker.current)
+      HintWorker.current = createHintWorker(); //create after terminate
 
     HintWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
 
@@ -423,8 +424,15 @@ const ChessProvider = ({
     setBoardIndex({ break: 0, step: 0 });
 
     //terminate worker
-    AIWorker.current.terminate();
-    HintWorker.current.terminate();
+    if (AIWorker.current) {
+      AIWorker.current.terminate();
+      AIWorker.current = undefined;
+    }
+
+    if (HintWorker.current) {
+      HintWorker.current.terminate();
+      HintWorker.current = undefined;
+    }
     //reset game state
     game.current = new Chess();
   };
@@ -666,7 +674,8 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn && window.Worker) {
-      AIWorker.current = createAIWorker(); //create after terminate
+      if (!AIWorker.current) 
+        AIWorker.current = createAIWorker(); //create after terminate
 
       AIWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
 
@@ -681,7 +690,7 @@ const ChessProvider = ({
   useEffect(() => {
     if (orientation !== turn && suggestMove.loading) {
       console.log("Terminate hint worker...");
-      HintWorker.current.terminate();
+      HintWorker.current!.terminate();
     }
 
     setSuggestMove((prev) => ({ ...prev, move: undefined }));
