@@ -1,18 +1,20 @@
 import { ReactNode, forwardRef } from "react";
 import css from "./button.module.css";
 import cn from "classnames";
+import Loading from "../../../assets/loading.svg"
 
 type ButtonProps = {
   label: string;
   disabled?: boolean;
   variant?: "basic" | "primary";
   size?: "sm" | "md";
+  loading?: boolean;
   children: ReactNode;
   onClick: () => void;
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ label, disabled, size = "md", variant, onClick, children }, ref) => {
+  ({ label, disabled, size = "md", loading = false, variant, onClick, children }, ref) => {
     return (
       <button
         ref={ref}
@@ -25,7 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         onClick={onClick}
       >
-        {children}
+        {loading ? <Loading/> : children}
       </button>
     );
   }

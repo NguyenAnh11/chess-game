@@ -1,4 +1,5 @@
 import { Chess, Color, Move, PieceSymbol, Square } from "chess.js";
+import _ from "lodash";
 import React, {
   createContext,
   useContext,
@@ -10,7 +11,7 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
-import { findRandomMove } from "../services/Minmax";
+import { findBestMove } from "../services/Minmax";
 import {
   BoardOrientation,
   BoardPosition,
@@ -30,6 +31,7 @@ import {
   PlayerInfo,
   PlayerInfoGame,
   MoveAction,
+  SuggestMove,
 } from "../types";
 import {
   DEFAULT_DURATION,
@@ -55,6 +57,7 @@ type ChessboardProviderProps = {
 
 type ChessContext = {
   boardRef: RefObject<HTMLDivElement>;
+  game: Chess;
   gameOver: boolean;
   duration: number;
   isShowGameOver: boolean;
@@ -69,6 +72,7 @@ type ChessContext = {
   animationDuration: number;
   moves: Move[];
   premoves: Premove[];
+  suggestMove: SuggestMove;
   arrows: Arrow[];
   lastMove: Move | undefined;
   highlightSquares: HighlightSquare[];
@@ -97,9 +101,13 @@ type ChessContext = {
   onClosePromotion: () => void;
   onCloseModalGameOver: () => void;
   onGameOver: () => void;
+  onHiddenSuggestMove: () => void;
+  onSetSuggestMove: (move: Move) => void;
 };
 
 export const ChessContext = createContext({} as ChessContext);
+
+const initialSuggestMoveValue: SuggestMove = { hidden: false, move: undefined };
 
 export const useChess = () => useContext(ChessContext);
 
@@ -126,6 +134,9 @@ const ChessProvider = ({
     move: Move;
     action: MoveAction;
   }>();
+  const [suggestMove, setSuggestMove] = useState<SuggestMove>(
+    initialSuggestMoveValue
+  );
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
@@ -162,6 +173,18 @@ const ChessProvider = ({
   const onClearArrows = () => setArrows([]);
 
   const onClearLeftClick = () => setLeftClick(undefined);
+
+  const onHiddenSuggestMove = () => {
+    setSuggestMove((prev) => ({ ...prev, hidden: !prev.hidden }));
+  };
+
+  const onSetSuggestMove = (move: Move) => {
+    setSuggestMove((prev) => ({ hidden: false, move }));
+  };
+
+  const onClearSuggestMove = () => {
+    setSuggestMove(initialSuggestMoveValue);
+  };
 
   const makeMove = (action: MoveAction, move: Move) => {
     const cloneMoves = [...moves];
@@ -213,11 +236,11 @@ const ChessProvider = ({
     try {
       let move: Move;
 
-      const isReachToPromotionRow =
-        (orientation === color && leftClick[1] === "7") ||
-        (orientation !== color && leftClick[1] === "2");
-
-      if (position[leftClick]![1] === "P" && isReachToPromotionRow) {
+      if (
+        position[leftClick]![1] === "P" &&
+        ((orientation === color && leftClick[1] === "7") ||
+          (orientation !== color && leftClick[1] === "2"))
+      ) {
         const isMoveToEndRow =
           hintMoves.find((p) => p.square === square) !== undefined;
 
@@ -339,11 +362,11 @@ const ChessProvider = ({
     try {
       let move: Move;
 
-      const isReachToPromotionRow =
-        (orientation === color && source[1] === "7") ||
-        (orientation !== color && source[1] === "2");
-
-      if (position[source]![1] === "P" && isReachToPromotionRow) {
+      if (
+        position[source]![1] === "P" &&
+        ((orientation === color && source[1] === "7") ||
+          (orientation !== color && source[1] === "2"))
+      ) {
         const isMoveToEndRow =
           hintMoves.find((p) => p.square === target) !== undefined;
 
@@ -455,7 +478,7 @@ const ChessProvider = ({
       if (lastMove) leftClicks.push(lastMove.from, lastMove.to);
 
       for (const left of leftClicks) {
-        if (!rightClicks.includes(left)) {
+        if (!suggestMove.move || suggestMove.move.from !== left) {
           const { row, col } = getPosition(left, orientation);
           squares.push({
             square: left,
@@ -468,8 +491,30 @@ const ChessProvider = ({
       }
     }
 
+    if (suggestMove.move && !suggestMove.hidden) {
+      for (const square of Object.values(
+        _.pick(suggestMove.move, ["from", "to"])
+      ) as Array<Square>) {
+        const { row, col } = getPosition(square, orientation);
+        squares.push({
+          square,
+          type: "suggest",
+          row,
+          col,
+          color: getColor(row, col),
+        });
+      }
+    }
+
     return squares;
-  }, [leftClick, lastMove, setting.board.highlightMove, rightClicks]);
+  }, [
+    lastMove,
+    leftClick,
+    rightClicks,
+    suggestMove.move,
+    suggestMove.hidden,
+    setting.board.highlightMove,
+  ]);
 
   const hintMoves = useMemo((): HintMove[] => {
     const hintMoves: HintMove[] = [];
@@ -478,7 +523,8 @@ const ChessProvider = ({
       setting.board.showHintMove &&
       leftClick &&
       position[leftClick] &&
-      position[leftClick]![0] === orientation
+      position[leftClick]![0] === orientation &&
+      (!suggestMove.move || suggestMove.move.from !== leftClick)
     ) {
       const moves = game.current.moves({ square: leftClick, verbose: true });
       for (const { to } of moves) {
@@ -491,7 +537,7 @@ const ChessProvider = ({
     }
 
     return hintMoves;
-  }, [leftClick, setting.board.showHintMove]);
+  }, [leftClick, suggestMove.move, setting.board.showHintMove]);
 
   const capturePieces = useMemo((): CapturePieces => {
     const playerPieces: CapturePieces = {
@@ -523,7 +569,7 @@ const ChessProvider = ({
       const pieces = Object.values(position).filter((p) => p && p[0] === color);
 
       for (const piece of pieces) {
-        const pieceSymbol = piece[1].toLowerCase() as PieceSymbol
+        const pieceSymbol = piece[1].toLowerCase() as PieceSymbol;
         value += PIECE_SCORES[pieceSymbol];
       }
 
@@ -605,16 +651,20 @@ const ChessProvider = ({
   }, [promotion.choosedPiece]);
 
   useEffect(() => {
+    onClearSuggestMove()
+  }, [turn]);
+
+  useEffect(() => {
     if (orientation !== turn) {
       const { time, value: move } = calcTimeExcute(() =>
-        findRandomMove(game.current)
+        findBestMove(game.current)
       );
 
-      const isReachToPromotionRow =
-        (orientation === move.color && move.from[1] === "7") ||
-        (orientation !== move.color && move.from[1] === "2");
-
-      if (position[move.from]![1] === "P" && isReachToPromotionRow) {
+      if (
+        move.piece === "p" &&
+        ((orientation === move.color && move.from[1] === "7") ||
+          (orientation !== move.color && move.from[1] === "2"))
+      ) {
         move.promotion = move.promotion || "q";
       }
 
@@ -648,6 +698,7 @@ const ChessProvider = ({
     <ChessContext.Provider
       value={{
         boardRef,
+        game: game.current,
         gameOver,
         duration,
         isShowGameOver,
@@ -660,9 +711,10 @@ const ChessProvider = ({
         squareStyle: SQUARE_STYLE[setting.board.squareColor],
         pieceImages: PIECE_COLOR_IMAGES[setting.board.pieceColor],
         animationDuration: ANIMATIONS[setting.board.animation],
+        arrows,
         moves,
         premoves,
-        arrows,
+        suggestMove,
         lastMove,
         highlightSquares,
         hintMoves,
@@ -690,6 +742,8 @@ const ChessProvider = ({
         onClosePromotion,
         onCloseModalGameOver,
         onGameOver,
+        onHiddenSuggestMove,
+        onSetSuggestMove,
       }}
     >
       {children}

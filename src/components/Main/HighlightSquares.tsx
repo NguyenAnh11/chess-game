@@ -11,14 +11,19 @@ export default function HighlightSquares() {
         const style: CSSProperties = {};
         switch (hq.type) {
           case "left":
+            style.opacity = 0.5
             style.background = squareStyle["highlight"];
             break;
           case "right":
+            style.opacity = 0.75
             style.background =
               hq.color === "b"
                 ? squareStyle["premove:dark"]
                 : squareStyle["premove:light"];
             break;
+          case "suggest": 
+            style.opacity = 0.75
+            style.background = squareStyle["suggest"]
         }
 
         return (

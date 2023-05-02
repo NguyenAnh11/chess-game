@@ -3,16 +3,22 @@ import { Grid, Tooltip, Icon } from "@chakra-ui/react";
 import { HiLightBulb } from "react-icons/hi";
 import { IoChevronBack, IoChevronForward, IoAdd } from "react-icons/io5";
 import { useChess } from "../../../../contexts/ChessContext";
+import { findBestMove } from "../../../../services/Minmax";
 
 export default function PrimaryControls() {
   const {
+    game,
+    turn,
     orientation,
     moves,
+    suggestMove,
     boardIndex,
     onNewGame,
     setBoardIndex,
     undo,
     move,
+    onHiddenSuggestMove,
+    onSetSuggestMove
   } = useChess();
 
   const onMoveBack = () => {
@@ -102,7 +108,14 @@ export default function PrimaryControls() {
   };
 
   const onShowHint = () => {
-    
+    if (turn === orientation) {
+      if (!suggestMove.move) {
+        const move = findBestMove(game);
+        onSetSuggestMove(move);
+      } else {
+        onHiddenSuggestMove();
+      }
+    }
   }
 
   return (

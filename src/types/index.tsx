@@ -1,4 +1,4 @@
-import { Square, PieceSymbol, Color } from "chess.js";
+import { Square, PieceSymbol, Color, Move } from "chess.js";
 import { ReactNode } from "react";
 import { IconType } from "react-icons/lib";
 
@@ -59,6 +59,7 @@ export type SquareStyle = {
     | "default.dark"
     | "over"
     | "highlight"
+    | "suggest"
     | "premove:light"
     | "premove:dark"
     | "arrow:shift"
@@ -96,13 +97,18 @@ export type CustomSquare = {
 };
 
 export type HighlightSquare = CustomSquare & {
-  type: "left" | "right" | "premove" | "king:check";
+  type: "left" | "right" | "premove" | "king:check" | "suggest";
   color: "w" | "b";
 };
 
 export type HintMove = CustomSquare & {
   type: "hint" | "capture";
 };
+
+export type SuggestMove = {
+  move: Move | undefined;
+  hidden: boolean;
+}
 
 export type KingSquare = CustomSquare;
 

@@ -3,7 +3,7 @@ import MoveList from "./MoveList";
 
 export default function MoveContainer() {
     return (
-        <Flex flex="4" direction="column" overflow="hidden">
+        <Flex flex="4" h="full" direction="column" overflow="hidden">
             <Box overflow="auto">
                 <MoveList/>
             </Box>
