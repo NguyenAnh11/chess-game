@@ -651,7 +651,7 @@ const ChessProvider = ({
   }, [promotion.choosedPiece]);
 
   useEffect(() => {
-    onClearSuggestMove()
+    onClearSuggestMove();
   }, [turn]);
 
   useEffect(() => {
@@ -677,7 +677,7 @@ const ChessProvider = ({
         setReadyMove({ action: "click", move });
       }
     }
-  }, [turn]);
+  }, [position]);
 
   useEffect(() => {
     if (orientation !== turn) {

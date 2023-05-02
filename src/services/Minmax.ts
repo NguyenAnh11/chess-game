@@ -4,6 +4,7 @@ import { PIECE_SCORES } from "../utils";
 
 const CHECKMATE = 1000;
 const STALEMATE = 0;
+const DEPTH = 3;
 
 export const findRandomMove = (game: Chess): Move => {
   const possibleMoves = game.moves({ verbose: true });
@@ -12,47 +13,48 @@ export const findRandomMove = (game: Chess): Move => {
 };
 
 export const findBestMove = (game: Chess): Move => {
-  const turn = game.turn();
-  const turnMultiiplier = turn === "w" ? 1 : -1;
-  let bestMove: Move
+  const [score, move] = minMax(game, DEPTH, game.turn() === "w")
 
-  if (turn === "w") {
-    let minMaxScore = -CHECKMATE;
-    const moves = shuffle(game.moves({ verbose: true }));
-    for (const move of moves) {
-      makeMove(game, move);
+  console.log('Score: ', score)
 
-      const opponentMoves = game.moves({ verbose: true });
+  return move!
+};
 
-      let opponentMaxScore = CHECKMATE;
-
-      for (const opponentMove of opponentMoves) {
-        makeMove(game, opponentMove);
-
-        let score = 0;
-        if (game.isCheckmate()) score = -turnMultiiplier * CHECKMATE;
-        else if (game.isStalemate() || game.isDraw()) score = STALEMATE;
-        else score = -turnMultiiplier * evaluateBoard(game);
-        if (score < opponentMaxScore) {
-          opponentMaxScore = score;
-        }
-
-        game.undo();
-      }
-
-      if (opponentMaxScore > minMaxScore) {
-        minMaxScore = opponentMaxScore;
-        bestMove = move
-      }
-
-      game.undo();
-    }
-
-    return bestMove!
+function minMax(game: Chess, depth: number, whiteToMove: boolean): [number, Move | undefined] {
+  if (depth === 0) {
+    const value = evaluateBoard(game)
+    return [value, undefined]
   }
 
-  return findRandomMove(game)
-};
+  let bestMove: Move;
+  const moves = shuffle(game.moves({ verbose: true }));
+
+  let bestScore: number = whiteToMove ? -CHECKMATE : CHECKMATE
+
+  for (let index = 0; index < moves.length; index++) {
+    const move = moves[index]
+
+    makeMove(game, move)
+
+    const score = minMax(game, depth - 1, !whiteToMove)[0]
+
+    if (whiteToMove) {
+      if (score > bestScore) {
+        bestScore = score
+        bestMove = move
+      }
+    } else {
+      if (score < bestScore) {
+        bestScore = score;
+        bestMove = move;
+      }
+    }
+
+    game.undo();
+  }
+
+  return [bestScore, bestMove!]
+}
 
 function makeMove(game: Chess, move: Move) {
   game.move({ from: move.from, to: move.to, promotion: move.promotion || "q" });
@@ -75,15 +77,21 @@ function shuffle(moves: Move[]): Move[] {
 }
 
 function evaluateBoard(game: Chess): number {
-  let value = 0;
+  if (game.isStalemate()) return STALEMATE;
 
-  game.board().forEach((row) => {
-    row.forEach((piece) => {
-      if (piece) {
-        value += (piece.color === "w" ? 1 : -1) * PIECE_SCORES[piece.type];
-      }
-    });
-  });
+  if (game.isCheckmate()) {
+    if (game.turn() === "w") return CHECKMATE;
+    return -CHECKMATE;
+  }
 
-  return value;
+  const score = _.flatten(game.board()).reduce((prev, piece) => {
+    if (piece) {
+      const pieceMultiplier = piece.color === "w" ? 1 : -1;
+      prev += pieceMultiplier * PIECE_SCORES[piece.type];
+    }
+
+    return prev;
+  }, 0);
+
+  return score;
 }
