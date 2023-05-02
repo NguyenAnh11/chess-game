@@ -12,36 +12,40 @@ export const findRandomMove = (game: Chess): Move => {
   return possibleMoves[randomIndex];
 };
 
-export const findBestMove = (game: Chess): Move => {
-  const [score, move] = minMax(game, DEPTH, game.turn() === "w")
+export async function findBestMove(
+  game: Chess
+): Promise<[number, Move | undefined]> {
+  return new Promise((resolve) => {
+    resolve(minMax(game, DEPTH, game.turn() === "w"));
+  });
+}
 
-  console.log('Score: ', score)
-
-  return move!
-};
-
-function minMax(game: Chess, depth: number, whiteToMove: boolean): [number, Move | undefined] {
+function minMax(
+  game: Chess,
+  depth: number,
+  whiteToMove: boolean
+): [number, Move | undefined] {
   if (depth === 0) {
-    const value = evaluateBoard(game)
-    return [value, undefined]
+    const value = evaluateBoard(game);
+    return [value, undefined];
   }
 
   let bestMove: Move;
   const moves = shuffle(game.moves({ verbose: true }));
 
-  let bestScore: number = whiteToMove ? -CHECKMATE : CHECKMATE
+  let bestScore: number = whiteToMove ? -CHECKMATE : CHECKMATE;
 
   for (let index = 0; index < moves.length; index++) {
-    const move = moves[index]
+    const move = moves[index];
 
-    makeMove(game, move)
+    makeMove(game, move);
 
-    const score = minMax(game, depth - 1, !whiteToMove)[0]
+    const score = minMax(game, depth - 1, !whiteToMove)[0];
 
     if (whiteToMove) {
       if (score > bestScore) {
-        bestScore = score
-        bestMove = move
+        bestScore = score;
+        bestMove = move;
       }
     } else {
       if (score < bestScore) {
@@ -53,7 +57,7 @@ function minMax(game: Chess, depth: number, whiteToMove: boolean): [number, Move
     game.undo();
   }
 
-  return [bestScore, bestMove!]
+  return [bestScore, bestMove!];
 }
 
 function makeMove(game: Chess, move: Move) {

@@ -42,8 +42,6 @@ import {
   PIECE_COLOR_IMAGES,
   ANIMATIONS,
   getPositionDifference,
-  calcTimeExcute,
-  DEFAULT_WAITTIME,
   PIECE_SCORES,
 } from "../utils";
 import { useSetting } from "./SettingContext";
@@ -410,6 +408,7 @@ const ChessProvider = ({
 
   const onNewGame = () => {
     setMoves([]);
+    setTurn("w");
     setDuration(Date.now() + DEFAULT_DURATION);
     setBoardIndex({ break: 0, step: 0 });
     game.current = new Chess();
@@ -656,28 +655,17 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn) {
-      const { time, value: move } = calcTimeExcute(() =>
-        findBestMove(game.current)
-      );
-
-      if (
-        move.piece === "p" &&
-        ((orientation === move.color && move.from[1] === "7") ||
-          (orientation !== move.color && move.from[1] === "2"))
-      ) {
-        move.promotion = move.promotion || "q";
-      }
-
-      const delta = DEFAULT_WAITTIME - time;
-      if (delta > 0) {
-        setTimeout(() => {
+      async function aiMove() {
+        const [score, move] = await findBestMove(game.current)
+        console.log('Score: ', score)
+        if (move) {
           setReadyMove({ action: "click", move });
-        }, delta);
-      } else {
-        setReadyMove({ action: "click", move });
+        }
       }
+
+      aiMove()
     }
-  }, [position]);
+  }, [position])
 
   useEffect(() => {
     if (orientation !== turn) {

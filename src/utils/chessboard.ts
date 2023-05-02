@@ -121,13 +121,3 @@ function toPiece(piece: string): Piece {
 function toColumn(index: number): string {
   return COLUMNS[index];
 }
-
-export function calcTimeExcute<T>(cb: () => T): { time: number; value: T } {
-  const startTime = performance.now();
-
-  const value = cb();
-
-  const endTime = performance.now();
-
-  return { time: endTime - startTime, value };
-}
