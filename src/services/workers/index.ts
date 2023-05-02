@@ -11,9 +11,9 @@ function createWorker(path: string): Worker {
 }
 
 export function createHintWorker(): Worker {
-  return createWorker("./hint.worker.ts");
+  return createWorker("./Hint.Worker.ts");
 }
 
 export function createAIWorker(): Worker {
-  return createWorker("./ai.worker.ts");
+  return createWorker("./Ai.Worker.ts");
 }
