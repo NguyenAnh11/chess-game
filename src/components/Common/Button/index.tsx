@@ -1,7 +1,6 @@
 import { ReactNode, forwardRef } from "react";
 import css from "./button.module.css";
 import cn from "classnames";
-import Loading from "../../../assets/loading.svg"
 
 type ButtonProps = {
   label: string;
@@ -27,7 +26,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         onClick={onClick}
       >
-        {loading ? <Loading/> : children}
+        {loading ? <p>Loading...</p> : children}
       </button>
     );
   }

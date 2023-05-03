@@ -11,6 +11,7 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
+import useWorker from "../hooks/useWorker";
 import { createAIWorker, createHintWorker } from "../services/workers";
 import {
   BoardOrientation,
@@ -103,6 +104,12 @@ type ChessContext = {
   onSuggestMove: () => void;
 };
 
+const inititalValueSuggestMove: SuggestMove = {
+  hidden: false,
+  loading: false,
+  move: undefined,
+};
+
 export const ChessContext = createContext({} as ChessContext);
 
 export const useChess = () => useContext(ChessContext);
@@ -130,11 +137,9 @@ const ChessProvider = ({
     move: Move;
     action: MoveAction;
   }>();
-  const [suggestMove, setSuggestMove] = useState<SuggestMove>({
-    hidden: false,
-    move: undefined,
-    loading: false,
-  });
+  const [suggestMove, setSuggestMove] = useState<SuggestMove>(
+    inititalValueSuggestMove
+  );
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
@@ -158,9 +163,20 @@ const ChessProvider = ({
     waiting: false,
   });
 
-  const hintWorker = useRef<Worker>();
+  const aiWorker = useWorker(createAIWorker, (e: MessageEvent<Move>) => {
+    setReadyMove({ action: "click", move: e.data });
+  });
 
-  const aiWorker = useRef<Worker>();
+  const hintWorker = useWorker(
+    createHintWorker,
+    (e: MessageEvent<Move>) => {
+      const move = e.data;
+      setSuggestMove({ hidden: false, loading: false, move });
+    },
+    () => {
+      setSuggestMove(inititalValueSuggestMove);
+    }
+  );
 
   const onChoosedPiecePromotion = (piece: string) => {
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
@@ -183,17 +199,7 @@ const ChessProvider = ({
   const onSuggestMove = () => {
     setSuggestMove((prev) => ({ ...prev, loading: true }));
 
-    if (!hintWorker.current) {
-      hintWorker.current = createHintWorker(); //create after terminate
-    }
-    
-    hintWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
-
-    hintWorker.current.onmessage = (e: MessageEvent<Move>) => {
-      const move = e.data;
-      console.log("Move: ", move);
-      setSuggestMove({ loading: false, hidden: false, move });
-    };
+    hintWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
   };
 
   const makeMove = (action: MoveAction, move: Move) => {
@@ -222,7 +228,13 @@ const ChessProvider = ({
 
     setLeftClick(undefined);
 
-    if (readyMove) setReadyMove(undefined);
+    if (readyMove) {
+      setReadyMove(undefined);
+    }
+
+    if (suggestMove.move) {
+      setSuggestMove(inititalValueSuggestMove);
+    }
 
     setIsManualDrop(action !== "click");
   };
@@ -424,16 +436,9 @@ const ChessProvider = ({
     setDuration(Date.now() + DEFAULT_DURATION);
     setBoardIndex({ break: 0, step: 0 });
 
-    //terminate worker
-    if (aiWorker.current) {
-      aiWorker.current.terminate();
-      aiWorker.current = undefined;
-    }
+    aiWorker.terminate();
+    hintWorker.terminate();
 
-    if (hintWorker.current) {
-      hintWorker.current.terminate();
-      hintWorker.current = undefined;
-    }
     //reset game state
     game.current = new Chess();
   };
@@ -674,29 +679,15 @@ const ChessProvider = ({
   }, [promotion.choosedPiece]);
 
   useEffect(() => {
-    if (orientation !== turn && window.Worker) {
-      if (!aiWorker.current) {
-        aiWorker.current = createAIWorker(); //create after terminate
-      }
-
-      aiWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
-
-      aiWorker.current.onmessage = (e: MessageEvent<Move>) => {
-        const move = e.data;
-        console.log("Move: ", move);
-        setReadyMove({ action: "click", move });
-      };
+    if (orientation !== turn) {
+      aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
     }
   }, [position]);
 
   useEffect(() => {
     if (orientation !== turn && suggestMove.loading) {
-      console.log("Terminate hint worker...");
-      hintWorker.current!.terminate();
-      hintWorker.current = undefined;
+      hintWorker.terminate();
     }
-
-    setSuggestMove((prev) => ({ ...prev, move: undefined }));
   }, [turn, suggestMove.loading]);
 
   useEffect(() => {
