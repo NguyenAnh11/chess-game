@@ -158,9 +158,9 @@ const ChessProvider = ({
     waiting: false,
   });
 
-  const HintWorker = useRef<Worker>();
+  const hintWorker = useRef<Worker>();
 
-  const AIWorker = useRef<Worker>();
+  const aiWorker = useRef<Worker>();
 
   const onChoosedPiecePromotion = (piece: string) => {
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
@@ -183,12 +183,13 @@ const ChessProvider = ({
   const onSuggestMove = () => {
     setSuggestMove((prev) => ({ ...prev, loading: true }));
 
-    if (!HintWorker.current)
-      HintWorker.current = createHintWorker(); //create after terminate
+    if (!hintWorker.current) {
+      hintWorker.current = createHintWorker(); //create after terminate
+    }
+    
+    hintWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
 
-    HintWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
-
-    HintWorker.current.onmessage = (e: MessageEvent<Move>) => {
+    hintWorker.current.onmessage = (e: MessageEvent<Move>) => {
       const move = e.data;
       console.log("Move: ", move);
       setSuggestMove({ loading: false, hidden: false, move });
@@ -424,14 +425,14 @@ const ChessProvider = ({
     setBoardIndex({ break: 0, step: 0 });
 
     //terminate worker
-    if (AIWorker.current) {
-      AIWorker.current.terminate();
-      AIWorker.current = undefined;
+    if (aiWorker.current) {
+      aiWorker.current.terminate();
+      aiWorker.current = undefined;
     }
 
-    if (HintWorker.current) {
-      HintWorker.current.terminate();
-      HintWorker.current = undefined;
+    if (hintWorker.current) {
+      hintWorker.current.terminate();
+      hintWorker.current = undefined;
     }
     //reset game state
     game.current = new Chess();
@@ -674,12 +675,13 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn && window.Worker) {
-      if (!AIWorker.current) 
-        AIWorker.current = createAIWorker(); //create after terminate
+      if (!aiWorker.current) {
+        aiWorker.current = createAIWorker(); //create after terminate
+      }
 
-      AIWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
+      aiWorker.current.postMessage(JSON.stringify({ fen: game.current.fen() }));
 
-      AIWorker.current.onmessage = (e: MessageEvent<Move>) => {
+      aiWorker.current.onmessage = (e: MessageEvent<Move>) => {
         const move = e.data;
         console.log("Move: ", move);
         setReadyMove({ action: "click", move });
@@ -690,7 +692,8 @@ const ChessProvider = ({
   useEffect(() => {
     if (orientation !== turn && suggestMove.loading) {
       console.log("Terminate hint worker...");
-      HintWorker.current!.terminate();
+      hintWorker.current!.terminate();
+      hintWorker.current = undefined;
     }
 
     setSuggestMove((prev) => ({ ...prev, move: undefined }));
