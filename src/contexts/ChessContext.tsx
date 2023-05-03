@@ -12,7 +12,6 @@ import React, {
   RefObject,
 } from "react";
 import useWorker from "../hooks/useWorker";
-import { createAIWorker, createHintWorker } from "../services/workers";
 import {
   BoardOrientation,
   BoardPosition,
@@ -104,11 +103,11 @@ type ChessContext = {
   onSuggestMove: () => void;
 };
 
-const inititalValueSuggestMove: SuggestMove = {
+const initialValueSuggestMove: SuggestMove = {
   hidden: false,
   loading: false,
   move: undefined,
-};
+}
 
 export const ChessContext = createContext({} as ChessContext);
 
@@ -137,9 +136,7 @@ const ChessProvider = ({
     move: Move;
     action: MoveAction;
   }>();
-  const [suggestMove, setSuggestMove] = useState<SuggestMove>(
-    inititalValueSuggestMove
-  );
+  const [suggestMove, setSuggestMove] = useState<SuggestMove>(initialValueSuggestMove);
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
@@ -163,18 +160,24 @@ const ChessProvider = ({
     waiting: false,
   });
 
-  const aiWorker = useWorker(createAIWorker, (e: MessageEvent<Move>) => {
-    setReadyMove({ action: "click", move: e.data });
-  });
+  const aiWorker = useWorker(
+    new Worker(new URL("../services/Ai.Worker.ts", import.meta.url), {
+      type: "module",
+    }),
+    (e: MessageEvent<Move>) => {
+      setReadyMove({ action: "click", move: e.data });
+    }
+  );
 
   const hintWorker = useWorker(
-    createHintWorker,
+    new Worker(new URL("../services/Ai.Worker.ts", import.meta.url), {
+      type: "module",
+    }),
     (e: MessageEvent<Move>) => {
-      const move = e.data;
-      setSuggestMove({ hidden: false, loading: false, move });
+      setSuggestMove({ hidden: false, loading: false, move: e.data });
     },
     () => {
-      setSuggestMove(inititalValueSuggestMove);
+      setSuggestMove(initialValueSuggestMove);
     }
   );
 
@@ -233,7 +236,7 @@ const ChessProvider = ({
     }
 
     if (suggestMove.move) {
-      setSuggestMove(inititalValueSuggestMove);
+      setSuggestMove(initialValueSuggestMove);
     }
 
     setIsManualDrop(action !== "click");
@@ -431,15 +434,17 @@ const ChessProvider = ({
   };
 
   const onNewGame = () => {
+    //reset state game
     setMoves([]);
     setTurn("w");
     setDuration(Date.now() + DEFAULT_DURATION);
     setBoardIndex({ break: 0, step: 0 });
 
+    //terminate worker
     aiWorker.terminate();
     hintWorker.terminate();
 
-    //reset game state
+    //reset game
     game.current = new Chess();
   };
 
@@ -688,7 +693,7 @@ const ChessProvider = ({
     if (orientation !== turn && suggestMove.loading) {
       hintWorker.terminate();
     }
-  }, [turn, suggestMove.loading]);
+  }, [turn]);
 
   useEffect(() => {
     if (orientation !== turn) {

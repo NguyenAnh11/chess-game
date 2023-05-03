@@ -1,52 +1,41 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-type InitWorkerFactory = (...args: any) => Worker;
-
-type WorkerCallback<T> = (e: MessageEvent<T>) => void;
+type WorkerFactory = (...args: any) => Worker;
 
 export default function useWorker<T>(
-  initialWorker: Worker | InitWorkerFactory,
-  onMessage?: WorkerCallback<T>,
+  value: Worker | WorkerFactory,
+  onMessage?: (e: MessageEvent<T>) => void,
   onTerminate?: () => void
 ) {
-  const worker = useRef<Worker | undefined>();
+  const worker = useRef<Worker>(value instanceof Worker ? value : value());
 
   useEffect(() => {
-    if (window.Worker) {
-      worker.current =
-        initialWorker instanceof Worker ? initialWorker : initialWorker();
-
-      worker.current.onmessage = (e: MessageEvent<T>) => {
-        if (onMessage) onMessage(e);
-      };
+    if (worker.current) {
+      worker.current.onmessage = (e: MessageEvent<T>) =>
+        onMessage && onMessage(e);
     }
+  }, [worker.current]);
 
-    return () => terminate();
-  }, []);
-
-  const terminate = () => {
+  function terminate() {
     if (worker.current) {
       worker.current.terminate();
-      worker.current = undefined;
-    }
 
-    if (onTerminate) onTerminate();
-  };
+      onTerminate && onTerminate();
+
+      const newWorker = value instanceof Worker ? value : value();
+
+      worker.current = newWorker;
+    }
+  }
 
   function postMessage(data: any) {
-    if (!worker.current && window.Worker) {
-      worker.current =
-        initialWorker instanceof Worker ? initialWorker : initialWorker();
-    }
-
     if (worker.current) {
-        worker.current.postMessage(data);
+      worker.current.postMessage(data);
     }
   }
 
   return {
-    worker,
-    terminate,
     postMessage,
+    terminate,
   };
 }

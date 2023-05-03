@@ -4,11 +4,10 @@ import { PIECE_SCORES } from "../utils";
 
 const CHECKMATE = 1000;
 const STALEMATE = 0;
-const DEPTH = 4;
+const DEPTH = 3;
 
 export function findBestMove(game: Chess): Move {
   const move = minMax(game, DEPTH, game.turn() === "w")[1];
-
   return move!;
 }
 
