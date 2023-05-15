@@ -119,7 +119,7 @@ export function evaluateMove(game: Chess, move: Move): number {
 
   //capture move
   let captureValue = 0;
-  if (move.flags.includes("n")) {
+  if (!move.flags.includes("n")) {
     captureValue = evaluateCapture(game, move);
   }
 
