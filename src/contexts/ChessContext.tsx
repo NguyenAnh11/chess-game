@@ -11,7 +11,6 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
-import useWorker from "../hooks/useWorker";
 import {
   BoardOrientation,
   BoardPosition,
@@ -121,6 +120,7 @@ const ChessProvider = ({
 }: ChessboardProviderProps) => {
   const { setting } = useSetting();
   const game = useRef<Chess>(new Chess());
+  console.log(game.current.moves({ verbose: true }).filter(p => !p.flags.includes("n")));
   const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
   const [gameOver, setGameOver] = useState(false);
   const [isShowGameOver, setIsShowGameOver] = useState(false);
@@ -160,27 +160,6 @@ const ChessProvider = ({
     waiting: false,
   });
 
-  const aiWorker = useWorker(
-    new Worker(new URL("../services/Ai.Worker.ts", import.meta.url), {
-      type: "module",
-    }),
-    (e: MessageEvent<Move>) => {
-      setReadyMove({ action: "click", move: e.data });
-    }
-  );
-
-  const hintWorker = useWorker(
-    new Worker(new URL("../services/Ai.Worker.ts", import.meta.url), {
-      type: "module",
-    }),
-    (e: MessageEvent<Move>) => {
-      setSuggestMove({ hidden: false, loading: false, move: e.data });
-    },
-    () => {
-      setSuggestMove(initialValueSuggestMove);
-    }
-  );
-
   const onChoosedPiecePromotion = (piece: string) => {
     setPromotion((pre) => ({ ...pre, choosedPiece: piece }));
   };
@@ -201,8 +180,6 @@ const ChessProvider = ({
 
   const onSuggestMove = () => {
     setSuggestMove((prev) => ({ ...prev, loading: true }));
-
-    hintWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
   };
 
   const makeMove = (action: MoveAction, move: Move) => {
@@ -251,7 +228,7 @@ const ChessProvider = ({
       return;
     }
 
-    if (leftClick === square || orientation !== turn) {
+    if (leftClick === square) {
       setLeftClick(undefined);
       return;
     }
@@ -441,8 +418,6 @@ const ChessProvider = ({
     setBoardIndex({ break: 0, step: 0 });
 
     //terminate worker
-    aiWorker.terminate();
-    hintWorker.terminate();
 
     //reset game
     game.current = new Chess();
@@ -685,13 +660,12 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn) {
-      aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
+      
     }
   }, [position]);
 
   useEffect(() => {
     if (orientation !== turn && suggestMove.loading) {
-      hintWorker.terminate();
     }
   }, [turn]);
 

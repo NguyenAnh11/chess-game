@@ -4,7 +4,7 @@ import cn from "classnames";
 import css from "./promotion.module.css";
 import { IoMdClose } from "react-icons/io";
 import { useChess } from "../../../contexts/ChessContext";
-import { Piece } from "../../../types";
+import { BoardColumn, Piece } from "../../../types";
 import { BLACK_COLUMNS, WHITE_COLUMNS, PROMOTION_PIECES } from "../../../utils";
 
 export default function Promotion() {
@@ -18,7 +18,7 @@ export default function Promotion() {
 
   const col = useMemo((): number => {
     const columns = orientation === "w" ? WHITE_COLUMNS : BLACK_COLUMNS;
-    return columns[square![0]];
+    return columns[square![0] as BoardColumn];
   }, [orientation, square]);
 
   const position = useMemo((): { top: boolean; bottom: boolean } => {

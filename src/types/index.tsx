@@ -41,6 +41,8 @@ export type Position = {
   col: number;
 };
 
+export type BoardColumn = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h";
+
 export type BoardOrientation = "w" | "b";
 
 export type MoveAction = "drop" | "click";

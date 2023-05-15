@@ -5,6 +5,7 @@ import {
   BoardOrientation,
   Position,
   BoardDifference,
+  BoardColumn,
 } from "../types";
 import {
   BLACK_COLUMNS,
@@ -54,7 +55,7 @@ export function getPosition(
   const rows = orientation === "w" ? WHITE_ROWS : BLACK_ROWS;
   const row = rows[parseInt(square[1]) - 1];
   const cols = orientation === "w" ? WHITE_COLUMNS : BLACK_COLUMNS;
-  const col = cols[square[0]];
+  const col = cols[square[0] as BoardColumn];
   return { row, col };
 }
 
