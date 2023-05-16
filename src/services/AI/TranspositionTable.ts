@@ -3,50 +3,50 @@ import Board from "./Board";
 
 export default class TranspositionTable {
   private size: number;
-  private board: Board;
-  private hashNodes: HashNode[];
+  private _board: Board;
+  private _hashNodes: HashNode[];
 
   constructor(size: number, board: Board) {
     this.size = size;
-    this.board = board;
-    this.hashNodes = new Array(size);
+    this._board = board;
+    this._hashNodes = new Array(size);
   }
 
   public clear() {
-    this.hashNodes = new Array(this.size);
+    this._hashNodes = new Array(this.size);
   }
 
   public getIndex(): number {
-    return this.board.zobristKey % this.size;
+    return this._board.zobristKey % this.size;
   }
 
   public getMove(): Move {
-    return this.hashNodes[this.getIndex()].move;
+    return this._hashNodes[this.getIndex()].move;
   }
 
   public getScore(): number {
-    return this.hashNodes[this.getIndex()].score;
+    return this._hashNodes[this.getIndex()].score;
   }
 
   public store(depth: number, score: number, move: Move, type: NodeType): void {
     const hashNode: HashNode = new HashNode(
-      this.board.zobristKey,
+      this._board.zobristKey,
       depth,
       score,
       move,
       type
     );
-    this.hashNodes[this.getIndex()] = hashNode;
+    this._hashNodes[this.getIndex()] = hashNode;
   }
 
   public lookup(depth: number, alpha: number, beta: number): number {
-    const hashNode = this.hashNodes[this.getIndex()];
+    const hashNode = this._hashNodes[this.getIndex()];
 
     //Ignore if the depth of the position is greater than the one already searched
     if (
       !hashNode ||
       hashNode.depth <= depth ||
-      hashNode.hash !== this.board.zobristKey
+      hashNode.hash !== this._board.zobristKey
     )
       return Number.NEGATIVE_INFINITY;
 

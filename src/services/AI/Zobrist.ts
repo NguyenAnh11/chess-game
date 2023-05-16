@@ -9,39 +9,38 @@ import {
 import { BoardColumn } from "../../types";
 
 export default class Zobrist {
-  private zobristTable!: number[][];
-  private castles!: number[];
-  private blackTurn!: number;
+  private _game: Chess;
+  private _zobristTable!: number[][];
+  private _castles!: number[];
+  private _blackTurn!: number;
 
-  constructor() {
-    this.generateKeys();
-  }
+  constructor(game: Chess) {
+    this._game = game;
 
-  private generateKeys() {
     const min = 0,
       max = Math.pow(2, 64);
 
-    this.zobristTable = [];
+    this._zobristTable = [];
 
     for (let r = 0; r < 12; r++) {
-      this.zobristTable[r] = [];
+      this._zobristTable[r] = [];
       for (let c = 0; c < 64; c++) {
-        this.zobristTable[r][c] = getRandomNumber(min, max);
+        this._zobristTable[r][c] = getRandomNumber(min, max);
       }
     }
 
-    this.castles = [];
+    this._castles = [];
     for (let c = 0; c < 4; c++) {
-      this.castles[c] = getRandomNumber(min, max);
+      this._castles[c] = getRandomNumber(min, max);
     }
 
-    this.blackTurn = getRandomNumber(min, max);
+    this._blackTurn = getRandomNumber(min, max);
   }
 
-  public getZobristKey(game: Chess): number {
+  public getZobristKey(): number {
     let key = 0;
 
-    const cells = flatMap(game.board());
+    const cells = flatMap(this._game.board());
     for (const cell of cells) {
       if (cell) {
         const pieceIdx =
@@ -51,30 +50,30 @@ export default class Zobrist {
         const col = WHITE_COLUMNS[cell.square[0] as BoardColumn];
         const row = WHITE_ROWS[parseInt(cell.square[1]) - 1];
         const squareIdx = row * 8 + col;
-        const value = this.zobristTable[pieceIdx][squareIdx];
+        const value = this._zobristTable[pieceIdx][squareIdx];
         key ^= value;
       }
     }
 
     //castiling
-    const turn = game.turn();
-    const histories = game.history({ verbose: true });
+    const turn = this._game.turn();
+    const histories = this._game.history({ verbose: true });
     const castleQueenSide = "O-O-O",
       castleKingSide = "O-O";
 
     if (histories.some((p) => p.san === castleKingSide && p.color === "w"))
-      key ^= this.castles[0];
+      key ^= this._castles[0];
 
     if (histories.some((p) => p.san === castleQueenSide && p.color === "w"))
-      key ^= this.castles[1];
+      key ^= this._castles[1];
 
     if (histories.some((p) => p.san === castleKingSide && p.color === "b"))
-      key ^= this.castles[2];
+      key ^= this._castles[2];
 
     if (histories.some((p) => p.san === castleQueenSide && p.color === "b"))
-      key ^= this.castles[3];
+      key ^= this._castles[3];
 
-    if (turn === "b") key ^= this.blackTurn;
+    if (turn === "b") key ^= this._blackTurn;
 
     return key;
   }
