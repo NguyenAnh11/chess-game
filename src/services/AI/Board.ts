@@ -1,4 +1,4 @@
-import { Chess, Move } from "chess.js";
+import { Chess, Color, Move } from "chess.js";
 import Zobrist from "./Zobrist";
 
 export default class Board {
@@ -16,6 +16,10 @@ export default class Board {
         return this._zobristKey;
     }
 
+    public get game(): Chess {
+        return this._game;
+    }
+
     public makeMove(move: Move) {
 
     }
@@ -23,4 +27,5 @@ export default class Board {
     public undoMove() {
         
     }
+
 }

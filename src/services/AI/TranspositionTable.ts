@@ -39,26 +39,10 @@ export default class TranspositionTable {
     this._hashNodes[this.getIndex()] = hashNode;
   }
 
-  public lookup(depth: number, alpha: number, beta: number): number {
+  public lookup(depth: number, alpha: number, beta: number): HashNode {
     const hashNode = this._hashNodes[this.getIndex()];
 
-    //Ignore if the depth of the position is greater than the one already searched
-    if (
-      !hashNode ||
-      hashNode.depth <= depth ||
-      hashNode.hash !== this._board.zobristKey
-    )
-      return Number.NEGATIVE_INFINITY;
-
-    if (hashNode.type === "Exact") return hashNode.score;
-
-    if (hashNode.type === "Upper" && hashNode.score <= alpha)
-      return hashNode.score;
-
-    if (hashNode.type === "Lower" && hashNode.score >= beta)
-      return hashNode.score;
-
-    return Number.NEGATIVE_INFINITY;
+    return hashNode;
   }
 }
 
