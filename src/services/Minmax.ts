@@ -1,5 +1,6 @@
 import { Chess, Move } from "chess.js";
 import { evaluateBoard } from "./AI/Evaluation";
+import { sortMove } from "./AI/MoveOrder";
 
 export default class Search {
   private CHECKMATE: number = 10000;
@@ -44,8 +45,8 @@ export default class Search {
     this.timeout = false;
     this.start = Date.now();
     const turn = this.game.turn();
-    const moves = this.game.moves({ verbose: true });
-    const randomMove = moves[Math.floor(Math.random() * moves.length)];
+    const sortedMoves = sortMove(this.game, this.game.moves({ verbose: true }));
+    const randomMove = sortedMoves[Math.floor(Math.random() * sortedMoves.length)];
     this.globalMove = randomMove;
 
     for (let depth = 0; depth < this.DEPTH; depth++) {
@@ -87,8 +88,8 @@ export default class Search {
 
     if (depth === 0) return evaluateBoard(this.game);
 
-    const moves = this.game.moves({ verbose: true });
-    for (const move of moves) {
+    const sortedMoves = sortMove(this.game, this.game.moves({ verbose: true }));
+    for (const move of sortedMoves) {
       this.makeMove(move);
 
       let rating = this.minimizer(depth - 1, alpha, beta);
@@ -123,8 +124,8 @@ export default class Search {
       return this.STALEMATE;
 
     if (depth === 0) return evaluateBoard(this.game);
-    const moves = this.game.moves({ verbose: true });
-    for (const move of moves) {
+    const sortedMoves = sortMove(this.game, this.game.moves({ verbose: true }));
+    for (const move of sortedMoves) {
       this.makeMove(move);
 
       let rating = this.maximizer(depth - 1, alpha, beta);
