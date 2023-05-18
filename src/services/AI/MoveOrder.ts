@@ -4,7 +4,7 @@ import { evaluateMove } from "./Evaluation";
 
 type MoveValue = Move & { value: number };
 
-export function getOrderMoves(game: Chess, moves: Move[]): Move[] {
+export function sortMove(game: Chess, moves: Move[]): Move[] {
   for (const move of moves) {
     game.move({ from: move.from, to: move.to, promotion: "q" });
     if (game.isCheckmate()) {

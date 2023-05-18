@@ -39,7 +39,7 @@ export default class TranspositionTable {
     this._hashNodes[this.getIndex()] = hashNode;
   }
 
-  public lookup(depth: number, alpha: number, beta: number): HashNode {
+  public lookup(): HashNode {
     const hashNode = this._hashNodes[this.getIndex()];
 
     return hashNode;

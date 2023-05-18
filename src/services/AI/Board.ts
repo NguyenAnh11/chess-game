@@ -1,4 +1,4 @@
-import { Chess, Color, Move } from "chess.js";
+import { Chess, Move } from "chess.js";
 import Zobrist from "./Zobrist";
 
 export default class Board {
