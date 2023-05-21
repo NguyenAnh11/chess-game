@@ -206,6 +206,8 @@ export const PAWN_EVAL = [
   0,  0,  0,  0,  0,  0,  0,  0
 ]
 
+export const PAWN_EVAL_BLACK = PAWN_EVAL.reverse();
+
 export const KNIGHT_EVAL = [
   -50,-40,-30,-30,-30,-30,-40,-50,
   -40,-20,  0,  0,  0,  0,-20,-40,
@@ -216,6 +218,8 @@ export const KNIGHT_EVAL = [
   -40,-20,  0,  5,  5,  0,-20,-40,
   -50,-40,-30,-30,-30,-30,-40,-50,
 ]
+
+export const KNIGHT_EVAL_BLACK = KNIGHT_EVAL.reverse();
 
 export const BISHOP_EVAL = [
   -20,-10,-10,-10,-10,-10,-10,-20,
@@ -228,6 +232,8 @@ export const BISHOP_EVAL = [
   -20,-10,-10,-10,-10,-10,-10,-20,
 ]
 
+export const BISHOP_EVAL_BLACK = BISHOP_EVAL.reverse();
+
 export const ROOK_EVAL = [
   0,  0,  0,  0,  0,  0,  0,  0,
   5, 10, 10, 10, 10, 10, 10,  5,
@@ -238,6 +244,8 @@ export const ROOK_EVAL = [
   -5,  0,  0,  0,  0,  0,  0, -5,
   0,  0,  0,  5,  5,  0,  0,  0
 ]
+
+export const ROOK_EVAL_BLACK = ROOK_EVAL.reverse();
 
 export const QUEEN_EVAL = [
   -20,-10,-10, -5, -5,-10,-10,-20,
@@ -250,6 +258,8 @@ export const QUEEN_EVAL = [
   -20,-10,-10, -5, -5,-10,-10,-20
 ]
 
+export const QUEEN_EVAL_BLACK = QUEEN_EVAL.reverse();
+
 export const KING_EVAL = [
   -30,-40,-40,-50,-50,-40,-40,-30,
   -30,-40,-40,-50,-50,-40,-40,-30,
@@ -261,6 +271,8 @@ export const KING_EVAL = [
   20, 30, 10,  0,  0, 10, 30, 20
 ]
 
+export const KING_EVAL_BLACK = KING_EVAL.reverse();
+
 export const KING_ENDGAME_EVAL = [
   -50, -40, -30, -20, -20, -30, -40, -50,
   -30, -20, -10,  0,  0, -10, -20, -30,
@@ -271,3 +283,5 @@ export const KING_ENDGAME_EVAL = [
   -30, -30,  0,  0,  0,  0, -30, -30,
   50, -30, -30, -30, -30, -30, -30, -50,
 ]
+
+export const KING_ENDGAME_EVAL_BLACK = KING_ENDGAME_EVAL.reverse();

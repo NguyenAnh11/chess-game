@@ -1,146 +1,95 @@
 import { Chess, Move } from "chess.js";
-import { evaluateBoard } from "./AI/Evaluation";
+import Board from "./AI/Board";
+import { evalBoard } from "./AI/Evaluation";
 import { sortMove } from "./AI/MoveOrder";
 
-export default class Search {
-  private CHECKMATE: number = 10000;
-  private STALEMATE: number = 0;
-  private DEPTH: number = 2;
-  private TIMEOUT_MILISECONDS: number = 6000;
-
-  private game: Chess;
-  private start: number;
-  private timeout: boolean;
-  private bestMove!: Move;
-  private globalMove!: Move;
-  private currentDepth!: number;
-
+export default class MinMax {
+  private DEPTH: number = 4;
+  private board: Board;
   constructor(game: Chess) {
-    this.game = game;
-    this.start = 0;
-    this.timeout = false;
+    this.board = new Board(game);
   }
 
-  private makeMove(move: Move) {
-    this.game.move({ from: move.from, to: move.to, promotion: "q" });
+  public chooseMove(): Move {
+    const move = this.minmaxRoot(this.DEPTH);
+    return move;
   }
 
-  private undoMove() {
-    this.game.undo();
-  }
+  private minmaxRoot(depth: number): Move {
+    const maximize = this.board.turn() === "w";
+    let bestScore = maximize
+      ? -Number.POSITIVE_INFINITY
+      : Number.POSITIVE_INFINITY;
 
-  public search(): Move {
-    this.currentDepth = 2;
+    const moves = sortMove(this.board.game, this.board.getAvailableMoves());
+    let bestMove = moves[0];
 
-    const turn = this.game.turn();
-
-    if (turn === "b")
-      this.minimizer(this.currentDepth, -this.CHECKMATE, this.CHECKMATE);
-    else this.maximizer(this.currentDepth, -this.CHECKMATE, this.CHECKMATE);
-
-    return this.bestMove;
-  }
-
-  public interativeDeepeningSearch(): Move {
-    this.timeout = false;
-    this.start = Date.now();
-    const turn = this.game.turn();
-    const sortedMoves = sortMove(this.game, this.game.moves({ verbose: true }));
-    const randomMove = sortedMoves[Math.floor(Math.random() * sortedMoves.length)];
-    this.globalMove = randomMove;
-
-    for (let depth = 0; depth < this.DEPTH; depth++) {
-      if (depth > 0) {
-        this.globalMove = this.bestMove;
-        console.log(
-          `Completed search with depth: ${this.currentDepth}.\nBest move: ${this.globalMove}`
-        );
-      }
-
-      this.currentDepth = depth + 1;
-      if (turn === "w")
-        this.maximizer(this.currentDepth, -this.CHECKMATE, this.CHECKMATE);
-      else this.minimizer(this.currentDepth, -this.CHECKMATE, this.CHECKMATE);
-
-      if (this.timeout) {
-        console.log("\n");
-        return this.globalMove;
-      }
-    }
-
-    return this.globalMove;
-  }
-
-  private maximizer(depth: number, alpha: number, beta: number): number {
-    if (this.start !== 0 && Date.now() - this.start > this.TIMEOUT_MILISECONDS) {
-      this.timeout = true;
-      return alpha;
-    }
-
-    if (this.game.isCheckmate()) return -this.CHECKMATE;
-
-    if (
-      this.game.isStalemate() ||
-      this.game.isInsufficientMaterial() ||
-      this.game.isThreefoldRepetition()
-    )
-      return this.STALEMATE;
-
-    if (depth === 0) return evaluateBoard(this.game);
-
-    const sortedMoves = sortMove(this.game, this.game.moves({ verbose: true }));
-    for (const move of sortedMoves) {
-      this.makeMove(move);
-
-      let rating = this.minimizer(depth - 1, alpha, beta);
-
-      this.undoMove();
-      if (rating > alpha) {
-        alpha = rating;
-        if (depth === this.currentDepth) {
-          this.bestMove = move;
+    for (const move of moves) {
+      this.board.makeMove(move);
+      let score = this.minmax(
+        depth - 1,
+        -Number.POSITIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+        !maximize
+      );
+      this.board.undoMove();
+      if (maximize) {
+        if (score >= bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+      } else {
+        if (score <= bestScore) {
+          bestScore = score;
+          bestMove = move;
         }
       }
-
-      if (alpha >= beta) return alpha;
     }
 
-    return alpha;
+    return bestMove;
   }
 
-  private minimizer(depth: number, alpha: number, beta: number): number {
-    if (this.start !== 0 && Date.now() - this.start > this.TIMEOUT_MILISECONDS) {
-      this.timeout = true;
-      return alpha;
-    }
+  private minmax(
+    depth: number,
+    alpha: number,
+    beta: number,
+    isMaximisingPlayer: boolean
+  ): number {
+    let score = evalBoard(this.board.game);
 
-    if (this.game.isCheckmate()) return this.CHECKMATE;
+    console.log("Depth: ", depth);
+
+    const moves = sortMove(this.board.game, this.board.getAvailableMoves());
 
     if (
-      this.game.isStalemate() ||
-      this.game.isThreefoldRepetition() ||
-      this.game.isInsufficientMaterial()
-    )
-      return this.STALEMATE;
-
-    if (depth === 0) return evaluateBoard(this.game);
-    const sortedMoves = sortMove(this.game, this.game.moves({ verbose: true }));
-    for (const move of sortedMoves) {
-      this.makeMove(move);
-
-      let rating = this.maximizer(depth - 1, alpha, beta);
-
-      this.undoMove();
-      if (rating < beta) {
-        beta = rating;
-        if (depth === this.currentDepth) {
-          this.bestMove = move;
-        }
-      }
-
-      if (alpha >= beta) return beta;
+      depth === 0 ||
+      moves.length === 0 ||
+      depth >= Number.POSITIVE_INFINITY ||
+      depth <= -Number.POSITIVE_INFINITY
+    ) {
+      return score;
     }
 
-    return beta;
+    let bestScore = isMaximisingPlayer
+      ? -Number.POSITIVE_INFINITY
+      : Number.POSITIVE_INFINITY;
+    for (const move of moves) {
+      this.board.makeMove(move);
+      let score = this.minmax(depth - 1, alpha, bestScore, !isMaximisingPlayer);
+      this.board.undoMove();
+      if (isMaximisingPlayer) {
+        bestScore = Math.max(bestScore, score);
+        alpha = Math.max(alpha, bestScore);
+      } else {
+        bestScore = Math.min(bestScore, score);
+        beta = Math.min(beta, bestScore);
+      }
+      if (beta <= alpha) {
+        console.log("Pruning...");
+        break;
+      }
+    }
+
+    return bestScore;
   }
 }

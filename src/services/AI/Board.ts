@@ -1,31 +1,41 @@
-import { Chess, Move } from "chess.js";
-import Zobrist from "./Zobrist";
+import { Chess, Color, Move } from "chess.js";
 
 export default class Board {
-    private _game: Chess;
-    private _zobrist: Zobrist;
-    private _zobristKey!: number;
-    
-    constructor(game: Chess) {
-        this._game = game;
-        this._zobrist = new Zobrist(this._game);
-        this._zobristKey = this._zobrist.getZobristKey();
-    }
+  private _game: Chess;
 
-    public get zobristKey(): number {
-        return this._zobristKey;
-    }
+  constructor(game: Chess) {
+    this._game = game;
+  }
 
-    public get game(): Chess {
-        return this._game;
-    }
+  public get game(): Chess {
+    return this._game;
+  }
 
-    public makeMove(move: Move) {
+  public makeMove(move: Move) {
+    this.game.move({ from: move.from, to: move.to, promotion: "q" });
+  }
 
-    }
+  public undoMove() {
+    this.game.undo();
+  }
 
-    public undoMove() {
-        
-    }
+  public getAvailableMoves(): Move[] {
+    return this.game.moves({ verbose: true });
+  }
 
+  public isCheckMate(): boolean {
+    return this.game.isCheckmate();
+  }
+
+  public isStalemate(): boolean {
+    return this.game.isStalemate();
+  }
+
+  public isThreefoldRepetition(): boolean {
+    return this.game.isThreefoldRepetition();
+  }
+
+  public turn(): Color {
+    return this.game.turn();
+  }
 }
