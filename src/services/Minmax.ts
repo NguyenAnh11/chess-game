@@ -4,92 +4,78 @@ import { evalBoard } from "./AI/Evaluation";
 import { sortMove } from "./AI/MoveOrder";
 
 export default class MinMax {
-  private DEPTH: number = 4;
+  private DEPTH: number = 3;
   private board: Board;
   constructor(game: Chess) {
     this.board = new Board(game);
   }
 
   public chooseMove(): Move {
-    const move = this.minmaxRoot(this.DEPTH);
-    return move;
-  }
+    const [score, move] = this.minmax(
+      this.DEPTH,
+      -Number.POSITIVE_INFINITY,
+      Number.POSITIVE_INFINITY,
+      this.board.turn() === "w"
+    );
 
-  private minmaxRoot(depth: number): Move {
-    const maximize = this.board.turn() === "w";
-    let bestScore = maximize
-      ? -Number.POSITIVE_INFINITY
-      : Number.POSITIVE_INFINITY;
+    console.log("Score: ", score);
 
-    const moves = sortMove(this.board.game, this.board.getAvailableMoves());
-    let bestMove = moves[0];
-
-    for (const move of moves) {
-      this.board.makeMove(move);
-      let score = this.minmax(
-        depth - 1,
-        -Number.POSITIVE_INFINITY,
-        Number.POSITIVE_INFINITY,
-        !maximize
-      );
-      this.board.undoMove();
-      if (maximize) {
-        if (score >= bestScore) {
-          bestScore = score;
-          bestMove = move;
-        }
-      } else {
-        if (score <= bestScore) {
-          bestScore = score;
-          bestMove = move;
-        }
-      }
-    }
-
-    return bestMove;
+    return move!;
   }
 
   private minmax(
     depth: number,
     alpha: number,
     beta: number,
-    isMaximisingPlayer: boolean
-  ): number {
-    let score = evalBoard(this.board.game);
-
-    console.log("Depth: ", depth);
+    isMaximizePlayer: boolean
+  ): [number, Move | undefined] {
+    if (
+      depth === 0 ||
+      this.board.isCheckMate() ||
+      this.board.isStalemate() ||
+      this.board.isThreefoldRepetition()
+    ) {
+      const score = evalBoard(this.board.game);
+      return [score, undefined];
+    }
 
     const moves = sortMove(this.board.game, this.board.getAvailableMoves());
 
-    if (
-      depth === 0 ||
-      moves.length === 0 ||
-      depth >= Number.POSITIVE_INFINITY ||
-      depth <= -Number.POSITIVE_INFINITY
-    ) {
-      return score;
-    }
+    let bestMove = moves[0],
+      bestScore = isMaximizePlayer
+        ? -Number.POSITIVE_INFINITY
+        : Number.POSITIVE_INFINITY;
 
-    let bestScore = isMaximisingPlayer
-      ? -Number.POSITIVE_INFINITY
-      : Number.POSITIVE_INFINITY;
-    for (const move of moves) {
-      this.board.makeMove(move);
-      let score = this.minmax(depth - 1, alpha, bestScore, !isMaximisingPlayer);
-      this.board.undoMove();
-      if (isMaximisingPlayer) {
-        bestScore = Math.max(bestScore, score);
+    if (isMaximizePlayer) {
+      for (const move of moves) {
+        this.board.makeMove(move);
+        let score = this.minmax(depth - 1, alpha, beta, !isMaximizePlayer)[0];
+        this.board.undoMove();
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+
         alpha = Math.max(alpha, bestScore);
-      } else {
-        bestScore = Math.min(bestScore, score);
-        beta = Math.min(beta, bestScore);
+        if (alpha >= beta) break;
       }
-      if (beta <= alpha) {
-        console.log("Pruning...");
-        break;
+    } else {
+      for (const move of moves) {
+        this.board.makeMove(move);
+        let score = this.minmax(depth - 1, alpha, beta, !isMaximizePlayer)[0];
+        this.board.undoMove();
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+
+        beta = Math.min(beta, bestScore);
+        if (beta <= alpha) break;
       }
     }
 
-    return bestScore;
+    return [bestScore, bestMove];
   }
 }

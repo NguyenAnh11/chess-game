@@ -1,10 +1,9 @@
-import { flatMap } from "lodash";
+import { flatMap, uniq } from "lodash";
 import { Chess, Square, PieceSymbol, Color, Move } from "chess.js";
 import { BoardColumn } from "../../types";
 import {
   BISHOP_EVAL,
   KING_ENDGAME_EVAL,
-  KING_EVAL,
   KNIGHT_EVAL,
   PAWN_EVAL,
   PIECE_SCORES,
@@ -13,67 +12,71 @@ import {
   WHITE_ROWS,
   WHITE_COLUMNS,
   PAWN_EVAL_BLACK,
-  KING_EVAL_BLACK,
   BISHOP_EVAL_BLACK,
   ROOK_EVAL_BLACK,
   QUEEN_EVAL_BLACK,
   KING_ENDGAME_EVAL_BLACK,
   KNIGHT_EVAL_BLACK,
+  KING_EVAL,
+  KING_EVAL_BLACK,
+  KINGHT_PAWN_ADJUSTMENT,
+  ROOK_PAWN_ADJUSTMENT,
+  DUAL_BISHOP_ADJUSTMENT,
+  PHASE_CONSTANT,
+  PAWN_PELANTY,
 } from "../../utils";
-
-function checkIsEndGame(game: Chess): boolean {
-  let queens = 0,
-    minors = 0;
-  const cells = flatMap(game.board());
-
-  for (const cell of cells) {
-    if (cell) {
-      const piece = cell.type;
-      if (piece === "q") queens += 1;
-      if (piece === "b" || piece === "n") minors += 1;
-    }
-  }
-
-  return queens === 0 || (queens === 2 && minors <= 1);
-}
-
-function isGameFinished(game: Chess) {
-  return (
-    game.isStalemate() ||
-    game.isInsufficientMaterial() ||
-    game.isThreefoldRepetition()
-  );
-}
 
 function getPieceScore(type: PieceSymbol): number {
   return PIECE_SCORES[type] * 100;
 }
 
-function evalMaterial(game: Chess) {
-  const cells = flatMap(game.board());
+function getPos(square: Square) {
+  const col = WHITE_COLUMNS[square[0] as BoardColumn];
+  const row = WHITE_ROWS[parseInt(square[1]) - 1];
+  const index = row * 8 + col;
+  return index;
+}
 
-  let score = 0;
+function getPieces(game: Chess, piece: PieceSymbol, color: Color) {
+  const squares: Square[] = [];
+  const cells = flatMap(game.board());
   for (const cell of cells) {
-    if (cell) {
-      const value = getPieceScore(cell.type);
-      const perspective = cell.color === "w" ? 1 : -1;
-      score += perspective * value;
+    if (cell !== null && cell.type === piece && cell.color === color) {
+      squares.push(cell.square);
     }
   }
 
-  return score;
+  return squares;
 }
 
-function evalPiece(
+function getPhase(game: Chess) {
+  let knightPhase = 1,
+    bishopPhase = 1,
+    rookPhase = 2,
+    queenPhase = 4;
+  const totalPhase =
+    knightPhase * 4 + bishopPhase * 4 + rookPhase * 2 + queenPhase * 2;
+  let phase = totalPhase;
+
+  phase -= getPieces(game, "n", "w").length * knightPhase;
+  phase -= getPieces(game, "n", "b").length * knightPhase;
+  phase -= getPieces(game, "b", "w").length * bishopPhase;
+  phase -= getPieces(game, "b", "b").length * bishopPhase;
+  phase -= getPieces(game, "r", "w").length * rookPhase;
+  phase -= getPieces(game, "r", "b").length * rookPhase;
+  phase -= getPieces(game, "q", "w").length * queenPhase;
+  phase -= getPieces(game, "q", "b").length * queenPhase;
+
+  return (phase * PHASE_CONSTANT + totalPhase / 2) / totalPhase;
+}
+
+function getSquareValue(
   piece: PieceSymbol,
   square: Square,
   color: Color,
   isEndGame: boolean
 ): number {
-  const col = WHITE_COLUMNS[square[0] as BoardColumn];
-  const row = WHITE_ROWS[parseInt(square[1]) - 1];
-
-  const index = row * 8 + col;
+  const index = getPos(square);
   let mapping = [];
 
   switch (piece) {
@@ -106,19 +109,20 @@ function evalPiece(
   return mapping[index];
 }
 
-function evalPlacement(game: Chess) {
-  const isEndGame = checkIsEndGame(game);
+function countPieces(game: Chess, color: Color) {
+  const pawnCnt = getPieces(game, "p", color).length;
+  const knightCnt = getPieces(game, "n", color).length;
+  const bishopCnt = getPieces(game, "b", color).length;
+  const queenCnt = getPieces(game, "q", color).length;
+  const rookCnt = getPieces(game, "r", color).length;
 
-  const cells = flatMap(game.board());
-
-  let score = 0;
-  for (const cell of cells) {
-    if (cell) {
-      score += evalPiece(cell.type, cell.square, cell.color, isEndGame);
-    }
-  }
-
-  return score;
+  return (
+    pawnCnt * getPieceScore("p") +
+    knightCnt * getPieceScore("n") +
+    bishopCnt * getPieceScore("b") +
+    queenCnt * getPieceScore("q") +
+    rookCnt * getPieceScore("r")
+  );
 }
 
 function evalCapture(game: Chess, move: Move): number {
@@ -127,15 +131,13 @@ function evalCapture(game: Chess, move: Move): number {
   const pieceFrom = game.get(move.from);
   const pieceTo = game.get(move.to);
 
-  if (!pieceFrom || !pieceTo) throw new Error("invalid capture");
-
   return getPieceScore(pieceTo.type) - getPieceScore(pieceFrom.type);
 }
 
 export function evalMove(game: Chess, move: Move): number {
   let moveValue: number = 0;
 
-  const isEndGame = checkIsEndGame(game);
+  const phase = getPhase(game);
   const turnMultiplier = game.turn() === "w" ? 1 : -1;
 
   //promotion move
@@ -144,8 +146,18 @@ export function evalMove(game: Chess, move: Move): number {
   }
 
   //change move
-  const pieceFromEval = evalPiece(move.piece, move.from, move.color, isEndGame);
-  const pieceToEval = evalPiece(move.piece, move.to, move.color, isEndGame);
+  const pieceFromEval = getSquareValue(
+    move.piece,
+    move.from,
+    move.color,
+    phase > 80
+  );
+  const pieceToEval = getSquareValue(
+    move.piece,
+    move.to,
+    move.color,
+    phase > 80
+  );
   const positionChangeValue = pieceToEval - pieceFromEval;
 
   //capture move
@@ -159,19 +171,90 @@ export function evalMove(game: Chess, move: Move): number {
   return turnMultiplier * moveValue;
 }
 
-export function evalBoard(game: Chess): number {
-  const maximize = game.turn() === "w";
+function evalPawn(game: Chess, color: Color) {
+  const pawns = getPieces(game, "p", color);
+  const uniqueColumns = uniq(
+    pawns.map((sq) => WHITE_COLUMNS[sq[0] as BoardColumn])
+  );
 
-  if (game.isCheckmate())
-    return maximize ? -Number.POSITIVE_INFINITY : Number.POSITIVE_INFINITY;
+  const badPawns = (pawns.length - uniqueColumns.length) * 2;
+  return badPawns * PAWN_PELANTY;
+}
 
-  if (isGameFinished(game)) return 0;
+function isGameFinsihed(game: Chess) {
+  return (
+    game.isStalemate() ||
+    game.isInsufficientMaterial() ||
+    game.isThreefoldRepetition()
+  );
+}
 
+function calculatePieceSquare(
+  game: Chess,
+  turn: Color,
+  isEndGame: boolean
+): number {
   let score = 0;
 
-  score += evalMaterial(game);
-  score += evalPlacement(game);
+  let knightCnt = 0,
+    bishopCnt = 0,
+    rookCnt = 0,
+    pawnCnt = 0;
+
+  const cells = flatMap(game.board());
+
+  for (const cell of cells) {
+    if (cell !== null && cell.color === turn) {
+      if (cell.type === "n") knightCnt += 1;
+      if (cell.type === "b") bishopCnt += 1;
+      if (cell.type === "r") rookCnt += 1;
+      if (cell.type === "p") pawnCnt += 1;
+      score += getSquareValue(cell.type, cell.square, cell.color, isEndGame);
+    }
+  }
+
+  if (knightCnt > 0) {
+    score += KINGHT_PAWN_ADJUSTMENT[pawnCnt] * knightCnt;
+  }
+
+  if (rookCnt > 0) {
+    score += ROOK_PAWN_ADJUSTMENT[pawnCnt] * rookCnt;
+  }
+
+  if (bishopCnt > 1) {
+    score += DUAL_BISHOP_ADJUSTMENT[pawnCnt] * bishopCnt;
+  }
 
   return score;
 }
 
+export function evalBoard(game: Chess): number {
+  if (isGameFinsihed(game)) return 0;
+
+  if (game.isCheckmate() && game.turn() === "w")
+    return -Number.POSITIVE_INFINITY;
+
+  if (game.isCheckmate() && game.turn() === "b")
+    return Number.NEGATIVE_INFINITY;
+
+  const phase = getPhase(game);
+
+  let score = 0;
+
+  const whiteMaterial = countPieces(game, "w");
+  const blackMaterial = countPieces(game, "b");
+  const whitePieceSquare = calculatePieceSquare(game, "w", phase > 80);
+  const blackPieceSquare = calculatePieceSquare(game, "b", phase > 80);
+  const whitePawn = evalPawn(game, "w");
+  const blackPawn = evalPawn(game, "b");
+
+  score +=
+    whiteMaterial -
+    blackMaterial +
+    whitePieceSquare +
+    blackPieceSquare +
+    whitePawn -
+    blackPawn;
+
+  return score;
+}

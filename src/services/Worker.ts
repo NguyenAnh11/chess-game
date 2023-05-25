@@ -1,6 +1,6 @@
 import { Chess } from "chess.js"
-import MinMax from "./IterativeDeepeningMinmax";
-//import MinMax from "./MinMax";
+//import MinMax from "./IterativeDeepeningMinmax";
+import MinMax from "./MinMax";
 
 
 self.onmessage = (e: MessageEvent<string>) => {

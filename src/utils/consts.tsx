@@ -285,3 +285,13 @@ export const KING_ENDGAME_EVAL = [
 ]
 
 export const KING_ENDGAME_EVAL_BLACK = KING_ENDGAME_EVAL.reverse();
+
+export const KINGHT_PAWN_ADJUSTMENT = [-30, -20, -15, -10, -5, 0, 5, 10, 15];
+
+export const ROOK_PAWN_ADJUSTMENT = [25, 20, 15, 10, 5, 0, -5, -10, -15];
+
+export const DUAL_BISHOP_ADJUSTMENT = [40, 40, 35, 30, 25, 20, 20, 15, 15];
+
+export const PHASE_CONSTANT = 256;
+
+export const PAWN_PELANTY = 50;
