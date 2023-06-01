@@ -181,6 +181,66 @@ function evalPawn(game: Chess, color: Color) {
   return badPawns * PAWN_PELANTY;
 }
 
+function kingSafety(game: Chess) {
+  const whiteKingSquare = getPieces(game, "k", "w")[0];
+  const blackKingSquare = getPieces(game, "k", "b")[0];
+
+  const whiteKingPos = getPos(whiteKingSquare);
+  const blackKingPos = getPos(blackKingSquare);
+
+  let whiteKingRank = whiteKingPos >> 3,
+    blackKingRank = blackKingPos >> 3,
+    whiteKingFile = whiteKingPos & 7,
+    blackKingFile = blackKingPos & 7;
+
+  let blackSafety = 0,
+    whiteSafety = 0,
+    blackAttacked = 0,
+    whiteAttacked = 0,
+    whiteRatio = 0,
+    blackRatio = 0,
+    wmat = 0,
+    bmat = 0;
+
+  const cells = flatMap(game.board());
+
+  for (const cell of cells) {
+    if (cell) {
+      const cellPos = getPos(cell.square);
+
+      const cellFile = cellPos & 7,
+        cellRank = cellPos >> 3;
+
+      const whiteDistance = Math.max(
+        Math.abs(whiteKingRank - cellRank),
+        Math.abs(whiteKingFile - cellFile)
+      );
+
+      const blackDistance = Math.max(
+        Math.abs(blackKingRank - cellRank),
+        Math.abs(blackKingFile - cellFile)
+      );
+
+      const pieceScore = PIECE_SCORES[cell.type];
+
+      if (cell.color === "w") {
+        blackAttacked += pieceScore * blackDistance;
+        whiteSafety += pieceScore * whiteDistance;
+        wmat += pieceScore;
+      } else {
+        whiteAttacked += pieceScore * whiteDistance;
+        blackSafety += pieceScore * blackDistance;
+        bmat += pieceScore;
+      }
+    }
+  }
+
+  whiteRatio = (whiteSafety - whiteAttacked) / bmat;
+  blackRatio = (blackSafety - blackAttacked) / wmat;
+
+  return blackRatio - whiteRatio
+}
+
 function isGameFinsihed(game: Chess) {
   return (
     game.isStalemate() ||
@@ -247,6 +307,7 @@ export function evalBoard(game: Chess): number {
   const blackPieceSquare = calculatePieceSquare(game, "b", phase > 80);
   const whitePawn = evalPawn(game, "w");
   const blackPawn = evalPawn(game, "b");
+  const safety = kingSafety(game);
 
   score +=
     whiteMaterial -
@@ -254,7 +315,8 @@ export function evalBoard(game: Chess): number {
     whitePieceSquare +
     blackPieceSquare +
     whitePawn -
-    blackPawn;
+    blackPawn +
+    safety
 
   return score;
 }

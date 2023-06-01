@@ -37,6 +37,21 @@ export function getPositionDifference(
   return difference;
 }
 
+export function getSquare(pos: number): Square {
+  const row = Math.floor(pos / 8);
+  const col = pos - row * 8;
+  
+  const whiteColumns: { [s: number]: string } = {}
+  for (const key of Object.keys(WHITE_COLUMNS)) {
+    const value = WHITE_COLUMNS[key as BoardColumn]
+    whiteColumns[value] = key
+  }
+
+  const squareRow = WHITE_ROWS[row] + 1;
+  const squareCol = whiteColumns[col];
+  return (squareCol + squareRow) as Square;
+}
+
 export function getRelativePosition(
   square: Square,
   orientation: BoardOrientation
