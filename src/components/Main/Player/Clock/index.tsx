@@ -14,7 +14,7 @@ export default function Clock({ color, duration }: ClockProps) {
   const ref = useRef<Countdown>(null);
   const time = useRef(duration);
 
-  const { turn, gameOver, onGameOver } = useChess();
+  const { turn, gameOver, onResign: onGameOver } = useChess();
 
   const [bow, setBow] = useState(0);
 

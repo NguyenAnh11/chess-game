@@ -90,7 +90,7 @@ type ChessContext = {
   onStep: (index: number) => void;
   onChoosedPiecePromotion: (piece: string) => void;
   onClosePromotion: () => void;
-  onGameOver: (playerId: string) => void;
+  onResign: (playerId: string) => void;
   onHiddenSuggestMove: () => void;
   onSuggestMove: () => void;
 };
@@ -111,7 +111,7 @@ const ChessProvider = ({
   orientation,
 }: ChessboardProviderProps) => {
   const { setting, mode } = useSetting();
-  const { isGameOver, onSetGameStatus } = useGame();
+  const { game: gameInfo, isGameOver, onSetGameStatus, onSetPlayerAsLoser } = useGame();
   const game = useRef<Chess>(new Chess());
   const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
   const [position, setPosition] = useState<BoardPosition>(
@@ -462,8 +462,10 @@ const ChessProvider = ({
     setBoardIndex((pre) => ({ ...pre, step: index }));
   };
 
-  const onGameOver = (playerId: string) => {};
-
+  const onResign = (playerId: string) => {
+    onSetPlayerAsLoser(playerId);
+  };
+  
   const viewSteps = useMemo(
     (): Move[] => moves.slice(0, boardIndex.step),
     [moves, boardIndex.step]
@@ -601,7 +603,10 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (game.current.isCheckmate() || game.current.isGameOver()) {
-      onSetGameStatus("End");
+      const currentPlayer = gameInfo.members.find(p => p.color === turn);
+      if (currentPlayer) {
+        onResign(currentPlayer.id);
+      }
     }
 
     if (game.current.isDraw()) {
@@ -734,7 +739,7 @@ const ChessProvider = ({
         onStep,
         onChoosedPiecePromotion,
         onClosePromotion,
-        onGameOver,
+        onResign,
         onHiddenSuggestMove,
         onSuggestMove,
       }}

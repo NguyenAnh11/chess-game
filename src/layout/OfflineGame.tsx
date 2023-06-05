@@ -1,5 +1,6 @@
 import { Box } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { cloneDeep } from "lodash";
+import { useRef, useState, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -8,10 +9,10 @@ import BoardPlayer from "../components/Main/Player";
 import GameSetting from "../components/Setting";
 import BoardSidebar from "../components/Sidebar";
 import ChessProvider from "../contexts/ChessContext";
-import GameProvider from "../contexts/GameContext";
+import GameProvider, { GameContextProps } from "../contexts/GameContext";
 import SettingProvider from "../contexts/SettingContext";
 import { useUser } from "../contexts/UserContext";
-import { GameInfo, GameStatus } from "../types";
+import { GameInfo, GameStatus, UserInfo } from "../types";
 
 export default function OfflineGame() {
   const boardRef = useRef<HTMLDivElement>(null);
@@ -37,10 +38,39 @@ export default function OfflineGame() {
     setGame((prev) => ({ ...prev, status }));
   };
 
-  console.log(game);
+  const onSetPlayerAsLoser = (playerId: string) => {
+    const cloneGame = cloneDeep(game);
+
+    cloneGame.status = "End";
+
+    cloneGame.members = game.members.reduce(
+      (prev: UserInfo[], curr: UserInfo) => {
+        if (curr.id === playerId) curr.isLoser = true;
+        return [...prev, curr];
+      },
+      []
+    );
+
+    setGame(cloneGame);
+  };
+
+  const isGameOver = useMemo(() => game.status === "End", [game.status]);
+
+  const isGameDraw = useMemo(() => game.status === "Draw", [game.status]);
+
+  const isGameStart = useMemo(() => game.status === "Ready", [game.status]);
+
+  const gameContextProps: GameContextProps = {
+    game,
+    isGameDraw,
+    isGameOver,
+    isGameStart,
+    onSetGameStatus,
+    onSetPlayerAsLoser,
+  };
 
   return (
-    <GameProvider game={game} onSetGameStatus={onSetGameStatus}>
+    <GameProvider {...gameContextProps}>
       <SettingProvider mode="Multiplayer">
         <ChessProvider boardRef={boardRef} orientation={user!.color}>
           <Box flex="1">

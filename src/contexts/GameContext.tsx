@@ -7,16 +7,17 @@ import {
 } from "react";
 import { GameInfo, GameStatus } from "../types";
 
-type GameContextProps = {
-  children: ReactNode;
+export type GameContextProps = {
+  children?: ReactNode;
   game: GameInfo;
+  isGameOver: boolean;
+  isGameDraw: boolean;
+  isGameStart: boolean;
   onSetGameStatus: (status: GameStatus) => void;
+  onSetPlayerAsLoser: (playerId: string) => void;
 };
 
-type GameContext = {
-  game: GameInfo;
-  onSetGameStatus: (status: GameStatus) => void;
-  isGameOver: boolean;
+type GameContext = GameContextProps & {
   isShowGameOver: boolean;
   onCloseModalGameOver: () => void;
 };
@@ -25,30 +26,26 @@ export const GameContext = createContext({} as GameContext);
 
 export const useGame = () => useContext(GameContext);
 
-const GameProvider = ({ children, game, onSetGameStatus }: GameContextProps) => {
-  const [isGameOver, setIsGameOver] = useState(game.status === "End");
+const GameProvider = (props: GameContextProps) => {
   const [isShowGameOver, setIsShowGameOver] = useState(false);
 
   useEffect(() => {
-    if (game && game.status === "End") {
-      setIsGameOver(true);
+    if (props.game.status === "End") {
       setIsShowGameOver(true);
     }
-  }, [game]);
+  }, [props.game.status]);
 
   const onCloseModalGameOver = () => setIsShowGameOver(false);
 
   return (
     <GameContext.Provider
       value={{
-        game,
-        onSetGameStatus,
-        isGameOver,
         isShowGameOver,
         onCloseModalGameOver,
+        ...props
       }}
     >
-      {children}
+      {props.children}
     </GameContext.Provider>
   );
 };

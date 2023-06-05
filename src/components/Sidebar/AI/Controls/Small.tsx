@@ -5,19 +5,21 @@ import { FiSettings } from "react-icons/fi";
 import { BsFlag } from "react-icons/bs";
 import { useChess } from "../../../../contexts/ChessContext";
 import { useSetting } from "../../../../contexts/SettingContext";
+import { useUser } from "../../../../contexts/UserContext";
 
 export default function SmallControls() {
-  const { boardRef, turn, onGameOver } = useChess();
+  const { user } = useUser();
+  const { boardRef, onResign: onGameResign } = useChess();
   
   const { onOpenEditSetting } = useSetting();
 
   const onDownload = () => {
     const element = boardRef.current;
-    if (element) {
-    }
+    if (element) {}
   };
 
   const onResign = () => {
+    onGameResign(user!.id);
   };
 
   return (

@@ -9,14 +9,20 @@ import {
 } from "react-icons/bs";
 import Icon from "../../../Common/Icon";
 import { useChess } from "../../../../contexts/ChessContext";
+import { useUser } from "../../../../contexts/UserContext";
 
 export default function LiveControls() {
-  const { turn, moves, boardIndex, onStep, onGameOver } =
+  const { user } = useUser();
+
+  const { moves, boardIndex, onStep, onResign: onGameResign } =
     useChess();
 
-  const onDraw = () => {};
+  const onDraw = () => {
+    console.log('Draw offer...');
+  };
 
   const onResign = () => {
+    onGameResign(user!.id);
   };
 
   const onBack = () => {
