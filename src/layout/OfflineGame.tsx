@@ -54,24 +54,15 @@ export default function OfflineGame() {
     setGame(cloneGame);
   };
 
-  const isGameOver = useMemo(() => game.status === "End", [game.status]);
-
-  const isGameDraw = useMemo(() => game.status === "Draw", [game.status]);
-
-  const isGameStart = useMemo(() => game.status === "Ready", [game.status]);
-
   const gameContextProps: GameContextProps = {
     game,
-    isGameDraw,
-    isGameOver,
-    isGameStart,
     onSetGameStatus,
     onSetPlayerAsLoser,
   };
 
   return (
     <GameProvider {...gameContextProps}>
-      <SettingProvider mode="Multiplayer">
+      <SettingProvider mode="AI">
         <ChessProvider boardRef={boardRef} orientation={user!.color}>
           <Box flex="1">
             <DndProvider backend={HTML5Backend}>
