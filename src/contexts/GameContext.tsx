@@ -32,13 +32,25 @@ export const useGame = () => useContext(GameContext);
 const GameProvider = (props: GameContextProps) => {
   const [isShowGameOver, setIsShowGameOver] = useState(false);
 
-  const isGameOver = useMemo(() => props.game.status === "End", [props.game.status]);
+  const isGameOver = useMemo(
+    () => props.game.status === "End",
+    [props.game.status]
+  );
 
-  const isGameDraw = useMemo(() => props.game.status === "Draw", [props.game.status]);
+  const isGameDraw = useMemo(
+    () => props.game.status === "Draw",
+    [props.game.status]
+  );
 
-  const isGameStart = useMemo(() => props.game.status === "Ready", [props.game.status]);
+  const isGameStart = useMemo(
+    () => props.game.status === "Ready",
+    [props.game.status]
+  );
 
-  const isGameWaiting = useMemo(() => props.game.status === "Wait", [props.game.status]);
+  const isGameWaiting = useMemo(
+    () => props.game.status === "Wait",
+    [props.game.status]
+  );
 
   useEffect(() => {
     if (props.game.status === "End") {
