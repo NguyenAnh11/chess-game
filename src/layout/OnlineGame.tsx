@@ -49,7 +49,7 @@ export default function OnlineGame() {
 
     return (
         <GameProvider {...gameContextProps}>
-        <SettingProvider mode="AI">
+        <SettingProvider mode="Multiplayer">
           <ChessProvider boardRef={boardRef} orientation={user!.color}>
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>

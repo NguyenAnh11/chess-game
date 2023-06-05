@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { cloneDeep } from "lodash";
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
