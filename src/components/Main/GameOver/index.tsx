@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 import css from "./gameover.module.css";
 import cn from "classnames";
+import { useGame } from "../../../contexts/GameContext";
 import GameOverHeader from "./Header";
-import GameOverPlayers from "./Players";
-import { useChess } from "../../../contexts/ChessContext";
+import GameOverUsers from "./Users";
 
 export default function GameOver() {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { playerGames, isShowGameOver, onCloseModalGameOver } = useChess();
+  const { game, isShowGameOver, onCloseModalGameOver } = useGame();
 
   const onClose = () => {
     onCloseModalGameOver();
@@ -37,7 +37,7 @@ export default function GameOver() {
         )}
       >
         <GameOverHeader onClose={onClose} />
-        <GameOverPlayers playerGames={playerGames} />
+        <GameOverUsers users={game.members} />
       </div>
     </div>
   ) : null;

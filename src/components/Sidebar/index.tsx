@@ -1,7 +1,8 @@
 import { Flex } from "@chakra-ui/react";
 import { useSetting } from "../../contexts/SettingContext";
 import GameControls from "./AI/Controls";
-import MoveContainer from "./AI/Moves";
+import MoveContainer from "./AI/Moves"
+import Multiplayer from "./Multiplayer";
 
 export default function BoardSidebar() {
   const { mode } = useSetting();
@@ -13,6 +14,9 @@ export default function BoardSidebar() {
           <MoveContainer />
           <GameControls />
         </>
+      )}
+      {mode === "Multiplayer" && (
+        <Multiplayer />
       )}
     </Flex>
   );

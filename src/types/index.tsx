@@ -143,16 +143,21 @@ export type PlaySetting = BaseSetting & {
   confirmResignDraw: number;
 };
 
-export type PlayerInfo = {
+export type UserInfo = {
   id: string;
   name: string;
   avatar: string;
   color: Color;
+  isLoser: boolean;
 };
 
-export type PlayerInfoGame = PlayerInfo & {
-  lose: boolean;
-};
+export type GameStatus = "Wait" | "Ready" | "Start" | "Draw" | "End";
+
+export type GameInfo = {
+  code: string;
+  status: GameStatus;
+  members: UserInfo[];
+}
 
 export type CapturePieces = {
   [c in Color]: { [p in Exclude<PieceSymbol, "k">]: number };

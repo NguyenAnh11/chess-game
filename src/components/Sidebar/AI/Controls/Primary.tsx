@@ -1,4 +1,4 @@
-import Button from "../../../Common/Button";
+import Button from "../../../Common/Button/Default";
 import { Grid, Tooltip, Icon } from "@chakra-ui/react";
 import { HiLightBulb } from "react-icons/hi";
 import { IoChevronBack, IoChevronForward, IoAdd } from "react-icons/io5";

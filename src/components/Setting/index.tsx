@@ -3,7 +3,7 @@ import { FaChessBoard, FaPlaystation } from "react-icons/fa";
 import { useSetting } from "../../contexts/SettingContext";
 import { ControlValue, Setting } from "../../types";
 import Modal from "../Common/Modal";
-import Button from "../Common/Button";
+import Button from "../Common/Button/Default";
 import { TabList } from "../Common/Tab";
 import BoardPanel from "./TabPanels/Board";
 import PlayPanel from "./TabPanels/Play";

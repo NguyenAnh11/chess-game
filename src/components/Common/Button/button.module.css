@@ -50,3 +50,14 @@
     filter: grayscale(.4);
     opacity: 0.9;
 }
+
+.live_btn {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}

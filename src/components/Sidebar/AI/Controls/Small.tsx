@@ -1,5 +1,5 @@
 import { Flex, Icon, Tooltip } from "@chakra-ui/react";
-import Button from "../../../Common/Button";
+import Button from "../../../Common/Button/Default";
 import { TbDownload } from "react-icons/tb";
 import { FiSettings } from "react-icons/fi";
 import { BsFlag } from "react-icons/bs";
@@ -7,7 +7,8 @@ import { useChess } from "../../../../contexts/ChessContext";
 import { useSetting } from "../../../../contexts/SettingContext";
 
 export default function SmallControls() {
-  const { boardRef, onGameOver } = useChess();
+  const { boardRef, turn, onGameOver } = useChess();
+  
   const { onOpenEditSetting } = useSetting();
 
   const onDownload = () => {
@@ -17,8 +18,7 @@ export default function SmallControls() {
   };
 
   const onResign = () => {
-    onGameOver();
-  }
+  };
 
   return (
     <Flex w="full" justify="space-between">

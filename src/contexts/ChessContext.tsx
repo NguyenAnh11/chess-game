@@ -26,10 +26,7 @@ import {
   BoardIndex,
   BoardDifference,
   BoardPromotion,
-  Premove,
   CapturePieces,
-  PlayerInfo,
-  PlayerInfoGame,
   MoveAction,
   SuggestMove,
 } from "../types";
@@ -44,21 +41,19 @@ import {
   getPositionDifference,
   PIECE_SCORES,
 } from "../utils";
+import { useGame } from "./GameContext";
 import { useSetting } from "./SettingContext";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
   boardRef: RefObject<HTMLDivElement>;
   orientation: BoardOrientation;
-  playerInfos: PlayerInfo[];
 };
 
 type ChessContext = {
   boardRef: RefObject<HTMLDivElement>;
   game: Chess;
-  gameOver: boolean;
   duration: number;
-  isShowGameOver: boolean;
   position: BoardPosition;
   positionDifference: BoardDifference;
   promotion: BoardPromotion;
@@ -69,7 +64,6 @@ type ChessContext = {
   pieceImages: PieceImages;
   animationDuration: number;
   moves: Move[];
-  premoves: Premove[];
   suggestMove: SuggestMove;
   arrows: Arrow[];
   lastMove: Move | undefined;
@@ -82,7 +76,6 @@ type ChessContext = {
   setBoardIndex: Dispatch<SetStateAction<BoardIndex>>;
   isWaitingForAnimation: boolean;
   kingUnderAttack: KingSquare | undefined;
-  playerGames: PlayerInfoGame[];
   onLeftClickDown: (sq: Square) => void;
   onClearLeftClick: () => void;
   onDropPiece: (source: Square, target: Square) => void;
@@ -97,8 +90,7 @@ type ChessContext = {
   onStep: (index: number) => void;
   onChoosedPiecePromotion: (piece: string) => void;
   onClosePromotion: () => void;
-  onCloseModalGameOver: () => void;
-  onGameOver: () => void;
+  onGameOver: (playerId: string) => void;
   onHiddenSuggestMove: () => void;
   onSuggestMove: () => void;
 };
@@ -107,7 +99,7 @@ const initialValueSuggestMove: SuggestMove = {
   hidden: false,
   loading: false,
   move: undefined,
-}
+};
 
 export const ChessContext = createContext({} as ChessContext);
 
@@ -117,13 +109,11 @@ const ChessProvider = ({
   children,
   boardRef,
   orientation,
-  playerInfos,
 }: ChessboardProviderProps) => {
-  const { setting } = useSetting();
+  const { setting, mode } = useSetting();
+  const { isGameOver, onSetGameStatus } = useGame();
   const game = useRef<Chess>(new Chess());
   const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
-  const [gameOver, setGameOver] = useState(false);
-  const [isShowGameOver, setIsShowGameOver] = useState(false);
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
   );
@@ -136,9 +126,10 @@ const ChessProvider = ({
     move: Move;
     action: MoveAction;
   }>();
-  const [suggestMove, setSuggestMove] = useState<SuggestMove>(initialValueSuggestMove);
+  const [suggestMove, setSuggestMove] = useState<SuggestMove>(
+    initialValueSuggestMove
+  );
   const [arrows, setArrows] = useState<Arrow[]>([]);
-  const [premoves, setPremoves] = useState<Premove[]>([]);
   const [currentRightClickDown, setCurrentRightClickDown] = useState<
     Square | undefined
   >(undefined);
@@ -154,7 +145,6 @@ const ChessProvider = ({
   const [isManualDrop, setIsManualDrop] = useState(false);
   const [previousTimeout, setPreviousTimeout] = useState<NodeJS.Timeout>();
   const [isWaitingForAnimation, setIsWaitingForAnimation] = useState(false);
-
   const [promotion, setPromotion] = useState<BoardPromotion>({
     show: false,
     waiting: false,
@@ -186,10 +176,6 @@ const ChessProvider = ({
   };
 
   const onClosePromotion = () => setPromotion({ show: false, waiting: false });
-
-  const onCloseModalGameOver = () => setIsShowGameOver(false);
-
-  const onGameOver = () => setGameOver(true);
 
   const onClearArrows = () => setArrows([]);
 
@@ -224,6 +210,7 @@ const ChessProvider = ({
     }
 
     const newMoves = [...cloneMoves, move];
+
     setMoves(newMoves);
 
     setTurn((prev) => (prev === "w" ? "b" : "w"));
@@ -243,7 +230,7 @@ const ChessProvider = ({
   };
 
   const onLeftClickDown = (square: Square) => {
-    if (gameOver || game.current.isDraw()) return;
+    if (isGameOver || game.current.isDraw()) return;
 
     if (!leftClick) {
       kingUnderAttack && setKingUnderAttack(undefined);
@@ -251,7 +238,7 @@ const ChessProvider = ({
       return;
     }
 
-    if (leftClick === square || orientation !== turn) {
+    if (leftClick === square) {
       setLeftClick(undefined);
       return;
     }
@@ -369,7 +356,7 @@ const ChessProvider = ({
   };
 
   const onDragPieceBegin = (square: Square) => {
-    if (gameOver || game.current.isCheckmate() || leftClick) return;
+    if (isGameOver || game.current.isCheckmate() || leftClick) return;
 
     setLeftClick(square);
   };
@@ -464,18 +451,18 @@ const ChessProvider = ({
   };
 
   const onStep = (index: number) => {
-    const newStepIndex = index + 1;
+    if (index === boardIndex.step) return;
 
-    if (newStepIndex === boardIndex.step) return;
-
-    if (newStepIndex < boardIndex.step) {
-      undo(boardIndex.step - newStepIndex);
+    if (index < boardIndex.step) {
+      undo(boardIndex.step - index);
     } else {
-      move(boardIndex.step, newStepIndex);
+      move(boardIndex.step, index);
     }
 
-    setBoardIndex((pre) => ({ ...pre, step: newStepIndex }));
+    setBoardIndex((pre) => ({ ...pre, step: index }));
   };
+
+  const onGameOver = (playerId: string) => {};
 
   const viewSteps = useMemo(
     (): Move[] => moves.slice(0, boardIndex.step),
@@ -612,28 +599,19 @@ const ChessProvider = ({
     return score;
   }, [viewSteps, position]);
 
-  const playerGames = useMemo((): PlayerInfoGame[] => {
-    const players: PlayerInfoGame[] = playerInfos.map((p) => ({
-      ...p,
-      lose: false,
-    }));
-    if (gameOver) {
-      const turnPlayer = players.find((p) => p.color === turn)!;
-      turnPlayer.lose = true;
+  useEffect(() => {
+    if (game.current.isCheckmate() || game.current.isGameOver()) {
+      onSetGameStatus("End");
     }
 
-    return players;
-  }, [gameOver]);
-
-  useEffect(() => {
-    if (gameOver) {
-      setIsShowGameOver(true);
+    if (game.current.isDraw()) {
+      onSetGameStatus("Draw");
     }
-  }, [gameOver]);
-
-  useEffect(() => {
-    setGameOver(game.current.isCheckmate() || game.current.isGameOver());
-  }, [game.current]);
+  }, [
+    game.current.isCheckmate(),
+    game.current.isGameOver(),
+    game.current.isDraw(),
+  ]);
 
   useEffect(() => {
     const nextPosition = convertFen(game.current.fen());
@@ -685,7 +663,9 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn) {
-      aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
+      if (mode === "AI") {
+        aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
+      }
     }
   }, [position]);
 
@@ -697,16 +677,18 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn) {
-      if (!readyMove || boardIndex.step !== moves.length) return;
-      //make change
-      game.current.move({
-        from: readyMove.move.from,
-        to: readyMove.move.to,
-        promotion: readyMove.move.promotion,
-      });
+      if (mode === "AI") {
+        if (!readyMove || boardIndex.step !== moves.length) return;
+        //make change
+        game.current.move({
+          from: readyMove.move.from,
+          to: readyMove.move.to,
+          promotion: readyMove.move.promotion,
+        });
 
-      //make move
-      makeMove(readyMove.action, readyMove.move);
+        //make move
+        makeMove(readyMove.action, readyMove.move);
+      }
     }
   }, [turn, readyMove, boardIndex.step]);
 
@@ -715,9 +697,7 @@ const ChessProvider = ({
       value={{
         boardRef,
         game: game.current,
-        gameOver,
         duration,
-        isShowGameOver,
         position,
         positionDifference,
         promotion,
@@ -729,7 +709,6 @@ const ChessProvider = ({
         animationDuration: ANIMATIONS[setting.board.animation],
         arrows,
         moves,
-        premoves,
         suggestMove,
         lastMove,
         highlightSquares,
@@ -741,7 +720,6 @@ const ChessProvider = ({
         setBoardIndex,
         isWaitingForAnimation,
         kingUnderAttack,
-        playerGames,
         onLeftClickDown,
         onClearLeftClick,
         onDropPiece,
@@ -756,7 +734,6 @@ const ChessProvider = ({
         onStep,
         onChoosedPiecePromotion,
         onClosePromotion,
-        onCloseModalGameOver,
         onGameOver,
         onHiddenSuggestMove,
         onSuggestMove,

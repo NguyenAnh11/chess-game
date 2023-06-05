@@ -1,6 +1,6 @@
 import { Box, Image } from "@chakra-ui/react";
-import classNames from "classnames";
 import { Move } from "chess.js";
+import classNames from "classnames";
 import { useChess } from "../../../../contexts/ChessContext";
 import { Piece } from "../../../../types";
 import css from "./move.module.css";
@@ -22,11 +22,11 @@ export default function MoveItem({ move, index }: MoveItemProps) {
   const piece = (move.color + move.piece.toUpperCase()) as Piece;
 
   return move.piece === "p" ? (
-    <Box className={boxClass} onClick={() => onStep(index)}>
+    <Box className={boxClass} onClick={() => onStep(index + 1)}>
       {move.san}
     </Box>
   ) : (
-    <Box className={boxClass} onClick={() => onStep(index)}>
+    <Box className={boxClass} onClick={() => onStep(index + 1)}>
       <Box w="4" h="4" mr="0.5">
         <Image src={pieceImages[piece]} />
       </Box>
