@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex } from "@chakra-ui/react";
 import "./index.css";
-import OfflineGame from "./layout/OfflineGame";
+import Offline from "./layout/Offline";
 
 const App = () => {
   return (
@@ -14,7 +14,7 @@ const App = () => {
         userSelect="none"
       >
         <Flex position="relative" h="min-content">
-          <OfflineGame/>
+          <Offline/>
         </Flex>
       </Flex>
     </React.Fragment>

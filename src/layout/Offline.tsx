@@ -14,7 +14,7 @@ import SettingProvider from "../contexts/SettingContext";
 import { useUser } from "../contexts/UserContext";
 import { GameInfo, GameStatus, UserInfo } from "../types";
 
-export default function OfflineGame() {
+export default function Offline() {
   const boardRef = useRef<HTMLDivElement>(null);
 
   const { user } = useUser();

@@ -18,13 +18,7 @@ export const UserContext = createContext({} as UserContext);
 export const useUser = () => useContext(UserContext);
 
 const UserProvider = ({ children }: UserContextProps) => {
-  const [user, setUser] = useLocalStorage<UserInfo | undefined>("user", {
-    id: uuidv4(),
-    name: "Anh",
-    avatar: `${import.meta.env.VITE_AVATAR}/Anh`,
-    color: "w",
-    isLoser: false,
-  });
+  const [user, setUser] = useLocalStorage<UserInfo | undefined>("user", undefined);
 
   const onSetUser = (name: string, color: Color) => {
     const user: UserInfo = {

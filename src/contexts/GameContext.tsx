@@ -19,6 +19,7 @@ type GameContext = GameContextProps & {
   isGameOver: boolean;
   isGameDraw: boolean;
   isGameStart: boolean;
+  isGameWaiting: boolean;
 
   isShowGameOver: boolean;
   onCloseModalGameOver: () => void;
@@ -37,6 +38,8 @@ const GameProvider = (props: GameContextProps) => {
 
   const isGameStart = useMemo(() => props.game.status === "Ready", [props.game.status]);
 
+  const isGameWaiting = useMemo(() => props.game.status === "Wait", [props.game.status]);
+
   useEffect(() => {
     if (props.game.status === "End") {
       setIsShowGameOver(true);
@@ -52,6 +55,7 @@ const GameProvider = (props: GameContextProps) => {
         isGameDraw,
         isGameOver,
         isGameStart,
+        isGameWaiting,
         isShowGameOver,
         onCloseModalGameOver,
       }}
