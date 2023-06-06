@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { cloneDeep } from "lodash";
 import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +13,7 @@ import GameProvider, { GameContextProps } from "../contexts/GameContext";
 import SettingProvider from "../contexts/SettingContext";
 import { useUser } from "../contexts/UserContext";
 import { GameInfo, GameStatus, UserInfo } from "../types";
+import Layout from "../layout";
 
 export default function Offline() {
   const boardRef = useRef<HTMLDivElement>(null);
@@ -21,7 +22,7 @@ export default function Offline() {
 
   const [game, setGame] = useState<GameInfo>({
     code: uuidv4(),
-    status: "Ready",
+    status: "Wait",
     members: [
       user!,
       {
@@ -29,6 +30,7 @@ export default function Offline() {
         name: "AI",
         avatar: `${import.meta.env.VITE_AVATAR}/AI`,
         color: user!.color === "w" ? "b" : "w",
+        countryFlag: import.meta.env.VITE_COUNTRY_FLAG_VIETNAM,
         isLoser: false,
       },
     ],
@@ -61,22 +63,24 @@ export default function Offline() {
   };
 
   return (
-    <GameProvider {...gameContextProps}>
-      <SettingProvider mode="AI">
-        <ChessProvider boardRef={boardRef} orientation={user!.color}>
-          <Box flex="1">
-            <DndProvider backend={HTML5Backend}>
-              <BoardPlayer color={user!.color === "w" ? "b" : "w"} />
-              <BoardMain ref={boardRef} />
-              <GameSetting />
-              <BoardPlayer color={user!.color} />
-            </DndProvider>
-          </Box>
-          <Box flex="1">
-            <BoardSidebar />
-          </Box>
-        </ChessProvider>
-      </SettingProvider>
-    </GameProvider>
+    <Layout bgColor="#312e2b">
+      <GameProvider {...gameContextProps}>
+        <SettingProvider mode="AI">
+          <ChessProvider boardRef={boardRef} orientation={user!.color}>
+            <Box flex="1">
+              <DndProvider backend={HTML5Backend}>
+                <BoardPlayer color={user!.color === "w" ? "b" : "w"} />
+                <BoardMain ref={boardRef} />
+                <GameSetting />
+                <BoardPlayer color={user!.color} />
+              </DndProvider>
+            </Box>
+            <Box flex="1">
+              <BoardSidebar />
+            </Box>
+          </ChessProvider>
+        </SettingProvider>
+      </GameProvider>
+    </Layout>
   );
 }

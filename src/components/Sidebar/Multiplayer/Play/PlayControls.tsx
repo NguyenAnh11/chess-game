@@ -1,4 +1,4 @@
-import { Flex, Text, Tooltip } from "@chakra-ui/react";
+import { Flex, Text, Tooltip, Icon, Box } from "@chakra-ui/react";
 import Button from "../../../Common/Button/Live";
 import { HiOutlineFlag, HiFlag } from "react-icons/hi";
 import {
@@ -7,18 +7,18 @@ import {
   BsChevronLeft,
   BsChevronRight,
 } from "react-icons/bs";
-import Icon from "../../../Common/Icon";
+import { FiSettings } from "react-icons/fi";
 import { useChess } from "../../../../contexts/ChessContext";
 import { useUser } from "../../../../contexts/UserContext";
+import { useSetting } from "../../../../contexts/SettingContext";
 
 export default function LiveControls() {
   const { user } = useUser();
-
-  const { moves, boardIndex, onStep, onResign: onGameResign } =
-    useChess();
+  const { onOpenEditSetting } = useSetting();
+  const { moves, boardIndex, onStep, onResign: onGameResign } = useChess();
 
   const onDraw = () => {
-    console.log('Draw offer...');
+    console.log("Draw offer...");
   };
 
   const onResign = () => {
@@ -47,6 +47,10 @@ export default function LiveControls() {
     onStep(moves.length);
   };
 
+  const onSetting = () => {
+    onOpenEditSetting(true);
+  };
+
   return (
     <Flex
       pos="relative"
@@ -56,69 +60,67 @@ export default function LiveControls() {
       gap="1px"
       bgColor="#f1f1f1"
     >
-      <Button
-        label="draw-offer"
-        onClick={onDraw}
-        customStyle={{ gap: "5px", marginRight: "10px", color: "#666564" }}
-      >
-        <Icon icon={HiOutlineFlag} style={{ fontSize: "24px" }} />
-        <Text fontSize="sm" fontWeight="semibold">
-          Draw
-        </Text>
-      </Button>
+      <Box mr="10px" gap="5px" color="#666564">
+        <Button label="draw-offer" onClick={onDraw}>
+          <Icon as={HiOutlineFlag} fontSize="2xl" />
+          <Text fontSize="sm" fontWeight="semibold">
+            Draw
+          </Text>
+        </Button>
+      </Box>
 
-      <Button
-        label="resign"
-        onClick={onResign}
-        customStyle={{ gap: "5px", marginRight: "10px", color: "#666564" }}
-      >
-        <Icon icon={HiFlag} style={{ fontSize: "24px" }} />
-        <Text fontSize="sm" fontWeight="semibold">
-          Resign
-        </Text>
-      </Button>
+      <Box mr="10px" gap="5px" color="#666564">
+        <Button label="resign" onClick={onResign}>
+          <Icon as={HiFlag} fontSize="2xl" />
+          <Text fontSize="sm" fontWeight="semibold">
+            Resign
+          </Text>
+        </Button>
+      </Box>
 
       <Flex flex="1" />
 
       <Tooltip label="Start">
-        <Button
-          label="Start"
-          onClick={onStart}
-          customStyle={{ fontSize: "24px", color: "#8b8987" }}
-        >
-          <Icon icon={BsChevronBarLeft} />
-        </Button>
+        <Box mr="0.5" fontSize="2xl" color="#8b8987">
+          <Button label="Start" onClick={onStart}>
+            <Icon as={BsChevronBarLeft} />
+          </Button>
+        </Box>
       </Tooltip>
 
-      <Tooltip label="Back">
-        <Button
-          label="Back"
-          onClick={onBack}
-          customStyle={{ fontSize: "24px", color: "#8b8987" }}
-        >
-          <Icon icon={BsChevronLeft} />
-        </Button>
-      </Tooltip>
+      <Box mr="0.5" fontSize="2xl" color="#8b8987">
+        <Tooltip label="Back">
+          <Button label="Back" onClick={onBack}>
+            <Icon as={BsChevronLeft} />
+          </Button>
+        </Tooltip>
+      </Box>
 
-      <Tooltip label="Forward">
-        <Button
-          label="Forward"
-          onClick={onForward}
-          customStyle={{ fontSize: "24px", color: "#8b8987" }}
-        >
-          <Icon icon={BsChevronRight} />
-        </Button>
-      </Tooltip>
+      <Box mr="0.5" fontSize="2xl" color="#8b8987">
+        <Tooltip label="Forward">
+          <Button label="Forward" onClick={onForward}>
+            <Icon as={BsChevronRight} />
+          </Button>
+        </Tooltip>
+      </Box>
 
-      <Tooltip label="Ending">
-        <Button
-          label="Ending"
-          onClick={onEnd}
-          customStyle={{ fontSize: "24px", color: "#8b8987" }}
-        >
-          <Icon icon={BsChevronBarRight} />
-        </Button>
-      </Tooltip>
+      <Box mr="0.5" fontSize="2xl" color="#8b8987">
+        <Tooltip label="Ending">
+          <Button label="Ending" onClick={onEnd}>
+            <Icon as={BsChevronBarRight} />
+          </Button>
+        </Tooltip>
+      </Box>
+
+
+      <Box fontSize="2xl" color="#8b8987">
+        <Tooltip label="Setting">
+          <Button label="Setting" onClick={onSetting}>
+            <Icon as={FiSettings} />
+          </Button>
+        </Tooltip>
+      </Box>
+
     </Flex>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import { Color } from "chess.js";
 import { UserInfo } from "../../../types";
@@ -18,18 +18,14 @@ export default function BoardPlayer({ color }: BoardPlayerProp) {
   const { mode } = useSetting();
   const { duration, capturePieces, capturePiecesScore } = useChess();
 
-  const [user, setUser] = useState<UserInfo | undefined>();
-
   const captureColor = color === "w" ? "b" : "w";
 
   const score = capturePiecesScore[color] - capturePiecesScore[captureColor];
 
-  useEffect(() => {
-    if (game) {
-      const user = game.members.find((p) => p.color === color);
-      setUser(user);
-    }
-  }, [game]);
+  const user = useMemo((): UserInfo | undefined => {
+    const user = game.members.find((p) => p.color === color);
+    return user;
+  }, [game.members]);
 
   return (
     <Box className={css.board_player}>

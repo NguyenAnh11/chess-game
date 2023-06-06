@@ -148,6 +148,7 @@ export type UserInfo = {
   name: string;
   avatar: string;
   color: Color;
+  countryFlag: string;
   isLoser: boolean;
 };
 

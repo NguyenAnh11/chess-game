@@ -1,22 +1,53 @@
-import React from "react";
-import { Flex } from "@chakra-ui/react";
+import React, { Suspense, lazy } from "react";
 import "./index.css";
-import Offline from "./layout/Offline";
+import { Routes, Route } from "react-router-dom";
+import Loading from "./pages/Loading";
+import PrivateRoute from "./routers/PrivateRoute";
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const Offline = lazy(() => import("./pages/Offline"));
+const Online = lazy(() => import("./pages/Online"));
 
 const App = () => {
   return (
     <React.Fragment>
-      <Flex
-        h="100vh"
-        bgColor="#312e2b"
-        align="center"
-        justify="center"
-        userSelect="none"
-      >
-        <Flex position="relative" h="min-content">
-          <Offline/>
-        </Flex>
-      </Flex>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <Suspense fallback={<Loading />}>
+              <Login />
+            </Suspense>
+          }
+        />
+        <Route element={<PrivateRoute />}>
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Home />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/offline"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Offline />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/online"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Online />
+              </Suspense>
+            }
+          />
+        </Route>
+      </Routes>
     </React.Fragment>
   );
 };

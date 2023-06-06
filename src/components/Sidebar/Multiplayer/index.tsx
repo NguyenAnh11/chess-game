@@ -5,7 +5,7 @@ import PlayPanel from "./Play/PlayPanel";
 import GamePanel from "./Game";
 import { TabList } from "../../Common/Tab";
 
-export default function Multiplayer() {
+export default function MultiplayerSidebar() {
   const [tabIndex, setTabIndex] = useState(0);
 
   const onChangeTab = (index: number) => setTabIndex(index);

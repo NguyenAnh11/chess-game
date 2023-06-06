@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { cloneDeep } from "lodash";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -12,6 +12,7 @@ import BoardPlayer from "../components/Main/Player";
 import BoardMain from "../components/Main";
 import GameSetting from "../components/Setting";
 import BoardSidebar from "../components/Sidebar";
+import Layout from "../layout";
 
 export default function Room() {
   const boardRef = useRef<HTMLDivElement>(null);
@@ -21,7 +22,7 @@ export default function Room() {
   const [game, setGame] = useState<GameInfo>({
     code: "",
     status: "Ready",
-    members: [],
+    members: [user!],
   });
 
   const onSetGameStatus = (status: GameStatus) => {
@@ -51,22 +52,24 @@ export default function Room() {
   };
 
   return (
-    <GameProvider {...gameContextProps}>
-      <SettingProvider mode="Multiplayer">
-        <ChessProvider boardRef={boardRef} orientation={user!.color}>
-          <Box flex="1">
-            <DndProvider backend={HTML5Backend}>
-              <BoardPlayer color={user!.color === "w" ? "b" : "w"} />
-              <BoardMain ref={boardRef} />
-              <GameSetting />
-              <BoardPlayer color={user!.color} />
-            </DndProvider>
-          </Box>
-          <Box flex="1">
-            <BoardSidebar />
-          </Box>
-        </ChessProvider>
-      </SettingProvider>
-    </GameProvider>
+    <Layout bgColor="#312e2b">
+      <GameProvider {...gameContextProps}>
+        <SettingProvider mode="Multiplayer">
+          <ChessProvider boardRef={boardRef} orientation={user!.color}>
+            <Box flex="1">
+              <DndProvider backend={HTML5Backend}>
+                <BoardPlayer color={user!.color === "w" ? "b" : "w"} />
+                <BoardMain ref={boardRef} />
+                <GameSetting />
+                <BoardPlayer color={user!.color} />
+              </DndProvider>
+            </Box>
+            <Box flex="1">
+              <BoardSidebar />
+            </Box>
+          </ChessProvider>
+        </SettingProvider>
+      </GameProvider>
+    </Layout>
   );
 }
