@@ -21,8 +21,6 @@ export default function SelectAsPlayer() {
   const [index, setIndex] = useState<number>(0);
 
   const onChooseColor = (index: number) => {
-    console.log("Index: ", index);
-
     setIndex(index);
 
     let color: Color = index === 0 ? "w" : "b";
