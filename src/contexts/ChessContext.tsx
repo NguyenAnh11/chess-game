@@ -111,7 +111,7 @@ const ChessProvider = ({
   orientation,
 }: ChessboardProviderProps) => {
   const { setting, mode } = useSetting();
-  const { game: gameInfo, isGameOver, onSetGameStatus, onSetPlayerAsLoser } = useGame();
+  const { game: gameInfo, isGameOver, isGameWaiting, onSetGameStatus, onSetPlayerAsLoser } = useGame();
   const game = useRef<Chess>(new Chess());
   const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
   const [position, setPosition] = useState<BoardPosition>(
@@ -273,6 +273,10 @@ const ChessProvider = ({
       }
 
       makeMove("click", move);
+
+      if (mode === "AI") {
+        onSetGameStatus("Ready");
+      }
     } catch {
       if (game.current.inCheck()) {
         const king = game.current
@@ -682,7 +686,7 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn) {
-      if (mode === "AI") {
+      if (mode === "AI" && !isGameWaiting) {
         if (!readyMove || boardIndex.step !== moves.length) return;
         //make change
         game.current.move({

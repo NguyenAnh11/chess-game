@@ -1,9 +1,9 @@
-import { Box, Flex, Image, Text } from "@chakra-ui/react";
+import { Flex, Image, Text } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useGame } from "../../../../contexts/GameContext";
 import { useUser } from "../../../../contexts/UserContext";
 
-export default function SeletedBot() {
+export default function SelectBot() {
   const { user } = useUser();
   const { game } = useGame();
 

@@ -1,9 +1,15 @@
-import { Box, Flex, Grid, Text } from "@chakra-ui/react";
-import { useUser } from "../../../../contexts/UserContext";
-import SeletedBot from "./SelectedBot";
+import { Box, Flex } from "@chakra-ui/react";
+import SelectBot from "./SelectBot";
+import SelectAsPlayer from "./SelectAsPlayer";
+import Button from "../../../Common/Button/Default";
+import { useGame } from "../../../../contexts/GameContext";
 
 export default function SelectionSidebar() {
-  const { onSetColor } = useUser();
+  const { onSetGameStatus } = useGame();
+
+  const onStart = () => {
+    onSetGameStatus("Ready");
+  };
 
   return (
     <Flex
@@ -13,21 +19,21 @@ export default function SelectionSidebar() {
       h="full"
       bgColor="#fff"
     >
-      <SeletedBot />
-      <Box h="100%" pos="relative" overflow="auto">
-        <Flex direction="column" align="center">
-          <Text
-            fontSize="12px"
-            fontWeight="semibold"
-            textAlign="center"
-            textTransform="uppercase"
-          >
-            I Play As
-          </Text>
-          <Grid gap="20px" justifyContent="center" m="13px">
-            
-          </Grid>
-        </Flex>
+      <SelectBot />
+      <SelectAsPlayer />
+      <Box
+        pt="4"
+        px="6"
+        pb="7"
+        w="full"
+        h="100px"
+        bg="#f1f1f1"
+        display="block"
+        zIndex={1}
+      >
+        <Button label="Play" size="lg" variant="primary" onClick={onStart}>
+          Play
+        </Button>
       </Box>
     </Flex>
   );
