@@ -109,7 +109,7 @@ const ChessProvider = ({
   orientation,
 }: ChessboardProviderProps) => {
   const { setting, mode } = useSetting();
-  const { game: gameInfo, isGameOver, isGameWaiting, onSetGameReady, onSetPlayerAsLoser } = useGame();
+  const { game: gameInfo, isGameOver, isGameWaiting, onSetGameDraw, onSetGameReady, onSetPlayerAsLoser } = useGame();
   const game = useRef<Chess>(new Chess());
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
@@ -606,7 +606,7 @@ const ChessProvider = ({
     }
 
     if (game.current.isDraw()) {
-      onSetGameReady();
+      onSetGameDraw();
     }
   }, [
     game.current.isCheckmate(),
@@ -677,21 +677,23 @@ const ChessProvider = ({
   }, [turn]);
 
   useEffect(() => {
-    if (orientation !== turn) {
-      if (mode === "AI" && !isGameWaiting) {
-        if (!readyMove || boardIndex.step !== moves.length) return;
-        //make change
-        game.current.move({
-          from: readyMove.move.from,
-          to: readyMove.move.to,
-          promotion: readyMove.move.promotion,
-        });
+    if (orientation !== turn && mode === "AI" && !isGameWaiting) {
+      if (!readyMove || boardIndex.step !== moves.length) return;
+      //make change
+      game.current.move({
+        from: readyMove.move.from,
+        to: readyMove.move.to,
+        promotion: readyMove.move.promotion,
+      });
 
-        //make move
-        makeMove(readyMove.action, readyMove.move);
-      }
+      //make move
+      makeMove(readyMove.action, readyMove.move);
     }
-  }, [turn, readyMove, boardIndex.step]);
+  }, [turn, isGameWaiting, readyMove, boardIndex.step]);
+
+  useEffect(() => {
+    if (mode === "AI" && moves.length > 0) onSetGameReady();
+  }, [moves])
 
   return (
     <ChessContext.Provider
