@@ -270,6 +270,8 @@ const ChessProvider = ({
       }
 
       makeMove("click", move);
+
+      if (mode === "AI") onSetGameReady();
     } catch {
       if (game.current.inCheck()) {
         const king = game.current
@@ -690,10 +692,6 @@ const ChessProvider = ({
       makeMove(readyMove.action, readyMove.move);
     }
   }, [turn, isGameWaiting, readyMove, boardIndex.step]);
-
-  useEffect(() => {
-    if (mode === "AI" && moves.length > 0) onSetGameReady();
-  }, [moves])
 
   return (
     <ChessContext.Provider
