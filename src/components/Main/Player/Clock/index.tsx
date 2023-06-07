@@ -17,7 +17,7 @@ export default function Clock({ color, duration }: ClockProps) {
   const time = useRef(duration);
 
   const { user } = useUser();
-  const { isGameOver } = useGame();
+  const { isGameOver, isGameStart } = useGame();
   const { turn, onResign: onGameOver } = useChess();
 
   const [bow, setBow] = useState(0);
@@ -32,9 +32,9 @@ export default function Clock({ color, duration }: ClockProps) {
     if (ref) {
       if (isGameOver) ref.current?.stop();
       if (turn === color) ref.current?.start();
-      if (turn !== color) ref.current?.pause();
+      if (!isGameStart || turn !== color) ref.current?.pause();
     }
-  }, [ref, turn, color, isGameOver]);
+  }, [ref, turn, color, isGameOver, isGameStart]);
 
   useEffect(() => {
     time.current = duration

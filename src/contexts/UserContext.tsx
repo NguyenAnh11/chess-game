@@ -12,7 +12,7 @@ type UserContextProps = {
 type UserContext = {
   user: UserInfo | undefined;
   onSetUser: (name: string) => void;
-  onSetColor: (color: Color) => void;
+  onSetUserColor: (color: Color) => void;
 };
 
 export const UserContext = createContext({} as UserContext);
@@ -38,14 +38,14 @@ const UserProvider = ({ children }: UserContextProps) => {
     setUser(user);
   };
 
-  const onSetColor = (color: Color) => {
+  const onSetUserColor = (color: Color) => {
     const cloneUser = cloneDeep(user)!;
     cloneUser.color = color;
     setUser(cloneUser);
   };
 
   return (
-    <UserContext.Provider value={{ user, onSetUser, onSetColor }}>
+    <UserContext.Provider value={{ user, onSetUser, onSetUserColor }}>
       {children}
     </UserContext.Provider>
   );

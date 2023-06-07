@@ -16,7 +16,7 @@ type BoardPlayerProp = {
 export default function BoardPlayer({ color }: BoardPlayerProp) {
   const { game } = useGame();
   const { mode } = useSetting();
-  const { duration, capturePieces, capturePiecesScore } = useChess();
+  const { capturePieces, capturePiecesScore } = useChess();
 
   const captureColor = color === "w" ? "b" : "w";
 
@@ -52,7 +52,7 @@ export default function BoardPlayer({ color }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode !== "AI" && <Clock color={color} duration={duration} />}
+        {mode !== "AI" && <Clock color={color} duration={game.duration!} />}
       </Box>
     </Box>
   );

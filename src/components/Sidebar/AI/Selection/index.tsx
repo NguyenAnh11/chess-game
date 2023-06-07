@@ -5,11 +5,7 @@ import Button from "../../../Common/Button/Default";
 import { useGame } from "../../../../contexts/GameContext";
 
 export default function SelectionSidebar() {
-  const { onSetGameStatus } = useGame();
-
-  const onStart = () => {
-    onSetGameStatus("Ready");
-  };
+  const { onSetGameReady } = useGame();
 
   return (
     <Flex
@@ -31,7 +27,7 @@ export default function SelectionSidebar() {
         display="block"
         zIndex={1}
       >
-        <Button label="Play" size="lg" variant="primary" onClick={onStart}>
+        <Button label="Play" size="lg" variant="primary" onClick={() => onSetGameReady()}>
           Play
         </Button>
       </Box>

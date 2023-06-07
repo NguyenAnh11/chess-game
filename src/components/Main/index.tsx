@@ -7,10 +7,12 @@ import HintMoves from "./HintMoves";
 import Arrows from "./Arrows";
 import Promotion from "./Promotion";
 import GameOver from "./GameOver";
+import { useGame } from "../../contexts/GameContext";
 
 type BoardMainProps = {};
 
 const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
+  const { isGameStart, isGameOver } = useGame();
   const { promotion, onClearLeftClick, onClearRightClicks } = useChess();
 
   useOutsideClick({
@@ -30,7 +32,7 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
           <HintMoves />
           <Arrows />
           {promotion.show && <Promotion />}
-          <GameOver/>
+          {isGameStart && isGameOver && <GameOver />}
         </Box>
       </Flex>
     </React.Fragment>

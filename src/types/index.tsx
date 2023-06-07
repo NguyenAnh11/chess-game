@@ -156,6 +156,7 @@ export type GameStatus = "Wait" | "Ready" | "Draw" | "End";
 
 export type GameInfo = {
   code: string;
+  duration?: number;
   status: GameStatus;
   members: UserInfo[];
 }

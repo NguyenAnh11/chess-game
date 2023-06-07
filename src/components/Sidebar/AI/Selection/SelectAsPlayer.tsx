@@ -1,14 +1,12 @@
 import { Box, Flex, Text, Grid } from "@chakra-ui/react";
 import { useUser } from "../../../../contexts/UserContext";
 import { Color } from "chess.js";
-import React, { ReactNode, useState } from "react";
-import White from "./Player/White";
-import SelectAsBlackPlayer from "./Player/Black";
-import SelectAsRandomPlayer from "./Player/Random";
+import React, { ReactNode, useEffect, useState } from "react";
+import { BiQuestionMark } from "react-icons/bi";
+import { TbChessKing, TbChessKingFilled } from "react-icons/tb";
+import SelectPlayer from "./SelectPlayer";
 
-type Players = Color | "random";
-
-export type PlayerProps<T extends Players> = {
+export type SelectPlayerProps<T extends Color | "random"> = {
   color: T;
   value: number;
   isChoosedColor: boolean;
@@ -16,9 +14,9 @@ export type PlayerProps<T extends Players> = {
 };
 
 export default function SelectAsPlayer() {
-  const { onSetColor } = useUser();
+  const { user, onSetUserColor } = useUser();
 
-  const [index, setIndex] = useState<number>(0);
+  const [index, setIndex] = useState<number>();
 
   const onChooseColor = (index: number) => {
     setIndex(index);
@@ -29,33 +27,25 @@ export default function SelectAsPlayer() {
       color = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    onSetColor(color);
+    onSetUserColor(color);
   };
 
   const options: {
-    [p in Players]: { value: number; color: p; component: ReactNode };
+    [p in Color | "random"]: { value: number; color: p; component: ReactNode };
   } = {
     w: {
       value: 0,
       color: "w",
       component: (
-        <White
+        <SelectPlayer
           value={0}
           color="w"
           isChoosedColor={index === 0}
           onClick={onChooseColor}
-        />
-      ),
-    },
-    b: {
-      value: 1,
-      color: "b",
-      component: (
-        <SelectAsBlackPlayer
-          value={1}
-          color="b"
-          isChoosedColor={index === 1}
-          onClick={onChooseColor}
+          icon={TbChessKing}
+          textColor="#262421"
+          backgroundColor="#f1f1f1"
+          style={{ fontSize: "40px" }}
         />
       ),
     },
@@ -63,15 +53,40 @@ export default function SelectAsPlayer() {
       value: 2,
       color: "random",
       component: (
-        <SelectAsRandomPlayer
+        <SelectPlayer
           value={2}
           color="random"
           isChoosedColor={index === 2}
           onClick={onChooseColor}
+          icon={BiQuestionMark}
+          textColor="#fff"
+          backgroundColor="linear-gradient(90deg,#f1f1f1 50%,#262421 0)"
+          style={{ paddingTop: "5px", fontSize: "35px" }}
+        />
+      ),
+    },
+    b: {
+      value: 1,
+      color: "b",
+      component: (
+        <SelectPlayer
+          value={1}
+          color="b"
+          isChoosedColor={index === 1}
+          onClick={onChooseColor}
+          icon={TbChessKingFilled}
+          textColor="#fff"
+          backgroundColor="#262421"
+          style={{ fontSize: "40px" }}
         />
       ),
     },
   };
+
+  useEffect(() => {
+    const index = user!.color === "w" ? 0 : 1;
+    setIndex(index);
+  }, [])
 
   return (
     <Box h="100%" pos="relative" overflow="auto">
@@ -87,7 +102,7 @@ export default function SelectAsPlayer() {
         <Grid gap="20px" justifyContent="center" m="13px">
           {Object.keys(options).map((color, index) => (
             <React.Fragment key={index}>
-              {options[color as Players].component}
+              {options[color as Color | "random"].component}
             </React.Fragment>
           ))}
         </Grid>

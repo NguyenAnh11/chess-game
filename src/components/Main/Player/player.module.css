@@ -237,7 +237,7 @@
 }
 
 .player_row_name {
-    max-width: 30px;
+    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

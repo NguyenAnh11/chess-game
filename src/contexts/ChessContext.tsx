@@ -31,7 +31,6 @@ import {
   SuggestMove,
 } from "../types";
 import {
-  DEFAULT_DURATION,
   SQUARE_STYLE,
   convertFen,
   getPosition,
@@ -53,7 +52,6 @@ type ChessboardProviderProps = {
 type ChessContext = {
   boardRef: RefObject<HTMLDivElement>;
   game: Chess;
-  duration: number;
   position: BoardPosition;
   positionDifference: BoardDifference;
   promotion: BoardPromotion;
@@ -111,9 +109,8 @@ const ChessProvider = ({
   orientation,
 }: ChessboardProviderProps) => {
   const { setting, mode } = useSetting();
-  const { game: gameInfo, isGameOver, isGameWaiting, onSetGameStatus, onSetPlayerAsLoser } = useGame();
+  const { game: gameInfo, isGameOver, isGameWaiting, onSetGameReady, onSetPlayerAsLoser } = useGame();
   const game = useRef<Chess>(new Chess());
-  const [duration, setDuration] = useState(Date.now() + DEFAULT_DURATION);
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
   );
@@ -273,10 +270,6 @@ const ChessProvider = ({
       }
 
       makeMove("click", move);
-
-      if (mode === "AI") {
-        onSetGameStatus("Ready");
-      }
     } catch {
       if (game.current.inCheck()) {
         const king = game.current
@@ -428,7 +421,6 @@ const ChessProvider = ({
     //reset state game
     setMoves([]);
     setTurn("w");
-    setDuration(Date.now() + DEFAULT_DURATION);
     setBoardIndex({ break: 0, step: 0 });
 
     //terminate worker
@@ -614,7 +606,7 @@ const ChessProvider = ({
     }
 
     if (game.current.isDraw()) {
-      onSetGameStatus("Draw");
+      onSetGameReady();
     }
   }, [
     game.current.isCheckmate(),
@@ -672,11 +664,11 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (orientation !== turn) {
-      if (mode === "AI") {
+      if (mode === "AI" && !isGameWaiting) {
         aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
       }
     }
-  }, [position]);
+  }, [position, isGameWaiting]);
 
   useEffect(() => {
     if (orientation !== turn && suggestMove.loading) {
@@ -706,7 +698,6 @@ const ChessProvider = ({
       value={{
         boardRef,
         game: game.current,
-        duration,
         position,
         positionDifference,
         promotion,

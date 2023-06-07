@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash";
 import {
   createContext,
   useContext,
@@ -6,23 +7,27 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { GameInfo, GameStatus } from "../types";
+import { useSetting } from "./SettingContext";
+import { UserInfo, GameInfo } from "../types";
 
 export type GameContextProps = {
   children?: ReactNode;
-  game: GameInfo;
-  onSetGameStatus: (status: GameStatus) => void;
-  onSetPlayerAsLoser: (playerId: string) => void;
+  members?: UserInfo[];
+  duration?: number;
 };
 
-type GameContext = GameContextProps & {
+type GameContext = {
+  game: GameInfo;
   isGameOver: boolean;
   isGameDraw: boolean;
   isGameStart: boolean;
   isGameWaiting: boolean;
-
   isShowGameOver: boolean;
   onCloseModalGameOver: () => void;
+  onSetPlayerAsLoser: (playerId: string) => void;
+  onSetGameReady: () => void;
+  onSetGameDraw: () => void;
+  onSetGameEnd: () => void;
 };
 
 export const GameContext = createContext({} as GameContext);
@@ -30,46 +35,80 @@ export const GameContext = createContext({} as GameContext);
 export const useGame = () => useContext(GameContext);
 
 const GameProvider = (props: GameContextProps) => {
+  const { mode } = useSetting();
+
+  const [game, setGame] = useState<GameInfo>({
+    code: "",
+    status: "Wait",
+    duration: props.duration,
+    members: props.members ?? [],
+  });
+
   const [isShowGameOver, setIsShowGameOver] = useState(false);
 
-  const isGameOver = useMemo(
-    () => props.game.status === "End",
-    [props.game.status]
-  );
+  const isGameOver = useMemo(() => game.status === "End", [game.status]);
 
-  const isGameDraw = useMemo(
-    () => props.game.status === "Draw",
-    [props.game.status]
-  );
+  const isGameDraw = useMemo(() => game.status === "Draw", [game.status]);
 
-  const isGameStart = useMemo(
-    () => props.game.status === "Ready",
-    [props.game.status]
-  );
+  const isGameStart = useMemo(() => game.status === "Ready", [game.status]);
 
-  const isGameWaiting = useMemo(
-    () => props.game.status === "Wait",
-    [props.game.status]
-  );
+  const isGameWaiting = useMemo(() => game.status === "Wait", [game.status]);
 
   useEffect(() => {
-    if (props.game.status === "End") {
+    if (game.status === "End") {
       setIsShowGameOver(true);
     }
-  }, [props.game.status]);
+  }, [game.status]);
+
+  useEffect(() => {
+    if (
+      (mode === "AI" || mode === "Multiplayer") &&
+      game.status === "Wait" &&
+      game.members.length === 2
+    ) {
+      onSetGameReady();
+    }
+  }, [game.members]);
 
   const onCloseModalGameOver = () => setIsShowGameOver(false);
+
+  const onSetPlayerAsLoser = (playerId: string) => {
+    const cloneGame = cloneDeep(game);
+
+    cloneGame.status = "End";
+
+    cloneGame.members = game.members.reduce(
+      (prev: UserInfo[], curr: UserInfo) => {
+        if (curr.id === playerId) curr.isLoser = true;
+        return [...prev, curr];
+      },
+      []
+    );
+
+    setGame(cloneGame);
+  };
+
+  const onSetGameReady = () =>
+    setGame((prev) => ({ ...prev, status: "Ready" }));
+
+  const onSetGameDraw = () => setGame((prev) => ({ ...prev, status: "Draw" }));
+
+  const onSetGameEnd = () => setGame((prev) => ({ ...prev, status: "End" }));
 
   return (
     <GameContext.Provider
       value={{
-        ...props,
+        game,
         isGameDraw,
         isGameOver,
         isGameStart,
         isGameWaiting,
         isShowGameOver,
         onCloseModalGameOver,
+        onSetPlayerAsLoser,
+        onSetGameReady,
+        onSetGameDraw,
+        onSetGameEnd,
       }}
     >
       {props.children}

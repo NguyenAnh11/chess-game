@@ -9,10 +9,10 @@ import BoardPlayer from "../components/Main/Player";
 import GameSetting from "../components/Setting";
 import BoardSidebar from "../components/Sidebar";
 import ChessProvider from "../contexts/ChessContext";
-import GameProvider, { GameContextProps } from "../contexts/GameContext";
+import GameProvider from "../contexts/GameContext";
 import SettingProvider from "../contexts/SettingContext";
 import { useUser } from "../contexts/UserContext";
-import { GameInfo, GameStatus, UserInfo } from "../types";
+import { UserInfo } from "../types";
 import Layout from "../layout";
 
 export default function Offline() {
@@ -20,52 +20,22 @@ export default function Offline() {
 
   const { user } = useUser();
 
-  const [game, setGame] = useState<GameInfo>({
-    code: uuidv4(),
-    status: "Wait",
-    members: [
-      user!,
-      {
-        id: uuidv4(),
-        name: "AI",
-        avatar: `${import.meta.env.VITE_AVATAR}/AI`,
-        color: user!.color === "w" ? "b" : "w",
-        countryFlag: import.meta.env.VITE_COUNTRY_FLAG_VIETNAM,
-        isLoser: false,
-      },
-    ],
-  });
-
-  const onSetGameStatus = (status: GameStatus) => {
-    setGame((prev) => ({ ...prev, status }));
-  };
-
-  const onSetPlayerAsLoser = (playerId: string) => {
-    const cloneGame = cloneDeep(game);
-
-    cloneGame.status = "End";
-
-    cloneGame.members = game.members.reduce(
-      (prev: UserInfo[], curr: UserInfo) => {
-        if (curr.id === playerId) curr.isLoser = true;
-        return [...prev, curr];
-      },
-      []
-    );
-
-    setGame(cloneGame);
-  };
-
-  const gameContextProps: GameContextProps = {
-    game,
-    onSetGameStatus,
-    onSetPlayerAsLoser,
-  };
+  const members: UserInfo[] = [
+    user!,
+    {
+      id: uuidv4(),
+      name: "AI",
+      avatar: `${import.meta.env.VITE_AVATAR}/AI`,
+      color: user!.color === "w" ? "b" : "w",
+      countryFlag: import.meta.env.VITE_COUNTRY_FLAG_VIETNAM,
+      isLoser: false,
+    },
+  ];
 
   return (
     <Layout bgColor="#312e2b">
-      <GameProvider {...gameContextProps}>
-        <SettingProvider mode="AI">
+      <SettingProvider mode="AI">
+        <GameProvider members={members}>
           <ChessProvider boardRef={boardRef} orientation={user!.color}>
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>
@@ -79,8 +49,8 @@ export default function Offline() {
               <BoardSidebar />
             </Box>
           </ChessProvider>
-        </SettingProvider>
-      </GameProvider>
+        </GameProvider>
+      </SettingProvider>
     </Layout>
   );
 }

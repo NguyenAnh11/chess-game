@@ -1,10 +1,8 @@
-import { useRef, useState } from "react";
-import { Box, Flex } from "@chakra-ui/react";
-import { cloneDeep } from "lodash";
+import { useRef } from "react";
+import { Box } from "@chakra-ui/react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { GameInfo, GameStatus, UserInfo } from "../types";
-import GameProvider, { GameContextProps } from "../contexts/GameContext";
+import GameProvider from "../contexts/GameContext";
 import SettingProvider from "../contexts/SettingContext";
 import ChessProvider from "../contexts/ChessContext";
 import { useUser } from "../contexts/UserContext";
@@ -19,42 +17,10 @@ export default function Room() {
 
   const { user } = useUser();
 
-  const [game, setGame] = useState<GameInfo>({
-    code: "",
-    status: "Ready",
-    members: [user!],
-  });
-
-  const onSetGameStatus = (status: GameStatus) => {
-    setGame((prev) => ({ ...prev, status }));
-  };
-
-  const onSetPlayerAsLoser = (playerId: string) => {
-    const cloneGame = cloneDeep(game);
-
-    cloneGame.status = "End";
-
-    cloneGame.members = game.members.reduce(
-      (prev: UserInfo[], curr: UserInfo) => {
-        if (curr.id === playerId) curr.isLoser = true;
-        return [...prev, curr];
-      },
-      []
-    );
-
-    setGame(cloneGame);
-  };
-
-  const gameContextProps: GameContextProps = {
-    game,
-    onSetGameStatus,
-    onSetPlayerAsLoser,
-  };
-
   return (
     <Layout bgColor="#312e2b">
-      <GameProvider {...gameContextProps}>
-        <SettingProvider mode="Multiplayer">
+      <SettingProvider mode="Multiplayer">
+        <GameProvider>
           <ChessProvider boardRef={boardRef} orientation={user!.color}>
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>
@@ -68,8 +34,8 @@ export default function Room() {
               <BoardSidebar />
             </Box>
           </ChessProvider>
-        </SettingProvider>
-      </GameProvider>
+        </GameProvider>
+      </SettingProvider>
     </Layout>
   );
 }

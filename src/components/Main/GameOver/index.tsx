@@ -8,7 +8,7 @@ import GameOverUsers from "./Users";
 export default function GameOver() {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { game, isShowGameOver, onCloseModalGameOver } = useGame();
+  const { game, onCloseModalGameOver } = useGame();
 
   const onClose = () => {
     onCloseModalGameOver();
@@ -26,7 +26,7 @@ export default function GameOver() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [ref.current]);
 
-  return isShowGameOver ? (
+  return (
     <div className={css.modal_game_over}>
       <div className={css.modal_game_over_bg} />
       <div
@@ -40,5 +40,5 @@ export default function GameOver() {
         <GameOverUsers users={game.members} />
       </div>
     </div>
-  ) : null;
+  );
 }
