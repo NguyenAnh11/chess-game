@@ -62,7 +62,7 @@ const GameProvider = (props: GameContextProps) => {
 
   useEffect(() => {
     if (
-      (mode === "AI" || mode === "Multiplayer") &&
+      mode === "Multiplayer" &&
       game.status === "Wait" &&
       game.members.length === 2
     ) {
