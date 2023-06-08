@@ -6,14 +6,15 @@ import {
   useState,
   useEffect,
   useMemo,
+  Dispatch,
+  SetStateAction,
 } from "react";
-import { useSetting } from "./SettingContext";
 import { UserInfo, GameInfo } from "../types";
 
 export type GameContextProps = {
   children?: ReactNode;
-  code: string;
-  members?: UserInfo[];
+  game: GameInfo;
+  onSetGame: Dispatch<SetStateAction<GameInfo>>;
 };
 
 type GameContext = {
@@ -34,16 +35,7 @@ export const GameContext = createContext({} as GameContext);
 
 export const useGame = () => useContext(GameContext);
 
-const GameProvider = (props: GameContextProps) => {
-  const { mode } = useSetting();
-
-  const [game, setGame] = useState<GameInfo>({
-    code: props.code,
-    status: "Wait",
-    duration: 0,
-    members: props.members ?? [],
-  });
-
+const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const [isShowGameOver, setIsShowGameOver] = useState(false);
 
   const isGameOver = useMemo(() => game.status === "End", [game.status]);
@@ -60,16 +52,6 @@ const GameProvider = (props: GameContextProps) => {
     }
   }, [game.status]);
 
-  useEffect(() => {
-    if (
-      mode === "Multiplayer" &&
-      game.status === "Wait" &&
-      game.members.length === 2
-    ) {
-      onSetGameReady();
-    }
-  }, [game.members]);
-
   const onCloseModalGameOver = () => setIsShowGameOver(false);
 
   const onSetPlayerAsLoser = (playerId: string) => {
@@ -85,15 +67,16 @@ const GameProvider = (props: GameContextProps) => {
       []
     );
 
-    setGame(cloneGame);
+    onSetGame(cloneGame);
   };
 
   const onSetGameReady = () =>
-    setGame((prev) => ({ ...prev, status: "Ready" }));
+    onSetGame((prev) => ({ ...prev, status: "Ready" }));
 
-  const onSetGameDraw = () => setGame((prev) => ({ ...prev, status: "Draw" }));
+  const onSetGameDraw = () =>
+    onSetGame((prev) => ({ ...prev, status: "Draw" }));
 
-  const onSetGameEnd = () => setGame((prev) => ({ ...prev, status: "End" }));
+  const onSetGameEnd = () => onSetGame((prev) => ({ ...prev, status: "End" }));
 
   return (
     <GameContext.Provider
@@ -111,7 +94,7 @@ const GameProvider = (props: GameContextProps) => {
         onSetGameEnd,
       }}
     >
-      {props.children}
+      {children}
     </GameContext.Provider>
   );
 };

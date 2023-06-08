@@ -3,11 +3,13 @@ import "./index.css";
 import { Routes, Route } from "react-router-dom";
 import Loading from "./pages/Loading";
 import PrivateRoute from "./routers/PrivateRoute";
+import SocketProvider from "./contexts/SocketContext";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Offline = lazy(() => import("./pages/Offline"));
 const Online = lazy(() => import("./pages/Online"));
+const Room = lazy(() => import("./pages/Room"));
 
 const App = () => {
   return (
@@ -42,7 +44,19 @@ const App = () => {
             path="/online"
             element={
               <Suspense fallback={<Loading />}>
-                <Online />
+                <SocketProvider>
+                  <Online />
+                </SocketProvider>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/live/:code"
+            element={
+              <Suspense fallback={<Loading />}>
+                <SocketProvider>
+                  <Room />
+                </SocketProvider>
               </Suspense>
             }
           />

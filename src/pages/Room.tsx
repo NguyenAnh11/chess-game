@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { DndProvider } from "react-dnd";
 import { useParams } from "react-router-dom";
@@ -10,17 +10,36 @@ import BoardPlayer from "../components/Main/Player";
 import BoardMain from "../components/Main";
 import GameSetting from "../components/Setting";
 import BoardSidebar from "../components/Sidebar";
+import Loading from "./Loading";
 import Layout from "../layout";
+import { GameInfo } from "../types";
+import { useSocket } from "../contexts/SocketContext";
 
 export default function Room() {
   const { code } = useParams();
-
+  const { socket } = useSocket();
   const boardRef = useRef<HTMLDivElement>(null);
 
-  return (
+  const [game, setGame] = useState<GameInfo>({
+    code: code!,
+    status: "Wait",
+    members: []
+  })
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+
+  }, [])
+
+  useEffect(() => {
+
+  }, [])
+
+  return !isLoading ?  (
     <Layout bgColor="#312e2b">
       <SettingProvider mode="Multiplayer">
-        <GameProvider code={code!}>
+        <GameProvider game={game} onSetGame={setGame}>
           <ChessProvider boardRef={boardRef}>
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>
@@ -37,5 +56,5 @@ export default function Room() {
         </GameProvider>
       </SettingProvider>
     </Layout>
-  );
+  ) : <Loading/>;
 }
