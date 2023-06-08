@@ -8,25 +8,21 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { GiShakingHands } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Common/Modal";
 import CreateGame from "../components/Main/CreateGame";
 import Layout from "../layout";
-import { CreateGameModel } from "../types";
-import { CREATE_GAME_DURATION_OPTIONS } from "../utils";
+import { GameColorOptions } from "../types";
+import { GAME_DURATION_OPTIONS } from "../utils";
 
 export default function Online() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
+  const [color, setColor] = useState<GameColorOptions>("w");
+  const [duration, setDuration] = useState(GAME_DURATION_OPTIONS.rapid["10 min"]);
   const [isOpenCreateGameModal, setIsOpenCreateGameModal] = useState(false);
-  const [game, setGame] = useState<CreateGameModel>({
-    color: "w",
-    duration: {
-      text: "10 min",
-      value: CREATE_GAME_DURATION_OPTIONS["10 min"]
-    }
-  });
 
   const onJoin = () => {
     if (!code) {
@@ -38,7 +34,15 @@ export default function Online() {
   };
 
   const onCreate = () => {
-    
+    const code = uuidv4();
+
+    const model = {
+      code,
+      color,
+      duration: duration.value
+    }
+
+    console.log(model);
   };
 
   return (
@@ -81,7 +85,7 @@ export default function Online() {
       <Modal
         isOpen={isOpenCreateGameModal}
         onClose={() => setIsOpenCreateGameModal(false)}
-        content={<CreateGame game={game} onSetGame={setGame} />}
+        content={<CreateGame color={color} onSetColor={setColor} duration={duration} onSetDuration={setDuration}/>}
         footer={
           <>
             <Button

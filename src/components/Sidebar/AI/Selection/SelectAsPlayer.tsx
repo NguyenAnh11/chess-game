@@ -5,7 +5,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { BiQuestionMark } from "react-icons/bi";
 import { TbChessKing, TbChessKingFilled } from "react-icons/tb";
 import SelectPlayer from "./SelectPlayer";
-import { ColorOptions } from "../../../../types";
+import { GameColorOptions } from "../../../../types";
 
 export type SelectPlayerProps<T extends Color | "random"> = {
   color: T;
@@ -32,7 +32,7 @@ export default function SelectAsPlayer() {
   };
 
   const options: {
-    [p in ColorOptions]: { component: ReactNode };
+    [p in GameColorOptions]: { component: ReactNode };
   } = {
     w: {
       component: (
@@ -97,7 +97,7 @@ export default function SelectAsPlayer() {
         <Grid gap="20px" justifyContent="center" m="13px">
           {Object.keys(options).map((color, index) => (
             <React.Fragment key={index}>
-              {options[color as ColorOptions].component}
+              {options[color as GameColorOptions].component}
             </React.Fragment>
           ))}
         </Grid>

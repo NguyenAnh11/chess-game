@@ -111,7 +111,7 @@ export type SuggestMove = {
   move: Move | undefined;
   hidden: boolean;
   loading: boolean;
-}
+};
 
 export type KingSquare = CustomSquare;
 
@@ -159,7 +159,7 @@ export type GameInfo = {
   duration?: number;
   status: GameStatus;
   members: UserInfo[];
-}
+};
 
 export type CapturePieces = {
   [c in Color]: { [p in Exclude<PieceSymbol, "k">]: number };
@@ -238,15 +238,19 @@ export class FieldSwitchControl<T> extends FieldControl<T> {
   }
 }
 
-export type CreateGameDuration = "10 min" | "15 min" | "30 min";
+export type GameColorOptions = Color | "random";
 
-export type ColorOptions = Color | "random";
-
-export type CreateGameModel = {
-  duration: {
-    text: CreateGameDuration;
-    value: number;
+export type GameDurationOptions = {
+  rapid: {
+    [p in "10 min" | "15 min" | "30 min"]: {
+      text: string;
+      value: number;
+    };
   };
-  color: ColorOptions;
-}
-
+  daily: {
+    [p in "1 day" | "7 day" | "30 day"]: {
+      text: string;
+      value: number;
+    };
+  };
+};

@@ -1,16 +1,16 @@
 import { Flex, Icon } from "@chakra-ui/react";
 import { IconType } from "react-icons/lib";
-import { ColorOptions } from "../../../../types";
+import { GameColorOptions } from "../../../../types";
 import { SelectPlayerProps } from "./SelectAsPlayer";
 
-type PlayerProps<T extends ColorOptions> = SelectPlayerProps<T> & {
+type PlayerProps<T extends GameColorOptions> = SelectPlayerProps<T> & {
   icon: IconType;
   textColor: string;
   backgroundColor: string;
   style: React.CSSProperties;
 };
 
-export default function SelectPlayer<T extends ColorOptions>({
+export default function SelectPlayer<T extends GameColorOptions>({
   value,
   isChoosedColor,
   icon,

@@ -7,7 +7,7 @@ import {
   Animation,
   BoardPosition,
   BoardColumn,
-  CreateGameDuration,
+  GameDurationOptions,
 } from "../types";
 
 export const BOARD_WIDTH = 576;
@@ -176,10 +176,17 @@ export const INITIAL_BOARD_POSITION: BoardPosition = {
   h1: "wR",
 };
 
-export const CREATE_GAME_DURATION_OPTIONS: { [p in CreateGameDuration]: number} = {
-  "10 min": 10 * 60 * 1000,
-  "15 min": 15 * 60 * 1000,
-  "30 min": 30 * 60 * 1000
+export const GAME_DURATION_OPTIONS: GameDurationOptions = {
+  rapid: {
+    "10 min": 10 * 60 * 1000,
+    "15 min": 15 * 60 * 1000,
+    "30 min": 30 * 60 * 1000,
+  },
+  daily: {
+    "1 day": 24 * 60 * 60 * 1000,
+    "7 day": 7 * 24 * 60 * 60 * 1000,
+    "30 day": 30 * 24 * 60 * 60 * 1000
+  }
 }
 
 export const PROMOTION_PIECES = ["b", "r", "n", "q"];

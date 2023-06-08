@@ -1,52 +1,50 @@
-import { Flex, Text, Icon } from "@chakra-ui/react";
-import React, { ReactNode } from "react";
-import { CreateGameProps } from ".";
-import { ColorOptions } from "../../../types";
-import CreateGamePlayer from "./Player";
+import { Flex, Text } from "@chakra-ui/react";
+import React, { ReactNode, Dispatch, SetStateAction } from "react";
 import { BiQuestionMark } from "react-icons/bi";
 import { TbChessKing, TbChessKingFilled } from "react-icons/tb";
+import { GameColorOptions } from "../../../types";
+import CreateGamePlayer from "./Player";
 
-type CreateGamePlayersProps = CreateGameProps;
+type CreateGamePlayersProps = {
+  color: GameColorOptions;
+  onSetColor: Dispatch<SetStateAction<GameColorOptions>>;
+};
 
 export default function CreateGamePlayers({
-  game,
-  onSetGame,
+  color,
+  onSetColor,
 }: CreateGamePlayersProps) {
-  const onChooseColor = (color: ColorOptions) => {
-    onSetGame((prev) => ({ ...prev, color }));
-  };
-
-  const options: { [p in ColorOptions]: { component: ReactNode } } = {
+  const options: { [p in GameColorOptions]: { component: ReactNode } } = {
     w: {
       component: (
         <CreateGamePlayer
-          label="White"
+          label="white"
           value="w"
           icon={TbChessKing}
-          isChoosed={game.color === "w"}
-          onClick={onChooseColor}
+          isChoosed={color === "w"}
+          onClick={() => onSetColor("w")}
         />
       ),
     },
     random: {
       component: (
         <CreateGamePlayer
-          label="Random"
+          label="random"
           value="random"
           icon={BiQuestionMark}
-          isChoosed={game.color === "random"}
-          onClick={onChooseColor}
+          isChoosed={color === "random"}
+          onClick={() => onSetColor("random")}
         />
       ),
     },
     b: {
       component: (
         <CreateGamePlayer
-          label="Black"
+          label="black"
           value="b"
           icon={TbChessKingFilled}
-          isChoosed={game.color === "b"}
-          onClick={onChooseColor}
+          isChoosed={color === "b"}
+          onClick={() => onSetColor("b")}
         />
       ),
     },
@@ -59,7 +57,7 @@ export default function CreateGamePlayers({
       </Text>
       {Object.keys(options).map((color, index) => (
         <React.Fragment key={index}>
-          {options[color as ColorOptions].component}
+          {options[color as GameColorOptions].component}
         </React.Fragment>
       ))}
     </Flex>

@@ -1,8 +1,8 @@
-import { Flex, Icon } from "@chakra-ui/react";
+import { BackgroundProps, BorderProps, Flex, Icon } from "@chakra-ui/react";
 import { IconType } from "react-icons/lib";
-import { ColorOptions } from "../../../types";
+import { GameColorOptions } from "../../../types";
 
-type CreateGamePlayerProps<T extends ColorOptions> = {
+type CreateGamePlayerProps<T extends GameColorOptions> = {
   value: T;
   label: string;
   icon: IconType;
@@ -10,13 +10,23 @@ type CreateGamePlayerProps<T extends ColorOptions> = {
   onClick: (value: T) => void;
 };
 
-export default function CreateGamePlayer<T extends ColorOptions>({
+export default function CreateGamePlayer<T extends GameColorOptions>({
   value,
   label,
   icon,
   isChoosed,
   onClick,
 }: CreateGamePlayerProps<T>) {
+  
+  const bgColor: BackgroundProps["backgroundColor"] =
+    value === "w" ? "#fff" : value === "b" ? "#262421" : "transparent";
+
+  const border: BorderProps["border"] = isChoosed
+    ? "2px solid #7fa650"
+    : value === "w"
+    ? "1px solid #dad8d6"
+    : "none";
+
   return (
     <Flex
       aria-label={label}
@@ -28,9 +38,9 @@ export default function CreateGamePlayer<T extends ColorOptions>({
       align="center"
       justify="center"
       cursor="pointer"
+      border={border}
       borderRadius="5px"
-      backgroundColor="transparent"
-      border={isChoosed ? "2px solid #7fa650" : "none"}
+      backgroundColor={bgColor}
       onClick={() => onClick(value)}
     >
       <Icon as={icon} fontSize="3xl" />
