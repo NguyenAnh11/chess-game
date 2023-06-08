@@ -1,6 +1,4 @@
-import { useMemo } from "react";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
-import { UserInfo } from "../../../types";
 import { useSetting } from "../../../contexts/SettingContext";
 import { useChess } from "../../../contexts/ChessContext";
 import { useGame } from "../../../contexts/GameContext";
