@@ -237,3 +237,16 @@ export class FieldSwitchControl<T> extends FieldControl<T> {
     super(name, label, value, onChange);
   }
 }
+
+export type CreateGameDuration = "10 min" | "15 min" | "30 min";
+
+export type ColorOptions = Color | "random";
+
+export type CreateGameModel = {
+  duration: {
+    text: CreateGameDuration;
+    value: number;
+  };
+  color: ColorOptions;
+}
+

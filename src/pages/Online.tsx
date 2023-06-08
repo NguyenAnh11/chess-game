@@ -1,45 +1,106 @@
-import { useRef } from "react";
-import { Box } from "@chakra-ui/react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import GameProvider from "../contexts/GameContext";
-import SettingProvider from "../contexts/SettingContext";
-import ChessProvider from "../contexts/ChessContext";
-import { useUser } from "../contexts/UserContext";
-import BoardPlayer from "../components/Main/Player";
-import BoardMain from "../components/Main";
-import GameSetting from "../components/Setting";
-import BoardSidebar from "../components/Sidebar";
+import {
+  Button,
+  Flex,
+  Input,
+  StackDivider,
+  VStack,
+  Icon,
+  Text,
+} from "@chakra-ui/react";
+import { useState } from "react";
+import { GiShakingHands } from "react-icons/gi";
+import { useNavigate } from "react-router-dom";
+import Modal from "../components/Common/Modal";
+import CreateGame from "../components/Main/CreateGame";
 import Layout from "../layout";
-import { DEFAULT_DURATION } from "../utils";
+import { CreateGameModel } from "../types";
+import { CREATE_GAME_DURATION_OPTIONS } from "../utils";
 
-export default function Room() {
-  const boardRef = useRef<HTMLDivElement>(null);
+export default function Online() {
+  const navigate = useNavigate();
+  const [code, setCode] = useState("");
+  const [isOpenCreateGameModal, setIsOpenCreateGameModal] = useState(false);
+  const [game, setGame] = useState<CreateGameModel>({
+    color: "w",
+    duration: {
+      text: "10 min",
+      value: CREATE_GAME_DURATION_OPTIONS["10 min"]
+    }
+  });
 
-  const { user } = useUser();
+  const onJoin = () => {
+    if (!code) {
+      alert("Enter room code");
+      return;
+    }
+
+    navigate(`/room/${code}`);
+  };
+
+  const onCreate = () => {
+    
+  };
 
   return (
-    <Layout bgColor="#312e2b">
-      <SettingProvider mode="Multiplayer">
-        <GameProvider
-          members={[user!]}
-          duration={Date.now() + DEFAULT_DURATION}
-        >
-          <ChessProvider boardRef={boardRef} orientation={user!.color}>
-            <Box flex="1">
-              <DndProvider backend={HTML5Backend}>
-                <BoardPlayer color={user!.color === "w" ? "b" : "w"} />
-                <BoardMain ref={boardRef} />
-                <GameSetting />
-                <BoardPlayer color={user!.color} />
-              </DndProvider>
-            </Box>
-            <Box flex="1">
-              <BoardSidebar />
-            </Box>
-          </ChessProvider>
-        </GameProvider>
-      </SettingProvider>
+    <Layout>
+      <VStack
+        divider={<StackDivider borderColor="gray.200" />}
+        spacing={4}
+        align="stretch"
+      >
+        <Flex w="full">
+          <Input
+            mr="4"
+            type="text"
+            value={code}
+            aria-label="Enter room code"
+            placeholder="Enter room code"
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <Button
+            aria-label="Join game"
+            colorScheme="whatsapp"
+            onClick={onJoin}
+          >
+            <Text p="2" fontWeight="semibold">
+              Join Game
+            </Text>
+          </Button>
+        </Flex>
+        <Flex justify="center" w="full" mt="4">
+          <Button
+            aria-label="Play as friend"
+            colorScheme="blue"
+            leftIcon={<Icon as={GiShakingHands} />}
+            onClick={() => setIsOpenCreateGameModal(true)}
+          >
+            <Text fontWeight="semibold">Play a friend</Text>
+          </Button>
+        </Flex>
+      </VStack>
+      <Modal
+        isOpen={isOpenCreateGameModal}
+        onClose={() => setIsOpenCreateGameModal(false)}
+        content={<CreateGame game={game} onSetGame={setGame} />}
+        footer={
+          <>
+            <Button
+              aria-label="Cancel"
+              colorScheme="red"
+              onClick={() => setIsOpenCreateGameModal(false)}
+            >
+              <Text fontWeight="semibold">Cancel</Text>
+            </Button>
+            <Button
+              aria-label="Create game"
+              colorScheme="whatsapp"
+              onClick={onCreate}
+            >
+              <Text fontWeight="semibold">Create game</Text>
+            </Button>
+          </>
+        }
+      ></Modal>
     </Layout>
   );
 }

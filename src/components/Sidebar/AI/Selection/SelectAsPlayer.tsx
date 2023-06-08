@@ -5,6 +5,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { BiQuestionMark } from "react-icons/bi";
 import { TbChessKing, TbChessKingFilled } from "react-icons/tb";
 import SelectPlayer from "./SelectPlayer";
+import { ColorOptions } from "../../../../types";
 
 export type SelectPlayerProps<T extends Color | "random"> = {
   color: T;
@@ -31,11 +32,9 @@ export default function SelectAsPlayer() {
   };
 
   const options: {
-    [p in Color | "random"]: { value: number; color: p; component: ReactNode };
+    [p in ColorOptions]: { component: ReactNode };
   } = {
     w: {
-      value: 0,
-      color: "w",
       component: (
         <SelectPlayer
           value={0}
@@ -50,8 +49,6 @@ export default function SelectAsPlayer() {
       ),
     },
     random: {
-      value: 2,
-      color: "random",
       component: (
         <SelectPlayer
           value={2}
@@ -66,8 +63,6 @@ export default function SelectAsPlayer() {
       ),
     },
     b: {
-      value: 1,
-      color: "b",
       component: (
         <SelectPlayer
           value={1}
@@ -102,7 +97,7 @@ export default function SelectAsPlayer() {
         <Grid gap="20px" justifyContent="center" m="13px">
           {Object.keys(options).map((color, index) => (
             <React.Fragment key={index}>
-              {options[color as Color | "random"].component}
+              {options[color as ColorOptions].component}
             </React.Fragment>
           ))}
         </Grid>

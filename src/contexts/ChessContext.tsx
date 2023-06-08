@@ -42,11 +42,11 @@ import {
 } from "../utils";
 import { useGame } from "./GameContext";
 import { useSetting } from "./SettingContext";
+import { useUser } from "./UserContext";
 
 type ChessboardProviderProps = {
   children: React.ReactNode;
   boardRef: RefObject<HTMLDivElement>;
-  orientation: BoardOrientation;
 };
 
 type ChessContext = {
@@ -105,15 +105,16 @@ export const useChess = () => useContext(ChessContext);
 
 const ChessProvider = ({
   children,
-  boardRef,
-  orientation,
+  boardRef
 }: ChessboardProviderProps) => {
+  const { user } = useUser();
   const { setting, mode } = useSetting();
   const { game: gameInfo, isGameOver, isGameWaiting, onSetGameDraw, onSetGameReady, onSetPlayerAsLoser } = useGame();
   const game = useRef<Chess>(new Chess());
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
   );
+  const [orientation, setOrientation] = useState<BoardOrientation>("w");
   const [turn, setTurn] = useState(game.current.turn());
   const [positionDifference, setPositionDifference] = useState<BoardDifference>(
     { added: {}, removed: {} }
@@ -692,6 +693,10 @@ const ChessProvider = ({
       makeMove(readyMove.action, readyMove.move);
     }
   }, [turn, isGameWaiting, readyMove, boardIndex.step]);
+
+  useEffect(() => {
+    setOrientation(user!.color);
+  }, [])
 
   return (
     <ChessContext.Provider

@@ -1,6 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import { cloneDeep } from "lodash";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -35,14 +34,14 @@ export default function Offline() {
   return (
     <Layout bgColor="#312e2b">
       <SettingProvider mode="AI">
-        <GameProvider members={members}>
-          <ChessProvider boardRef={boardRef} orientation={user!.color}>
+        <GameProvider code={uuidv4()} members={members}>
+          <ChessProvider boardRef={boardRef}>
             <Box flex="1">
               <DndProvider backend={HTML5Backend}>
-                <BoardPlayer color={user!.color === "w" ? "b" : "w"} />
+                <BoardPlayer isOpponent={true} />
                 <BoardMain ref={boardRef} />
                 <GameSetting />
-                <BoardPlayer color={user!.color} />
+                <BoardPlayer isOpponent={false} />
               </DndProvider>
             </Box>
             <Box flex="1">

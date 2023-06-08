@@ -12,8 +12,8 @@ import { UserInfo, GameInfo } from "../types";
 
 export type GameContextProps = {
   children?: ReactNode;
+  code: string;
   members?: UserInfo[];
-  duration?: number;
 };
 
 type GameContext = {
@@ -38,9 +38,9 @@ const GameProvider = (props: GameContextProps) => {
   const { mode } = useSetting();
 
   const [game, setGame] = useState<GameInfo>({
-    code: "",
+    code: props.code,
     status: "Wait",
-    duration: props.duration,
+    duration: 0,
     members: props.members ?? [],
   });
 
