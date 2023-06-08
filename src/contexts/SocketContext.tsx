@@ -7,7 +7,7 @@ type SocketContextProps = {
 };
 
 type SocketContext = {
-  socket: Socket;
+  ws: Socket;
 };
 
 export const SocketContext = createContext({} as SocketContext);
@@ -16,7 +16,7 @@ export const useSocket = () => useContext(SocketContext);
 
 const SocketProvider = ({ children }: SocketContextProps) => {
   return (
-    <SocketContext.Provider value={{ socket }}>
+    <SocketContext.Provider value={{ ws: socket }}>
       {children}
     </SocketContext.Provider>
   );

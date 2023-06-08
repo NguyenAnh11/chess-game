@@ -12,31 +12,50 @@ import GameSetting from "../components/Setting";
 import BoardSidebar from "../components/Sidebar";
 import Loading from "./Loading";
 import Layout from "../layout";
-import { GameInfo } from "../types";
+import { GameInfo, UserInfo } from "../types";
 import { useSocket } from "../contexts/SocketContext";
+import { useUser } from "../contexts/UserContext";
 
 export default function Room() {
   const { code } = useParams();
-  const { socket } = useSocket();
+  const { ws } = useSocket();
+  const { user } = useUser();
   const boardRef = useRef<HTMLDivElement>(null);
 
   const [game, setGame] = useState<GameInfo>({
     code: code!,
     status: "Wait",
-    members: []
-  })
+    members: [],
+  });
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-
-  }, [])
+    ws.emit("join_room", { code, user });
+  }, []);
 
   useEffect(() => {
+    ws.on("get_members", ({ members }: { members: UserInfo[] }) => {
+      setGame((prev) => ({
+        ...prev,
+        members,
+      }));
+    });
 
-  }, [])
+    ws.on("game_ready", () => {
+      setGame((prev) => ({
+        ...prev,
+        status: "Ready"
+      }))
+    })
 
-  return !isLoading ?  (
+    return () => {
+      ws.off("get_members");
+      ws.off("game_ready");
+    };
+  }, []);
+
+  return !isLoading ? (
     <Layout bgColor="#312e2b">
       <SettingProvider mode="Multiplayer">
         <GameProvider game={game} onSetGame={setGame}>
@@ -56,5 +75,7 @@ export default function Room() {
         </GameProvider>
       </SettingProvider>
     </Layout>
-  ) : <Loading/>;
+  ) : (
+    <Loading />
+  );
 }

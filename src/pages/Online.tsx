@@ -20,10 +20,12 @@ import { useSocket } from "../contexts/SocketContext";
 
 export default function Online() {
   const navigate = useNavigate();
-  const { socket } = useSocket();
+  const { ws } = useSocket();
   const [code, setCode] = useState("");
   const [color, setColor] = useState<GameColorOptions>("w");
-  const [duration, setDuration] = useState(GAME_DURATION_OPTIONS.rapid["10 min"]);
+  const [duration, setDuration] = useState(
+    GAME_DURATION_OPTIONS.rapid["10 min"]
+  );
   const [isOpenCreateGameModal, setIsOpenCreateGameModal] = useState(false);
 
   const onJoin = () => {
@@ -41,17 +43,21 @@ export default function Online() {
     const model = {
       code,
       color,
-      duration: duration.value
-    }
+      duration: duration.value,
+    };
 
     console.log(model);
   };
 
   useEffect(() => {
-    socket.on("room_created", () => {
-      
-    })
-  }, [])
+    ws.on("room_created", ({ code }: { code: string }) => {
+      navigate(`/room/${code}`);
+    });
+
+    return () => {
+      ws.off("room_created");
+    };
+  }, []);
 
   return (
     <Layout>
@@ -93,7 +99,14 @@ export default function Online() {
       <Modal
         isOpen={isOpenCreateGameModal}
         onClose={() => setIsOpenCreateGameModal(false)}
-        content={<CreateGame color={color} onSetColor={setColor} duration={duration} onSetDuration={setDuration}/>}
+        content={
+          <CreateGame
+            color={color}
+            onSetColor={setColor}
+            duration={duration}
+            onSetDuration={setDuration}
+          />
+        }
         footer={
           <>
             <Button
