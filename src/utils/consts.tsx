@@ -177,15 +177,47 @@ export const INITIAL_BOARD_POSITION: BoardPosition = {
 };
 
 export const GAME_DURATION_OPTIONS: GameDurationOptions = {
+  blitz: {
+    "2 min": {
+      text: "2 min",
+      value: 2 * 60 * 1000
+    },
+    "3 min": {
+      text: "3 min",
+      value: 3 * 60 * 1000
+    },
+    "5 min": {
+      text: "5 min",
+      value: 5 * 60 * 1000
+    },
+  },
   rapid: {
-    "10 min": 10 * 60 * 1000,
-    "15 min": 15 * 60 * 1000,
-    "30 min": 30 * 60 * 1000,
+    "10 min": {
+      text: "10 min",
+      value: 10 * 60 * 1000
+    },
+    "15 min": {
+      text: "15 min",
+      value: 15 * 60 * 1000
+    },
+    "30 min": {
+      text: "30 min",
+      value: 30 * 60 * 1000
+    },
   },
   daily: {
-    "1 day": 24 * 60 * 60 * 1000,
-    "7 day": 7 * 24 * 60 * 60 * 1000,
-    "30 day": 30 * 24 * 60 * 60 * 1000
+    "1 day": {
+      text: "1 day",
+      value: 24 * 60 * 60 * 1000
+    },
+    "7 day": {
+      text: "7 day",
+      value: 7 * 24 * 60 * 60 * 1000
+    },
+    "30 day": {
+      text: "30 day",
+      value: 30 * 24 * 60 * 60 * 1000
+    }
   }
 }
 

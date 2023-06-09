@@ -1,10 +1,12 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, ReactNode } from "react";
 import { Box, Flex, Grid, Icon, Text } from "@chakra-ui/react";
-import { BiTimer } from "react-icons/bi";
+import { AiOutlineThunderbolt } from "react-icons/ai";
+import { BiTimer, BiSun } from "react-icons/bi";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import Button from "../../Common/Button/Selector";
 import TimeSelector from "../../Common/Button/TimeSelector";
 import { GAME_DURATION_OPTIONS } from "../../../utils";
+import { GameDurationType } from "../../../types";
 
 type CreateGameTimerProps = {
   duration: { text: string; value: number };
@@ -16,6 +18,31 @@ export default function CreateGameTimer({
   onSetDuration,
 }: CreateGameTimerProps) {
   const [isShow, setIsShow] = useState(false);
+
+  const durationOptions: {
+    [t in GameDurationType]: {
+      label: string;
+      icon: ReactNode;
+      options: (typeof GAME_DURATION_OPTIONS)[t];
+    };
+  } = {
+    blitz: {
+      label: "Blitz",
+      icon: <Icon as={AiOutlineThunderbolt} color="#f1ab22" fontSize="xl" />,
+      options: GAME_DURATION_OPTIONS["blitz"],
+    },
+    rapid: {
+      label: "Rapid",
+      icon: <Icon as={BiTimer} color="#769656" fontSize="xl" />,
+      options: GAME_DURATION_OPTIONS["rapid"],
+    },
+    daily: {
+      label: "Daily",
+      icon: <Icon as={BiSun} color="#f1ab22" fontSize="xl" />,
+      options: GAME_DURATION_OPTIONS["daily"],
+    },
+  };
+
   return (
     <Box mb="4">
       <Button onClick={() => setIsShow(!isShow)}>
@@ -42,37 +69,38 @@ export default function CreateGameTimer({
           minH="0"
           maxH="calc(100vh-550px)"
         >
-          <Box mt="16px">
-            <Flex align="center" direction="row" gap="2px" mb="8px">
-              <Icon as={BiTimer} color="#769656" fontSize="20px" />
-              <Text
-                color="#4b4847"
-                fontSize="14px"
-                fontWeight="semibold"
-                textTransform="capitalize"
-              >
-                Rapid
-              </Text>
-            </Flex>
-            {Object.entries(GAME_DURATION_OPTIONS).map(([type, options]) => (
-              <Grid key={type} gap="8px" gridTemplateColumns="repeat(3, 1fr)">
-                {Object.values(options).map((option, index) => (
-                  <TimeSelector
-                    key={index}
-                    label={option.text}
-                    value={option.value}
-                    isSelected={option.text === duration.text}
-                    onClick={() => {
-                      console.log("Option: ", option);
-                      onSetDuration(option);
-                    }}
+          {(Object.keys(durationOptions) as Array<GameDurationType>).map(
+            (type) => (
+              <Box key={type} mt="4">
+                <Flex align="center" direction="row" gap="2px" mb="2">
+                  {durationOptions[type].icon}
+                  <Text
+                    color="#4b4847"
+                    fontSize="sm"
+                    fontWeight="semibold"
+                    textTransform="capitalize"
                   >
-                    <Text>{option.text}</Text>
-                  </TimeSelector>
-                ))}
-              </Grid>
-            ))}
-          </Box>
+                    {durationOptions[type].label}
+                  </Text>
+                </Flex>
+                <Grid gap="8px" gridTemplateColumns="repeat(3, 1fr)">
+                  {Object.values(durationOptions[type].options).map(
+                    (option, index) => (
+                      <TimeSelector
+                        key={index}
+                        label={option.text}
+                        value={option.value}
+                        isSelected={option.text === duration.text}
+                        onClick={() => onSetDuration(option)}
+                      >
+                        <Text>{option.text}</Text>
+                      </TimeSelector>
+                    )
+                  )}
+                </Grid>
+              </Box>
+            )
+          )}
         </Flex>
       )}
     </Box>

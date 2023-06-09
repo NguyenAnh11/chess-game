@@ -149,8 +149,11 @@ export type UserInfo = {
   avatar: string;
   color: Color;
   countryFlag: string;
-  isLoser: boolean;
 };
+
+export type UserPlayInfo = UserInfo & {
+  isLoser: boolean;
+}
 
 export type GameStatus = "Wait" | "Ready" | "Draw" | "End";
 
@@ -158,7 +161,7 @@ export type GameInfo = {
   code: string;
   duration?: number;
   status: GameStatus;
-  members: UserInfo[];
+  members: UserPlayInfo[];
 };
 
 export type CapturePieces = {
@@ -240,7 +243,15 @@ export class FieldSwitchControl<T> extends FieldControl<T> {
 
 export type GameColorOptions = Color | "random";
 
+export type GameDurationType = "rapid" | "daily" | "blitz";
+
 export type GameDurationOptions = {
+  blitz: {
+    [p in "2 min" | "3 min" | "5 min"]: {
+      text: string;
+      value: number;
+    };
+  }
   rapid: {
     [p in "10 min" | "15 min" | "30 min"]: {
       text: string;

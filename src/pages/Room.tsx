@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { DndProvider } from "react-dnd";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import GameProvider from "../contexts/GameContext";
 import SettingProvider from "../contexts/SettingContext";
@@ -12,14 +12,14 @@ import GameSetting from "../components/Setting";
 import BoardSidebar from "../components/Sidebar";
 import Loading from "./Loading";
 import Layout from "../layout";
-import { GameInfo, UserInfo } from "../types";
+import { GameInfo } from "../types";
 import { useSocket } from "../contexts/SocketContext";
-import { useUser } from "../contexts/UserContext";
+import { SOCKET_EVENTS } from "../services/Socket";
 
 export default function Room() {
+  const navigate = useNavigate();
   const { code } = useParams();
   const { ws } = useSocket();
-  const { user } = useUser();
   const boardRef = useRef<HTMLDivElement>(null);
 
   const [game, setGame] = useState<GameInfo>({
@@ -31,27 +31,23 @@ export default function Room() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    ws.emit("join_room", { code, user });
-  }, []);
+    ws.emit(SOCKET_EVENTS.REQ_GAME_INFO, { code });
 
-  useEffect(() => {
-    ws.on("get_members", ({ members }: { members: UserInfo[] }) => {
+    ws.on(SOCKET_EVENTS.RES_GAME_INFO, (data) => {
+      if (!data.success) {
+        navigate("/online");
+      }
+
       setGame((prev) => ({
         ...prev,
-        members,
+        ...data.info,
       }));
+
+      setIsLoading(false);
     });
 
-    ws.on("game_ready", () => {
-      setGame((prev) => ({
-        ...prev,
-        status: "Ready"
-      }))
-    })
-
     return () => {
-      ws.off("get_members");
-      ws.off("game_ready");
+      ws.off(SOCKET_EVENTS.RES_GAME_INFO);
     };
   }, []);
 

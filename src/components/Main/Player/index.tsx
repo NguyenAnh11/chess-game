@@ -17,11 +17,9 @@ export default function BoardPlayer({ isOpponent }: BoardPlayerProp) {
   const { mode } = useSetting();
   const { capturePieces, capturePiecesScore } = useChess();
 
-  const player = !isOpponent
-    ? game.members.find((p) => p.id === user!.id)
-    : game.members.find((p) => p.id !== user!.id);
+  const color = !isOpponent ? user!.color : user!.color === "w" ? "b" : "w";
 
-  const color = !isOpponent ? player!.color : player!.color === "w" ? "b" : "w";
+  const player = !isOpponent ? user : game.members.find(p => p.id !== user!.id)
 
   const captureColor = color === "w" ? "b" : "w";
 

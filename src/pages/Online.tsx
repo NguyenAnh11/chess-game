@@ -8,7 +8,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { GiShakingHands } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Common/Modal";
@@ -17,9 +16,13 @@ import Layout from "../layout";
 import { GameColorOptions } from "../types";
 import { GAME_DURATION_OPTIONS } from "../utils";
 import { useSocket } from "../contexts/SocketContext";
+import { useUser } from "../contexts/UserContext";
+import { Color } from "chess.js";
+import { SOCKET_EVENTS } from "../services/Socket";
 
 export default function Online() {
   const navigate = useNavigate();
+  const { user, onSetUserColor } = useUser();
   const { ws } = useSocket();
   const [code, setCode] = useState("");
   const [color, setColor] = useState<GameColorOptions>("w");
@@ -34,30 +37,45 @@ export default function Online() {
       return;
     }
 
-    navigate(`/room/${code}`);
+    ws.emit(SOCKET_EVENTS.REQ_JOIN_GAME, { code, user });
   };
 
   const onCreate = () => {
-    const code = uuidv4();
-
     const model = {
-      code,
-      color,
       duration: duration.value,
     };
 
-    console.log(model);
+    ws.emit(SOCKET_EVENTS.CREATE_GAME, { model });
   };
 
   useEffect(() => {
-    ws.on("room_created", ({ code }: { code: string }) => {
-      navigate(`/room/${code}`);
+    ws.on(SOCKET_EVENTS.ROOM_CREATED, ({ code }: { code: string }) => {
+      ws.emit(SOCKET_EVENTS.REQ_JOIN_GAME, { code, user });
+    });
+
+    ws.on(SOCKET_EVENTS.RES_JOIN_GAME, (data) => {
+      if (!data.success) {
+        alert(data.error);
+        return;
+      }
+
+      navigate(`/live/${data.code}`);
     });
 
     return () => {
-      ws.off("room_created");
+      ws.off(SOCKET_EVENTS.ROOM_CREATED);
+      ws.off(SOCKET_EVENTS.RES_JOIN_GAME);
     };
   }, []);
+
+  useEffect(() => {
+    let selectedColor = color;
+    if (selectedColor === "random") {
+      const colors: Color[] = ["w", "b"];
+      selectedColor = colors[Math.floor(Math.random() * colors.length)];
+      onSetUserColor(selectedColor as Color);
+    }
+  }, [color]);
 
   return (
     <Layout>

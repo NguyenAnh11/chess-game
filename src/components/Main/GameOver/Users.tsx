@@ -1,9 +1,9 @@
 import GameOverUser from "./User";
 import css from "./gameover.module.css";
-import { UserInfo } from "../../../types";
+import { UserPlayInfo } from "../../../types";
 
 type GameOverUsersProps = {
-  users: UserInfo[];
+  users: UserPlayInfo[];
 };
 
 export default function GameOverUsers({ users }: GameOverUsersProps) {

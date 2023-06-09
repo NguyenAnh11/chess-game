@@ -23,7 +23,7 @@ export default function Offline() {
     code: uuidv4(),
     status: "Wait",
     members: [
-      user!,
+      { ...user!, isLoser: false },
       {
         id: uuidv4(),
         name: "AI",
@@ -32,8 +32,8 @@ export default function Offline() {
         countryFlag: import.meta.env.VITE_COUNTRY_FLAG_VIETNAM,
         isLoser: false,
       },
-    ]
-  })
+    ],
+  });
 
   return (
     <Layout bgColor="#312e2b">

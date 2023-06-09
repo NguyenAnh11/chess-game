@@ -15,14 +15,12 @@ import { useSetting } from "../../../../contexts/SettingContext";
 export default function LiveControls() {
   const { user } = useUser();
   const { onOpenEditSetting } = useSetting();
-  const { moves, boardIndex, onStep, onResign: onGameResign } = useChess();
+  const { moves, boardIndex, onStep, onResign: onGameOver } = useChess();
 
-  const onDraw = () => {
-    console.log("Draw offer...");
-  };
+  const onDraw = () => {};
 
   const onResign = () => {
-    onGameResign(user!.id);
+    onGameOver(user!.id);
   };
 
   const onBack = () => {
@@ -112,7 +110,6 @@ export default function LiveControls() {
         </Tooltip>
       </Box>
 
-
       <Box fontSize="2xl" color="#8b8987">
         <Tooltip label="Setting">
           <Button label="Setting" onClick={onSetting}>
@@ -120,7 +117,6 @@ export default function LiveControls() {
           </Button>
         </Tooltip>
       </Box>
-
     </Flex>
   );
 }

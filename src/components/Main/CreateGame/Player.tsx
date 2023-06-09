@@ -1,25 +1,24 @@
 import { BackgroundProps, BorderProps, Flex, Icon } from "@chakra-ui/react";
-import { IconType } from "react-icons/lib";
+import { ReactNode } from "react";
 import { GameColorOptions } from "../../../types";
 
 type CreateGamePlayerProps<T extends GameColorOptions> = {
   value: T;
   label: string;
-  icon: IconType;
   isChoosed: boolean;
   onClick: (value: T) => void;
+  children: ReactNode;
 };
 
 export default function CreateGamePlayer<T extends GameColorOptions>({
   value,
   label,
-  icon,
   isChoosed,
   onClick,
+  children
 }: CreateGamePlayerProps<T>) {
-  
   const bgColor: BackgroundProps["backgroundColor"] =
-    value === "w" ? "#fff" : value === "b" ? "#262421" : "transparent";
+    value === "w" ? "#fff" : "transparent";
 
   const border: BorderProps["border"] = isChoosed
     ? "2px solid #7fa650"
@@ -41,9 +40,14 @@ export default function CreateGamePlayer<T extends GameColorOptions>({
       border={border}
       borderRadius="5px"
       backgroundColor={bgColor}
+      bgImage={
+        value === "random"
+          ? "linear-gradient(90deg,#fff 50%,#262421 0)"
+          : undefined
+      }
       onClick={() => onClick(value)}
     >
-      <Icon as={icon} fontSize="3xl" />
+      {children}
     </Flex>
   );
 }

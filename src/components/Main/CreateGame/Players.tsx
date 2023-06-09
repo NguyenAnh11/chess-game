@@ -1,4 +1,4 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Text, Icon } from "@chakra-ui/react";
 import React, { ReactNode, Dispatch, SetStateAction } from "react";
 import { BiQuestionMark } from "react-icons/bi";
 import { TbChessKing, TbChessKingFilled } from "react-icons/tb";
@@ -20,10 +20,11 @@ export default function CreateGamePlayers({
         <CreateGamePlayer
           label="white"
           value="w"
-          icon={TbChessKing}
           isChoosed={color === "w"}
           onClick={() => onSetColor("w")}
-        />
+        >
+          <Icon as={TbChessKing} fontSize="3xl" />
+        </CreateGamePlayer>
       ),
     },
     random: {
@@ -31,10 +32,11 @@ export default function CreateGamePlayers({
         <CreateGamePlayer
           label="random"
           value="random"
-          icon={BiQuestionMark}
           isChoosed={color === "random"}
           onClick={() => onSetColor("random")}
-        />
+        >
+          <Icon as={BiQuestionMark} fontSize="3xl" color="white"/>
+        </CreateGamePlayer>
       ),
     },
     b: {
@@ -42,10 +44,11 @@ export default function CreateGamePlayers({
         <CreateGamePlayer
           label="black"
           value="b"
-          icon={TbChessKingFilled}
           isChoosed={color === "b"}
           onClick={() => onSetColor("b")}
-        />
+        >
+          <Icon as={TbChessKingFilled} fontSize="3xl" />
+        </CreateGamePlayer>
       ),
     },
   };

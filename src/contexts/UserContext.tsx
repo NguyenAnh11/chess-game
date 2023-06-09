@@ -32,7 +32,6 @@ const UserProvider = ({ children }: UserContextProps) => {
       avatar: `${import.meta.env.VITE_AVATAR}/${name}`,
       color: "w",
       countryFlag: import.meta.env.VITE_COUNTRY_FLAG_VIETNAM,
-      isLoser: false,
     };
 
     setUser(user);

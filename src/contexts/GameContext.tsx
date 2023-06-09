@@ -9,10 +9,10 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { UserInfo, GameInfo } from "../types";
+import { GameInfo, UserPlayInfo } from "../types";
 
 export type GameContextProps = {
-  children?: ReactNode;
+  children: ReactNode;
   game: GameInfo;
   onSetGame: Dispatch<SetStateAction<GameInfo>>;
 };
@@ -47,9 +47,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const isGameWaiting = useMemo(() => game.status === "Wait", [game.status]);
 
   useEffect(() => {
-    if (game.status === "End") {
-      setIsShowGameOver(true);
-    }
+    if (game.status === "End") setIsShowGameOver(true);
   }, [game.status]);
 
   const onCloseModalGameOver = () => setIsShowGameOver(false);
@@ -60,7 +58,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
     cloneGame.status = "End";
 
     cloneGame.members = game.members.reduce(
-      (prev: UserInfo[], curr: UserInfo) => {
+      (prev: UserPlayInfo[], curr: UserPlayInfo) => {
         if (curr.id === playerId) curr.isLoser = true;
         return [...prev, curr];
       },
