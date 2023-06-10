@@ -11,7 +11,7 @@ export default function PlayNewGame() {
 
   const onRematch = () => {};
 
-  return !isGameOver || !isGameDraw ? (
+  return isGameOver || isGameDraw ? (
     <Grid
       gridTemplateColumns="repeat(2, 1fr)"
       gridColumnGap="16px"

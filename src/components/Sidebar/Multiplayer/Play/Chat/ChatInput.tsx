@@ -8,12 +8,20 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { BsSend } from "react-icons/bs";
+import { useChat } from "../../../../../contexts/ChatContext";
 
 export default function ChatInput() {
+  const { onSend } = useChat();
   const [value, setValue] = useState("");
 
-  const onSend = () => {
-    console.log("Value: ", value);
+  const onSendMessage = () => {
+    if (!value) {
+      alert("Enter message");
+      return;
+    }
+
+    onSend(value);
+
     setValue("");
   };
 
@@ -29,7 +37,7 @@ export default function ChatInput() {
             onChange={(e) => setValue(e.target.value)}
             onKeyUp={(e) => {
               if (e.key === "Enter") {
-                onSend();
+                onSendMessage();
               }
             }}
           />
@@ -38,7 +46,7 @@ export default function ChatInput() {
               as={BsSend}
               cursor="pointer"
               fontSize="2xl"
-              onClick={onSend}
+              onClick={() => onSendMessage()}
             />
           </InputRightElement>
         </InputGroup>

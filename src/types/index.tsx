@@ -162,6 +162,7 @@ export type GameInfo = {
   duration?: number;
   status: GameStatus;
   members: UserPlayInfo[];
+  created_at?: number;
 };
 
 export type CapturePieces = {
@@ -265,3 +266,9 @@ export type GameDurationOptions = {
     };
   };
 };
+
+export type Message = {
+  user: UserInfo;
+  content: string;
+  timestamp: number;
+}

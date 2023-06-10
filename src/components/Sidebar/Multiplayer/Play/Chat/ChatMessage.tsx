@@ -1,14 +1,13 @@
-import { Box, Text } from "@chakra-ui/react";
-import { UserInfo } from "../../../../../types";
+import { Flex, Text } from "@chakra-ui/react";
+import { Message } from "../../../../../types";
 
 type ChatMessageProps = {
-  player: UserInfo;
-  message: string;
+  message: Message;
 };
 
-export default function ChatMessage({ player, message }: ChatMessageProps) {
+export default function ChatMessage({ message }: ChatMessageProps) {
   return (
-    <Box
+    <Flex
       style={{ wordWrap: "break-word", wordBreak: "break-word" }}
       color="#666564"
       cursor="text"
@@ -18,17 +17,16 @@ export default function ChatMessage({ player, message }: ChatMessageProps) {
       py="0"
       px="4"
     >
-      <Box color="#f3c536">
-        <Text
-          cursor="pointer"
-          fontSize="14px"
-          fontWeight="semibold"
-          lineHeight="1.3"
-        >
-          {player.name}
-        </Text>
-      </Box>
-      <Text whiteSpace="pre-wrap">{message}</Text>
-    </Box>
+      <Text
+        color="#f3c536"
+        fontSize="14px"
+        cursor="pointer"
+        lineHeight="1.3"
+        fontWeight="semibold"
+      >
+        {message.user.name}:
+      </Text>
+      <Text ml="1.5" whiteSpace="pre-wrap">{message.content}</Text>
+    </Flex>
   );
 }

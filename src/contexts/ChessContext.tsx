@@ -11,7 +11,9 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
+import { HiArrowSmRight } from "react-icons/hi";
 import useWorker from "../hooks/useWorker";
+import { SOCKET_EVENTS } from "../services/Socket";
 import {
   BoardOrientation,
   BoardPosition,
@@ -42,6 +44,7 @@ import {
 } from "../utils";
 import { useGame } from "./GameContext";
 import { useSetting } from "./SettingContext";
+import { useSocket } from "./SocketContext";
 import { useUser } from "./UserContext";
 
 type ChessboardProviderProps = {
@@ -103,13 +106,19 @@ export const ChessContext = createContext({} as ChessContext);
 
 export const useChess = () => useContext(ChessContext);
 
-const ChessProvider = ({
-  children,
-  boardRef
-}: ChessboardProviderProps) => {
+const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
+  const { ws } = useSocket();
   const { user } = useUser();
   const { setting, mode } = useSetting();
-  const { game: gameInfo, isGameOver, isGameWaiting, onSetGameDraw, onSetGameReady, onSetPlayerAsLoser } = useGame();
+  const {
+    game: gameInfo,
+    isGameOver,
+    isGameDraw,
+    isGameWaiting,
+    onSetGameDraw,
+    onSetGameReady,
+    onSetPlayerAsLoser,
+  } = useGame();
   const game = useRef<Chess>(new Chess());
   const [position, setPosition] = useState<BoardPosition>(
     convertFen(game.current.fen())
@@ -119,6 +128,7 @@ const ChessProvider = ({
   const [positionDifference, setPositionDifference] = useState<BoardDifference>(
     { added: {}, removed: {} }
   );
+  const movesRef = useRef<Move[]>([]);
   const [moves, setMoves] = useState<Move[]>([]);
   const [readyMove, setReadyMove] = useState<{
     move: Move;
@@ -190,24 +200,26 @@ const ChessProvider = ({
   };
 
   const makeMove = (action: MoveAction, move: Move) => {
-    const cloneMoves = [...moves];
+    const cloneMoves = [...movesRef.current];
     if (
       orientation === "w" &&
-      moves.length >= 2 &&
+      cloneMoves.length >= 2 &&
       boardIndex.step !== moves.length
     ) {
-      cloneMoves.splice(boardIndex.step, moves.length - boardIndex.step);
+      cloneMoves.splice(boardIndex.step, cloneMoves.length - boardIndex.step);
     }
 
     if (
       orientation === "b" &&
-      moves.length >= 3 &&
+      cloneMoves.length >= 3 &&
       boardIndex.step !== moves.length
     ) {
-      cloneMoves.slice(boardIndex.step, moves.length - boardIndex.step);
+      cloneMoves.slice(boardIndex.step, cloneMoves.length - boardIndex.step);
     }
 
     const newMoves = [...cloneMoves, move];
+
+    movesRef.current = newMoves;
 
     setMoves(newMoves);
 
@@ -228,7 +240,7 @@ const ChessProvider = ({
   };
 
   const onLeftClickDown = (square: Square) => {
-    if (isGameOver || game.current.isDraw()) return;
+    if (isGameOver || isGameDraw) return;
 
     if (!leftClick) {
       kingUnderAttack && setKingUnderAttack(undefined);
@@ -236,7 +248,11 @@ const ChessProvider = ({
       return;
     }
 
-    if (leftClick === square) {
+    if (
+      leftClick === square ||
+      orientation !== turn ||
+      (leftClick && isGameWaiting)
+    ) {
       setLeftClick(undefined);
       return;
     }
@@ -356,7 +372,7 @@ const ChessProvider = ({
   };
 
   const onDragPieceBegin = (square: Square) => {
-    if (isGameOver || game.current.isCheckmate() || leftClick) return;
+    if (isGameOver || isGameDraw || leftClick) return;
 
     setLeftClick(square);
   };
@@ -364,7 +380,7 @@ const ChessProvider = ({
   const onDropPiece = (source: Square, target: Square) => {
     if (setting.board.moveMethod === "c") return;
 
-    if (source === target || orientation !== turn) {
+    if (isGameWaiting || source === target || orientation !== turn) {
       setLeftClick(undefined);
       return;
     }
@@ -422,7 +438,8 @@ const ChessProvider = ({
 
   const onNewGame = () => {
     //reset state game
-    setMoves([]);
+    movesRef.current = [];
+    setMoves(movesRef.current);
     setTurn("w");
     setBoardIndex({ break: 0, step: 0 });
 
@@ -434,14 +451,14 @@ const ChessProvider = ({
     game.current = new Chess();
   };
 
-  const undo = (num: number) => {
+  const undoMove = (num: number) => {
     while (num > 0) {
       game.current.undo();
       num -= 1;
     }
   };
 
-  const move = (startIndex: number, endIndex: number) => {
+  const doMove = (startIndex: number, endIndex: number) => {
     const nextMoves = moves.slice(startIndex, endIndex);
     for (const { from, to, promotion } of nextMoves) {
       if (promotion) game.current.move({ from, to, promotion });
@@ -453,9 +470,9 @@ const ChessProvider = ({
     if (index === boardIndex.step) return;
 
     if (index < boardIndex.step) {
-      undo(boardIndex.step - index);
+      undoMove(boardIndex.step - index);
     } else {
-      move(boardIndex.step, index);
+      doMove(boardIndex.step, index);
     }
 
     setBoardIndex((pre) => ({ ...pre, step: index }));
@@ -464,7 +481,7 @@ const ChessProvider = ({
   const onResign = (playerId: string) => {
     onSetPlayerAsLoser(playerId);
   };
-  
+
   const viewSteps = useMemo(
     (): Move[] => moves.slice(0, boardIndex.step),
     [moves, boardIndex.step]
@@ -602,7 +619,7 @@ const ChessProvider = ({
 
   useEffect(() => {
     if (game.current.isCheckmate() || game.current.isGameOver()) {
-      const currentPlayer = gameInfo.members.find(p => p.color === turn);
+      const currentPlayer = gameInfo.members.find((p) => p.color === turn);
       if (currentPlayer) {
         onResign(currentPlayer.id);
       }
@@ -670,8 +687,17 @@ const ChessProvider = ({
       if (mode === "AI" && !isGameWaiting) {
         aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
       }
+
+      if (ws && mode === "Multiplayer" && moves.length > 0) {
+        const lastMove = moves[moves.length - 1];
+
+        ws.emit(SOCKET_EVENTS.MAKE_MOVE, {
+          code: gameInfo.code,
+          move: lastMove,
+        });
+      }
     }
-  }, [position, isGameWaiting]);
+  }, [turn, isGameWaiting]);
 
   useEffect(() => {
     if (orientation !== turn && suggestMove.loading) {
@@ -680,23 +706,40 @@ const ChessProvider = ({
   }, [turn]);
 
   useEffect(() => {
-    if (orientation !== turn && mode === "AI" && !isGameWaiting) {
-      if (!readyMove || boardIndex.step !== moves.length) return;
-      //make change
+    if (readyMove) {
+      if (mode === "AI" && boardIndex.step !== moves.length) return;
+
+      if (mode === "Multiplayer") {
+        const latestIndex = moves.length;
+        if (boardIndex.step !== latestIndex)
+          doMove(boardIndex.step, latestIndex);
+      }
+
       game.current.move({
         from: readyMove.move.from,
         to: readyMove.move.to,
         promotion: readyMove.move.promotion,
       });
 
-      //make move
       makeMove(readyMove.action, readyMove.move);
     }
-  }, [turn, isGameWaiting, readyMove, boardIndex.step]);
+  }, [readyMove, boardIndex.step]);
+
+  useEffect(() => {
+    if (mode === "Multiplayer") {
+      ws.on(SOCKET_EVENTS.RECEIVE_MOVE, (move: Move) => {
+        setReadyMove({ move, action: "click" });
+      });
+
+      return () => {
+        ws.off(SOCKET_EVENTS.RECEIVE_MOVE);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     setOrientation(user!.color);
-  }, [])
+  }, [user!.color]);
 
   return (
     <ChessContext.Provider
@@ -733,8 +776,8 @@ const ChessProvider = ({
         onClearRightClicks,
         onDragPieceBegin,
         onNewGame,
-        undo,
-        move,
+        undo: undoMove,
+        move: doMove,
         onClearArrows,
         onStep,
         onChoosedPiecePromotion,

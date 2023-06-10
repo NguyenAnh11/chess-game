@@ -37,7 +37,7 @@ export default function Online() {
       return;
     }
 
-    ws.emit(SOCKET_EVENTS.REQ_JOIN_GAME, { code, user });
+    navigate(`/live/${code}`);
   };
 
   const onCreate = () => {
@@ -50,21 +50,11 @@ export default function Online() {
 
   useEffect(() => {
     ws.on(SOCKET_EVENTS.ROOM_CREATED, ({ code }: { code: string }) => {
-      ws.emit(SOCKET_EVENTS.REQ_JOIN_GAME, { code, user });
-    });
-
-    ws.on(SOCKET_EVENTS.RES_JOIN_GAME, (data) => {
-      if (!data.success) {
-        alert(data.error);
-        return;
-      }
-
-      navigate(`/live/${data.code}`);
+      navigate(`/live/${code}`);
     });
 
     return () => {
       ws.off(SOCKET_EVENTS.ROOM_CREATED);
-      ws.off(SOCKET_EVENTS.RES_JOIN_GAME);
     };
   }, []);
 

@@ -11,13 +11,17 @@ import { FiSettings } from "react-icons/fi";
 import { useChess } from "../../../../contexts/ChessContext";
 import { useUser } from "../../../../contexts/UserContext";
 import { useSetting } from "../../../../contexts/SettingContext";
+import { useRoom } from "../../../../contexts/RoomContext";
 
 export default function LiveControls() {
   const { user } = useUser();
+  const { onRequestGameDraw } = useRoom();
   const { onOpenEditSetting } = useSetting();
   const { moves, boardIndex, onStep, onResign: onGameOver } = useChess();
 
-  const onDraw = () => {};
+  const onDraw = () => {
+    
+  };
 
   const onResign = () => {
     onGameOver(user!.id);

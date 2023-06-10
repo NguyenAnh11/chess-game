@@ -34,8 +34,12 @@ export default function Login() {
         aria-label="Enter your name"
         placeholder="Enter your name"
         onChange={(e) => {
-          const value = e.target.value;
-          setName(value);
+          setName(e.target.value);
+        }}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            onSubmit();
+          }
         }}
       />
       <Button colorScheme="blue" onClick={onSubmit}>

@@ -1,7 +1,11 @@
 import { Box, Flex } from "@chakra-ui/react";
 import ChatInput from "./ChatInput";
+import { useChat } from "../../../../../contexts/ChatContext";
+import ChatMessage from "./ChatMessage";
 
 export default function ChatList() {
+  const { messages } = useChat();
+
   return (
     <Flex pos="relative" flex="0" direction="column" minH="200px" h="200px">
       <Flex pos="relative" flex="1 1 auto" direction="column">
@@ -14,9 +18,11 @@ export default function ChatList() {
           px="0"
           overflow="auto"
         >
-          
+          {messages.map((message, index) => (
+            <ChatMessage key={index} message={message} />
+          ))}
         </Box>
-        <ChatInput/>
+        <ChatInput />
       </Flex>
     </Flex>
   );

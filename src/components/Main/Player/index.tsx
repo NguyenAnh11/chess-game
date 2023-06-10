@@ -50,7 +50,7 @@ export default function BoardPlayer({ isOpponent }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode !== "AI" && <Clock color={color} duration={game.duration!} />}
+        {/* {mode !== "AI" && <Clock color={color} duration={game.duration!} />} */}
       </Box>
     </Box>
   );

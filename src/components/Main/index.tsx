@@ -1,18 +1,19 @@
 import React, { forwardRef, RefObject } from "react";
 import { Box, Flex, useOutsideClick } from "@chakra-ui/react";
 import { useChess } from "../../contexts/ChessContext";
+import { useGame } from "../../contexts/GameContext";
 import Squares from "./Squares";
 import HighlightSquares from "./HighlightSquares";
 import HintMoves from "./HintMoves";
 import Arrows from "./Arrows";
 import Promotion from "./Promotion";
 import GameOver from "./GameOver";
-import { useGame } from "../../contexts/GameContext";
+import GameDraw from "./GameDraw";
 
 type BoardMainProps = {};
 
 const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
-  const { isGameStart, isGameOver } = useGame();
+  const { isGameStart, isGameOver, isGameDraw } = useGame();
   const { promotion, onClearLeftClick, onClearRightClicks } = useChess();
 
   useOutsideClick({
@@ -33,6 +34,7 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
           <Arrows />
           {promotion.show && <Promotion />}
           {isGameStart && isGameOver && <GameOver />}
+          {isGameStart && isGameDraw && <GameDraw/> }
         </Box>
       </Flex>
     </React.Fragment>
