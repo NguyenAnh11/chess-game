@@ -38,14 +38,6 @@ export const useGame = () => useContext(GameContext);
 const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const [isShowGameOver, setIsShowGameOver] = useState(false);
 
-  const isGameOver = useMemo(() => game.status === "End", [game.status]);
-
-  const isGameDraw = useMemo(() => game.status === "Draw", [game.status]);
-
-  const isGameStart = useMemo(() => game.status === "Ready", [game.status]);
-
-  const isGameWaiting = useMemo(() => game.status === "Wait", [game.status]);
-
   useEffect(() => {
     if (game.status === "End") setIsShowGameOver(true);
   }, [game.status]);
@@ -67,6 +59,14 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
 
     onSetGame(cloneGame);
   };
+
+  const isGameOver = useMemo(() => game.status === "End", [game.status]);
+
+  const isGameDraw = useMemo(() => game.status === "Draw", [game.status]);
+
+  const isGameStart = useMemo(() => game.status === "Ready", [game.status]);
+
+  const isGameWaiting = useMemo(() => game.status === "Wait", [game.status]);
 
   const onSetGameReady = () =>
     onSetGame((prev) => ({ ...prev, status: "Ready" }));
