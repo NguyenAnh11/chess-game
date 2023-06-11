@@ -16,9 +16,8 @@ type BoardMainProps = {};
 const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
   const {
     game,
-    isGameStart,
-    isGameOver,
     isGameDraw,
+    isGameOver,
     isShowGameOver,
     isShowGameDraw,
     onCloseModalGameDraw,
@@ -40,7 +39,7 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
       <Flex direction="column" my="2.5">
         <Box ref={ref} position="relative" w="xl" height="xl">
           <HighlightSquares />
-          
+
           <Squares />
 
           <HintMoves />
@@ -49,7 +48,7 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
 
           {promotion.show && <Promotion />}
 
-          {isGameStart && isGameOver && isShowGameOver && (
+          {isGameOver && isShowGameOver && (
             <GameInfo
               title="Game Over"
               onCloseModal={onCloseModalGameOver}
@@ -57,13 +56,13 @@ const BoardMain = forwardRef<HTMLDivElement, BoardMainProps>(({}, ref) => {
             />
           )}
 
-          {isGameStart && isGameDraw && isShowGameDraw && (
+          {(isGameDraw && isShowGameDraw) ? (
             <GameInfo
               title="Draw"
               onCloseModal={onCloseModalGameDraw}
               content={<GameDrawUser users={game.members} />}
             />
-          )}
+          ) : null}
         </Box>
       </Flex>
     </React.Fragment>

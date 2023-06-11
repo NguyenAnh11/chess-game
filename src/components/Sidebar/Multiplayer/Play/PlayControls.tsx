@@ -1,20 +1,5 @@
-import {
-  Flex,
-  Text,
-  Tooltip,
-  Icon,
-  Box,
-  Image,
-  Popover,
-  PopoverTrigger,
-  Portal,
-  PopoverContent,
-  PopoverBody,
-  useDisclosure,
-} from "@chakra-ui/react";
-import DefaultButton from "../../../Common/Button/Default";
+import { Flex, Text, Tooltip, Icon, Box, Image } from "@chakra-ui/react";
 import LiveButton from "../../../Common/Button/Live";
-import { HiOutlineFlag, HiFlag } from "react-icons/hi";
 import {
   BsChevronBarLeft,
   BsChevronBarRight,
@@ -23,25 +8,17 @@ import {
 } from "react-icons/bs";
 import { FiSettings } from "react-icons/fi";
 import { useChess } from "../../../../contexts/ChessContext";
-import { useUser } from "../../../../contexts/UserContext";
 import { useSetting } from "../../../../contexts/SettingContext";
 import { useRoom } from "../../../../contexts/RoomContext";
+import { useGame } from "../../../../contexts/GameContext";
+import PlayStartedGameControls from "./PlayStartedGameControls";
+import PlayEndGameControls from "./PlayEndGameControls";
 
 export default function LiveControls() {
-  const { user } = useUser();
-  const { isRequestGameDraw, isShowAcceptOrRejectGameDraw, onRequestGameDraw } =
-    useRoom();
+  const { isRequestGameDraw } = useRoom();
   const { onOpenEditSetting } = useSetting();
-  const { moves, boardIndex, onStep, onResign: onGameOver } = useChess();
-  const { isOpen, onClose, onToggle } = useDisclosure();
-
-  const onDraw = () => {
-    onToggle();
-  };
-
-  const onResign = () => {
-    onGameOver(user!.id);
-  };
+  const { isGameOver, isGameDraw } = useGame();
+  const { moves, boardIndex, onStep } = useChess();
 
   const onBack = () => {
     if (boardIndex.step > 0) {
@@ -106,76 +83,12 @@ export default function LiveControls() {
           />
         </Flex>
       )}
-      <Popover
-        closeOnBlur={true}
-        placement="top"
-        isOpen={isOpen}
-        onClose={onClose}
-      >
-        <PopoverTrigger>
-          <Box mr="10px" gap="5px" color="#666564">
-            <LiveButton
-              label="draw-offer"
-              onClick={onDraw}
-              disabled={isRequestGameDraw || isShowAcceptOrRejectGameDraw}
-            >
-              <Icon as={HiOutlineFlag} fontSize="2xl" />
-              <Text fontSize="sm" fontWeight="semibold">
-                Draw
-              </Text>
-            </LiveButton>
-          </Box>
-        </PopoverTrigger>
-        <Portal>
-          <PopoverContent mb="2">
-            <PopoverBody
-              bg="#fff"
-              p="15px"
-              fontSize="15px"
-              cursor="auto"
-              textAlign="center"
-              width="260px"
-              borderRadius="3px"
-            >
-              <Text mb="4" whiteSpace="break-spaces">
-                Do you want to offer/clain a draw?
-              </Text>
-              <Flex align="center" justify="center">
-                <Box mr="3">
-                  <DefaultButton
-                    label="No"
-                    size="sm"
-                    variant="basic"
-                    onClick={() => onClose()}
-                  >
-                    <Text>No</Text>
-                  </DefaultButton>
-                </Box>
-                <DefaultButton
-                  label="Yes"
-                  size="sm"
-                  variant="primary"
-                  onClick={() => {
-                    onRequestGameDraw();
-                    onClose();
-                  }}
-                >
-                  <Text>Yes</Text>
-                </DefaultButton>
-              </Flex>
-            </PopoverBody>
-          </PopoverContent>
-        </Portal>
-      </Popover>
 
-      <Box mr="10px" gap="5px" color="#666564">
-        <LiveButton label="resign" onClick={onResign}>
-          <Icon as={HiFlag} fontSize="2xl" />
-          <Text fontSize="sm" fontWeight="semibold">
-            Resign
-          </Text>
-        </LiveButton>
-      </Box>
+      {(!isGameDraw && !isGameOver) ? (
+        <PlayStartedGameControls />
+      ) : (
+        <PlayEndGameControls />
+      )}
 
       <Flex flex="1" />
 

@@ -241,6 +241,12 @@ export const PIECE_INDEX: { [p in PieceSymbol]: number } = {
   p: 5
 };
 
+type MessageTitle = "OFFER_DRAW"
+
+export const MESSAGES: { [message in MessageTitle]: string } = {
+  "OFFER_DRAW": "offered a draw"
+}
+ 
 export const PAWN_EVAL = [
   0,  0,  0,  0,  0,  0,  0,  0,
   50, 50, 50, 50, 50, 50, 50, 50,

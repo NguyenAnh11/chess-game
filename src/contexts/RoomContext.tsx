@@ -95,6 +95,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
     });
 
     ws.on(SOCKET_EVENTS.GAME_DRAW, () => {
+      setIsRequestGameDraw(false);
       setGame((prev) => ({ ...prev, status: "Draw" }));
     });
 
@@ -103,6 +104,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
       ws.off(SOCKET_EVENTS.USER_JOINED);
       ws.off(SOCKET_EVENTS.SHOW_ACCEPT_REJECT_GAME_DRAW);
       ws.off(SOCKET_EVENTS.REJECT_GAME_DRAW);
+      ws.off(SOCKET_EVENTS.GAME_DRAW);
     };
   }, []);
 
@@ -114,6 +116,9 @@ const RoomProvider = ({ children }: RoomContextProps) => {
 
   const onAcceptOrRejectGameDraw = (accept: boolean) => {
     setIsShowAcceptOrRejectGameDraw(false);
+    if (accept) {
+      setGame((prev) => ({ ...prev, status: "Draw" }));
+    }
 
     ws.emit(SOCKET_EVENTS.ACCEPT_OR_REJECT_GAME_DRAW, { code, accept });
   };

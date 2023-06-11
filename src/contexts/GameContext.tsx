@@ -43,6 +43,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
 
   useEffect(() => {
     if (game.status === "End") setIsShowGameOver(true);
+    if (game.status === "Draw") setIsShowGameDraw(true);
   }, [game.status]);
 
   const onCloseModalGameOver = () => setIsShowGameOver(false);
