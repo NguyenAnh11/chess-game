@@ -5,9 +5,9 @@ import {
   useState,
   useEffect,
 } from "react";
+import { useParams } from "react-router-dom";
 import { SOCKET_EVENTS } from "../services/Socket";
 import { Message } from "../types";
-import { useRoom } from "./RoomContext";
 import { useSocket } from "./SocketContext";
 import { useUser } from "./UserContext";
 
@@ -27,7 +27,7 @@ export const useChat = () => useContext(ChatContext);
 const ChatProvider = ({ children }: ChatContextProps) => {
   const { ws } = useSocket();
   const { user } = useUser();
-  const { game } = useRoom();
+  const { code } = useParams();
   const [messages, setMessages] = useState<Message[]>([]);
 
   const onSend = (content: string) => {
@@ -40,7 +40,7 @@ const ChatProvider = ({ children }: ChatContextProps) => {
     setMessages((prev) => [...prev, message]);
 
     ws.emit(SOCKET_EVENTS.SEND_MESSAGE, {
-      code: game.code,
+      code: code,
       data: message,
     });
   };

@@ -241,10 +241,11 @@ export const PIECE_INDEX: { [p in PieceSymbol]: number } = {
   p: 5
 };
 
-type MessageTitle = "OFFER_DRAW"
+type MessageTitle = "OFFER_DRAW" | "DECLINED DRAW"
 
 export const MESSAGES: { [message in MessageTitle]: string } = {
-  "OFFER_DRAW": "offered a draw"
+  "OFFER_DRAW": "offered a draw",
+  "DECLINED DRAW": "declined a draw"
 }
  
 export const PAWN_EVAL = [

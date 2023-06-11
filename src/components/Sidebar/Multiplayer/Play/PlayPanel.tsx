@@ -3,7 +3,6 @@ import ChatList from "./Chat/ChatList";
 import LiveControls from "./PlayControls";
 import MoveContainer from "./PlayMoves";
 import PlayNewGame from "./PlayNewGame";
-import ChatProvider from "../../../../contexts/ChatContext";
 import AcceptDraw from "./AcceptDraw";
 import { useRoom } from "../../../../contexts/RoomContext";
 import { useGame } from "../../../../contexts/GameContext";
@@ -17,9 +16,7 @@ export default function PlayPanel() {
       {!isShowAcceptOrRejectGameDraw ? <MoveContainer /> : <AcceptDraw />}
       {(isGameOver || isGameDraw) && <PlayNewGame />}
       <LiveControls />
-      <ChatProvider>
-        <ChatList />
-      </ChatProvider>
+      <ChatList />
     </Flex>
   );
 }

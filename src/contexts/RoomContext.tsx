@@ -10,6 +10,8 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { SOCKET_EVENTS } from "../services/Socket";
 import { GameInfo } from "../types";
+import { MESSAGES } from "../utils";
+import { useChat } from "./ChatContext";
 import { useSocket } from "./SocketContext";
 import { useUser } from "./UserContext";
 
@@ -35,6 +37,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
   const navigate = useNavigate();
   const { code } = useParams();
   const { ws } = useSocket();
+  const { onSend } = useChat();
   const { user, onSetUserColor } = useUser();
   const [game, setGame] = useState<GameInfo>({
     code: code!,
@@ -118,6 +121,10 @@ const RoomProvider = ({ children }: RoomContextProps) => {
     setIsShowAcceptOrRejectGameDraw(false);
     if (accept) {
       setGame((prev) => ({ ...prev, status: "Draw" }));
+    }
+
+    if (!accept) {
+      onSend(MESSAGES["DECLINED DRAW"]);
     }
 
     ws.emit(SOCKET_EVENTS.ACCEPT_OR_REJECT_GAME_DRAW, { code, accept });

@@ -5,6 +5,7 @@ import Loading from "./pages/Loading";
 import PrivateRoute from "./routers/PrivateRoute";
 import SocketProvider from "./contexts/SocketContext";
 import RoomProvider from "./contexts/RoomContext";
+import ChatProvider from "./contexts/ChatContext";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -56,9 +57,11 @@ const App = () => {
             element={
               <Suspense fallback={<Loading />}>
                 <SocketProvider>
-                  <RoomProvider>
-                    <Room />
-                  </RoomProvider>
+                  <ChatProvider>
+                    <RoomProvider>
+                      <Room />
+                    </RoomProvider>
+                  </ChatProvider>
                 </SocketProvider>
               </Suspense>
             }

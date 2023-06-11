@@ -37,7 +37,6 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
 
   const onDraw = () => {
     onToggle();
-    onSend(MESSAGES["OFFER_DRAW"]);
   };
 
   return (
@@ -94,6 +93,7 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
                   onClick={() => {
                     onRequestGameDraw();
                     onClose();
+                    onSend(MESSAGES["OFFER_DRAW"]);
                   }}
                 >
                   <Text>Yes</Text>
