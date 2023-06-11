@@ -64,12 +64,9 @@
 
 .disabled {
     pointer-events: none;
-}
-
-.md:disabled {
     cursor: not-allowed;
     filter: grayscale(.4);
-    opacity: 0.9;
+    opacity: 0.65;
 }
 
 .live_btn {

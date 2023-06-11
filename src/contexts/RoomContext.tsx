@@ -23,7 +23,7 @@ type RoomContext = {
   onSetGame: Dispatch<SetStateAction<GameInfo>>;
   onRequestGameDraw: () => void;
   isRequestGameDraw: boolean;
-  isAcceptOrRejectGameDraw: boolean;
+  isShowAcceptOrRejectGameDraw: boolean;
   onAcceptOrRejectGameDraw: (accept: boolean) => void;
 };
 
@@ -44,7 +44,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isRequestGameDraw, setIsRequestGameDraw] = useState(false);
-  const [isAcceptOrRejectGameDraw, setIsAcceptOrRejectGameDraw] =
+  const [isShowAcceptOrRejectGameDraw, setIsShowAcceptOrRejectGameDraw] =
     useState(false);
 
   useEffect(() => {
@@ -86,26 +86,36 @@ const RoomProvider = ({ children }: RoomContextProps) => {
       }));
     });
 
+    ws.on(SOCKET_EVENTS.SHOW_ACCEPT_REJECT_GAME_DRAW, () => {
+      setIsShowAcceptOrRejectGameDraw(true);
+    });
+
+    ws.on(SOCKET_EVENTS.REJECT_GAME_DRAW, () => {
+      setIsRequestGameDraw(false);
+    });
+
+    ws.on(SOCKET_EVENTS.GAME_DRAW, () => {
+      setGame((prev) => ({ ...prev, status: "Draw" }));
+    });
+
     return () => {
       ws.off(SOCKET_EVENTS.REQ_JOIN_GAME);
       ws.off(SOCKET_EVENTS.USER_JOINED);
+      ws.off(SOCKET_EVENTS.SHOW_ACCEPT_REJECT_GAME_DRAW);
+      ws.off(SOCKET_EVENTS.REJECT_GAME_DRAW);
     };
   }, []);
 
   const onRequestGameDraw = () => {
     setIsRequestGameDraw(true);
+
+    ws.emit(SOCKET_EVENTS.REQ_GAME_DRAW, code);
   };
 
   const onAcceptOrRejectGameDraw = (accept: boolean) => {
-    setIsAcceptOrRejectGameDraw(false);
+    setIsShowAcceptOrRejectGameDraw(false);
 
-    if (accept) {
-
-    }
-
-    if (!accept) {
-      
-    }
+    ws.emit(SOCKET_EVENTS.ACCEPT_OR_REJECT_GAME_DRAW, { code, accept });
   };
 
   return (
@@ -116,7 +126,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
         onSetGame: setGame,
         onRequestGameDraw,
         isRequestGameDraw,
-        isAcceptOrRejectGameDraw,
+        isShowAcceptOrRejectGameDraw,
         onAcceptOrRejectGameDraw,
       }}
     >

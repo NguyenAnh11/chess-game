@@ -24,7 +24,9 @@ type GameContext = {
   isGameStart: boolean;
   isGameWaiting: boolean;
   isShowGameOver: boolean;
+  isShowGameDraw: boolean;
   onCloseModalGameOver: () => void;
+  onCloseModalGameDraw: () => void;
   onSetPlayerAsLoser: (playerId: string) => void;
   onSetGameReady: () => void;
   onSetGameDraw: () => void;
@@ -37,12 +39,15 @@ export const useGame = () => useContext(GameContext);
 
 const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const [isShowGameOver, setIsShowGameOver] = useState(false);
+  const [isShowGameDraw, setIsShowGameDraw] = useState(false);
 
   useEffect(() => {
     if (game.status === "End") setIsShowGameOver(true);
   }, [game.status]);
 
   const onCloseModalGameOver = () => setIsShowGameOver(false);
+
+  const onCloseModalGameDraw = () => setIsShowGameDraw(false);
 
   const onSetPlayerAsLoser = (playerId: string) => {
     const cloneGame = cloneDeep(game);
@@ -85,7 +90,9 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
         isGameStart,
         isGameWaiting,
         isShowGameOver,
+        isShowGameDraw,
         onCloseModalGameOver,
+        onCloseModalGameDraw,
         onSetPlayerAsLoser,
         onSetGameReady,
         onSetGameDraw,

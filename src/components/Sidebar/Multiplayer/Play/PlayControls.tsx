@@ -29,7 +29,7 @@ import { useRoom } from "../../../../contexts/RoomContext";
 
 export default function LiveControls() {
   const { user } = useUser();
-  const { isRequestGameDraw, isAcceptOrRejectGameDraw, onRequestGameDraw } =
+  const { isRequestGameDraw, isShowAcceptOrRejectGameDraw, onRequestGameDraw } =
     useRoom();
   const { onOpenEditSetting } = useSetting();
   const { moves, boardIndex, onStep, onResign: onGameOver } = useChess();
@@ -117,7 +117,7 @@ export default function LiveControls() {
             <LiveButton
               label="draw-offer"
               onClick={onDraw}
-              disabled={isRequestGameDraw || isAcceptOrRejectGameDraw}
+              disabled={isRequestGameDraw || isShowAcceptOrRejectGameDraw}
             >
               <Icon as={HiOutlineFlag} fontSize="2xl" />
               <Text fontSize="sm" fontWeight="semibold">
@@ -155,7 +155,10 @@ export default function LiveControls() {
                   label="Yes"
                   size="sm"
                   variant="primary"
-                  onClick={() => onRequestGameDraw()}
+                  onClick={() => {
+                    onRequestGameDraw();
+                    onClose();
+                  }}
                 >
                   <Text>Yes</Text>
                 </DefaultButton>

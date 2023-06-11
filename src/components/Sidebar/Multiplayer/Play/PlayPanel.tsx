@@ -9,12 +9,12 @@ import { useRoom } from "../../../../contexts/RoomContext";
 import { useGame } from "../../../../contexts/GameContext";
 
 export default function PlayPanel() {
-  const { isAcceptOrRejectGameDraw } = useRoom();
+  const { isShowAcceptOrRejectGameDraw } = useRoom();
   const { isGameOver, isGameDraw } = useGame();
 
   return (
     <Flex flexGrow="1" flexShrink="1" flexBasis="0" direction="column" minH="0">
-      {!isAcceptOrRejectGameDraw ? <MoveContainer /> : <AcceptDraw />}
+      {!isShowAcceptOrRejectGameDraw ? <MoveContainer /> : <AcceptDraw />}
       {(isGameOver || isGameDraw) && <PlayNewGame />}
       <LiveControls />
       <ChatProvider>
