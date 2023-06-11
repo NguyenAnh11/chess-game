@@ -11,7 +11,6 @@ import React, {
   SetStateAction,
   RefObject,
 } from "react";
-import { HiArrowSmRight } from "react-icons/hi";
 import useWorker from "../hooks/useWorker";
 import { SOCKET_EVENTS } from "../services/Socket";
 import {

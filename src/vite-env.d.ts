@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_DEFAULT_AVATAR: string;
   readonly VITE_COUNTRY_FLAG_VIETNAM: string;
   readonly VITE_SOCKET_ENDPOINT: string;
+  readonly VITE_SPINNER_URL: string;
 }
 
 interface ImportMeta {

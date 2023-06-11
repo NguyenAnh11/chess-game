@@ -1,5 +1,19 @@
-import { Flex, Text, Tooltip, Icon, Box } from "@chakra-ui/react";
-import Button from "../../../Common/Button/Live";
+import {
+  Flex,
+  Text,
+  Tooltip,
+  Icon,
+  Box,
+  Image,
+  Popover,
+  PopoverTrigger,
+  Portal,
+  PopoverContent,
+  PopoverBody,
+  useDisclosure,
+} from "@chakra-ui/react";
+import DefaultButton from "../../../Common/Button/Default";
+import LiveButton from "../../../Common/Button/Live";
 import { HiOutlineFlag, HiFlag } from "react-icons/hi";
 import {
   BsChevronBarLeft,
@@ -15,12 +29,14 @@ import { useRoom } from "../../../../contexts/RoomContext";
 
 export default function LiveControls() {
   const { user } = useUser();
-  const { onRequestGameDraw } = useRoom();
+  const { isRequestGameDraw, isAcceptOrRejectGameDraw, onRequestGameDraw } =
+    useRoom();
   const { onOpenEditSetting } = useSetting();
   const { moves, boardIndex, onStep, onResign: onGameOver } = useChess();
+  const { isOpen, onClose, onToggle } = useDisclosure();
 
   const onDraw = () => {
-    
+    onToggle();
   };
 
   const onResign = () => {
@@ -62,63 +78,141 @@ export default function LiveControls() {
       gap="1px"
       bgColor="#f1f1f1"
     >
-      <Box mr="10px" gap="5px" color="#666564">
-        <Button label="draw-offer" onClick={onDraw}>
-          <Icon as={HiOutlineFlag} fontSize="2xl" />
-          <Text fontSize="sm" fontWeight="semibold">
-            Draw
-          </Text>
-        </Button>
-      </Box>
+      {isRequestGameDraw && (
+        <Flex
+          pos="absolute"
+          p="4"
+          fontSize="3"
+          justify="space-between"
+          right="0"
+          left="0"
+          bottom="100%"
+        >
+          <Flex direction="column" gap="2px">
+            <Text color="#666564" fontWeight="semibold" fontSize="sm">
+              Draw Offered
+            </Text>
+            <Text color="#8b8987" fontSize="sm">
+              Waiting for opponent's response
+            </Text>
+          </Flex>
+          <Image
+            alt="Spinner"
+            h="20px"
+            w="20px"
+            alignSelf="center"
+            ml="4"
+            src={import.meta.env.VITE_SPINNER_URL}
+          />
+        </Flex>
+      )}
+      <Popover
+        closeOnBlur={true}
+        placement="top"
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <PopoverTrigger>
+          <Box mr="10px" gap="5px" color="#666564">
+            <LiveButton
+              label="draw-offer"
+              onClick={onDraw}
+              disabled={isRequestGameDraw || isAcceptOrRejectGameDraw}
+            >
+              <Icon as={HiOutlineFlag} fontSize="2xl" />
+              <Text fontSize="sm" fontWeight="semibold">
+                Draw
+              </Text>
+            </LiveButton>
+          </Box>
+        </PopoverTrigger>
+        <Portal>
+          <PopoverContent mb="2">
+            <PopoverBody
+              bg="#fff"
+              p="15px"
+              fontSize="15px"
+              cursor="auto"
+              textAlign="center"
+              width="260px"
+              borderRadius="3px"
+            >
+              <Text mb="4" whiteSpace="break-spaces">
+                Do you want to offer/clain a draw?
+              </Text>
+              <Flex align="center" justify="center">
+                <Box mr="3">
+                  <DefaultButton
+                    label="No"
+                    size="sm"
+                    variant="basic"
+                    onClick={() => onClose()}
+                  >
+                    <Text>No</Text>
+                  </DefaultButton>
+                </Box>
+                <DefaultButton
+                  label="Yes"
+                  size="sm"
+                  variant="primary"
+                  onClick={() => onRequestGameDraw()}
+                >
+                  <Text>Yes</Text>
+                </DefaultButton>
+              </Flex>
+            </PopoverBody>
+          </PopoverContent>
+        </Portal>
+      </Popover>
 
       <Box mr="10px" gap="5px" color="#666564">
-        <Button label="resign" onClick={onResign}>
+        <LiveButton label="resign" onClick={onResign}>
           <Icon as={HiFlag} fontSize="2xl" />
           <Text fontSize="sm" fontWeight="semibold">
             Resign
           </Text>
-        </Button>
+        </LiveButton>
       </Box>
 
       <Flex flex="1" />
 
       <Tooltip label="Start">
         <Box mr="0.5" fontSize="2xl" color="#8b8987">
-          <Button label="Start" onClick={onStart}>
+          <LiveButton label="Start" onClick={onStart}>
             <Icon as={BsChevronBarLeft} />
-          </Button>
+          </LiveButton>
         </Box>
       </Tooltip>
 
       <Box mr="0.5" fontSize="2xl" color="#8b8987">
         <Tooltip label="Back">
-          <Button label="Back" onClick={onBack}>
+          <LiveButton label="Back" onClick={onBack}>
             <Icon as={BsChevronLeft} />
-          </Button>
+          </LiveButton>
         </Tooltip>
       </Box>
 
       <Box mr="0.5" fontSize="2xl" color="#8b8987">
         <Tooltip label="Forward">
-          <Button label="Forward" onClick={onForward}>
+          <LiveButton label="Forward" onClick={onForward}>
             <Icon as={BsChevronRight} />
-          </Button>
+          </LiveButton>
         </Tooltip>
       </Box>
 
       <Box mr="0.5" fontSize="2xl" color="#8b8987">
         <Tooltip label="Ending">
-          <Button label="Ending" onClick={onEnd}>
+          <LiveButton label="Ending" onClick={onEnd}>
             <Icon as={BsChevronBarRight} />
-          </Button>
+          </LiveButton>
         </Tooltip>
       </Box>
 
       <Box fontSize="2xl" color="#8b8987">
         <Tooltip label="Setting">
-          <Button label="Setting" onClick={onSetting}>
+          <LiveButton label="Setting" onClick={onSetting}>
             <Icon as={FiSettings} />
-          </Button>
+          </LiveButton>
         </Tooltip>
       </Box>
     </Flex>

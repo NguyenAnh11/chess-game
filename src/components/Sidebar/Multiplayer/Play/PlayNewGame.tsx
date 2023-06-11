@@ -1,17 +1,19 @@
 import { Grid, Icon } from "@chakra-ui/react";
-import { useGame } from "../../../../contexts/GameContext";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../Common/Button/Default";
 import { IoAdd } from "react-icons/io5";
 import { CiUndo } from "react-icons/ci";
 
 export default function PlayNewGame() {
-  const { isGameOver, isGameDraw } = useGame();
+  const navigate = useNavigate();
 
-  const onNewGame = () => {};
+  const onNewGame = () => {
+    navigate("/online");
+  };
 
   const onRematch = () => {};
 
-  return isGameOver || isGameDraw ? (
+  return (
     <Grid
       gridTemplateColumns="repeat(2, 1fr)"
       gridColumnGap="16px"
@@ -31,5 +33,5 @@ export default function PlayNewGame() {
         <span>Rematch</span>
       </Button>
     </Grid>
-  ) : null;
+  );
 }

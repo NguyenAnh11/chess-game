@@ -22,6 +22,9 @@ type RoomContext = {
   game: GameInfo;
   onSetGame: Dispatch<SetStateAction<GameInfo>>;
   onRequestGameDraw: () => void;
+  isRequestGameDraw: boolean;
+  isAcceptOrRejectGameDraw: boolean;
+  onAcceptOrRejectGameDraw: (accept: boolean) => void;
 };
 
 export const RoomContext = createContext({} as RoomContext);
@@ -40,6 +43,9 @@ const RoomProvider = ({ children }: RoomContextProps) => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isRequestGameDraw, setIsRequestGameDraw] = useState(false);
+  const [isAcceptOrRejectGameDraw, setIsAcceptOrRejectGameDraw] =
+    useState(false);
 
   useEffect(() => {
     ws.emit(SOCKET_EVENTS.REQ_JOIN_GAME, { code, user });
@@ -87,11 +93,33 @@ const RoomProvider = ({ children }: RoomContextProps) => {
   }, []);
 
   const onRequestGameDraw = () => {
+    setIsRequestGameDraw(true);
+  };
 
-  }
+  const onAcceptOrRejectGameDraw = (accept: boolean) => {
+    setIsAcceptOrRejectGameDraw(false);
+
+    if (accept) {
+
+    }
+
+    if (!accept) {
+      
+    }
+  };
 
   return (
-    <RoomContext.Provider value={{ isLoading, game, onSetGame: setGame, onRequestGameDraw }}>
+    <RoomContext.Provider
+      value={{
+        isLoading,
+        game,
+        onSetGame: setGame,
+        onRequestGameDraw,
+        isRequestGameDraw,
+        isAcceptOrRejectGameDraw,
+        onAcceptOrRejectGameDraw,
+      }}
+    >
       {children}
     </RoomContext.Provider>
   );
