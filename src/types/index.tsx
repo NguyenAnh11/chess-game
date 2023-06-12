@@ -155,7 +155,7 @@ export type UserPlayInfo = UserInfo & {
   isLoser: boolean;
 }
 
-export type GameStatus = "Wait" | "Ready" | "Draw" | "End";
+export type GameStatus = "Wait" | "Ready" | "Draw" | "Game Over";
 
 export type GameInfo = {
   code: string;

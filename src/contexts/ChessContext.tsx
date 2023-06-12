@@ -111,8 +111,7 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
   const { setting, mode } = useSetting();
   const {
     game: gameInfo,
-    isGameOver,
-    isGameDraw,
+    isGameEnd,
     isGameWaiting,
     onSetGameDraw,
     onSetGameReady,
@@ -239,7 +238,7 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
   };
 
   const onLeftClickDown = (square: Square) => {
-    if (isGameOver || isGameDraw) return;
+    if (isGameEnd) return;
 
     if (!leftClick) {
       kingUnderAttack && setKingUnderAttack(undefined);
@@ -371,7 +370,7 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
   };
 
   const onDragPieceBegin = (square: Square) => {
-    if (isGameOver || isGameDraw || leftClick) return;
+    if (isGameEnd || leftClick) return;
 
     setLeftClick(square);
   };

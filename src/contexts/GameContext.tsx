@@ -22,6 +22,7 @@ type GameContext = {
   isGameOver: boolean;
   isGameDraw: boolean;
   isGameStart: boolean;
+  isGameEnd: boolean;
   isGameWaiting: boolean;
   isShowGameOver: boolean;
   isShowGameDraw: boolean;
@@ -30,7 +31,7 @@ type GameContext = {
   onSetPlayerAsLoser: (playerId: string) => void;
   onSetGameReady: () => void;
   onSetGameDraw: () => void;
-  onSetGameEnd: () => void;
+  onSetGameOver: () => void;
 };
 
 export const GameContext = createContext({} as GameContext);
@@ -42,7 +43,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const [isShowGameDraw, setIsShowGameDraw] = useState(false);
 
   useEffect(() => {
-    if (game.status === "End") setIsShowGameOver(true);
+    if (game.status === "Game Over") setIsShowGameOver(true);
     if (game.status === "Draw") setIsShowGameDraw(true);
   }, [game.status]);
 
@@ -53,7 +54,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const onSetPlayerAsLoser = (playerId: string) => {
     const cloneGame = cloneDeep(game);
 
-    cloneGame.status = "End";
+    cloneGame.status = "Game Over";
 
     cloneGame.members = game.members.reduce(
       (prev: UserPlayInfo[], curr: UserPlayInfo) => {
@@ -66,7 +67,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
     onSetGame(cloneGame);
   };
 
-  const isGameOver = useMemo(() => game.status === "End", [game.status]);
+  const isGameOver = useMemo(() => game.status === "Game Over", [game.status]);
 
   const isGameDraw = useMemo(() => game.status === "Draw", [game.status]);
 
@@ -74,13 +75,15 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
 
   const isGameWaiting = useMemo(() => game.status === "Wait", [game.status]);
 
+  const isGameEnd = isGameOver || isGameDraw;
+
   const onSetGameReady = () =>
     onSetGame((prev) => ({ ...prev, status: "Ready" }));
 
   const onSetGameDraw = () =>
     onSetGame((prev) => ({ ...prev, status: "Draw" }));
 
-  const onSetGameEnd = () => onSetGame((prev) => ({ ...prev, status: "End" }));
+  const onSetGameOver = () => onSetGame((prev) => ({ ...prev, status: "Game Over" }));
 
   return (
     <GameContext.Provider
@@ -90,6 +93,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
         isGameOver,
         isGameStart,
         isGameWaiting,
+        isGameEnd,
         isShowGameOver,
         isShowGameDraw,
         onCloseModalGameOver,
@@ -97,7 +101,7 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
         onSetPlayerAsLoser,
         onSetGameReady,
         onSetGameDraw,
-        onSetGameEnd,
+        onSetGameOver,
       }}
     >
       {children}

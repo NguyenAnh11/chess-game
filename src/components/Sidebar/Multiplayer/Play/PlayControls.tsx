@@ -7,6 +7,7 @@ import {
   BsChevronRight,
 } from "react-icons/bs";
 import { FiSettings } from "react-icons/fi";
+import { IoReload } from "react-icons/io5";
 import { useChess } from "../../../../contexts/ChessContext";
 import { useSetting } from "../../../../contexts/SettingContext";
 import { useRoom } from "../../../../contexts/RoomContext";
@@ -17,7 +18,7 @@ import PlayEndGameControls from "./PlayEndGameControls";
 export default function LiveControls() {
   const { isRequestGameDraw } = useRoom();
   const { onOpenEditSetting } = useSetting();
-  const { isGameOver, isGameDraw } = useGame();
+  const { isGameEnd } = useGame();
   const { moves, boardIndex, onStep } = useChess();
 
   const onBack = () => {
@@ -84,11 +85,7 @@ export default function LiveControls() {
         </Flex>
       )}
 
-      {(!isGameDraw && !isGameOver) ? (
-        <PlayStartedGameControls />
-      ) : (
-        <PlayEndGameControls />
-      )}
+      {isGameEnd ? <PlayStartedGameControls /> : <PlayEndGameControls />}
 
       <Flex flex="1" />
 
