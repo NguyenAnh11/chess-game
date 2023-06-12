@@ -1,4 +1,4 @@
-import { BackgroundProps, BorderProps, Flex, Icon } from "@chakra-ui/react";
+import { BackgroundProps, BorderProps, Flex } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { GameColorOptions } from "../../../types";
 

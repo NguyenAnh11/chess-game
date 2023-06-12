@@ -20,6 +20,7 @@ import { useChess } from "../../../../contexts/ChessContext";
 import { useUser } from "../../../../contexts/UserContext";
 import { useChat } from "../../../../contexts/ChatContext";
 import { MESSAGES } from "../../../../utils";
+import { useGame } from "../../../../contexts/GameContext";
 
 type PlayStartedGameControlsProps = {};
 
@@ -28,6 +29,7 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
   const { isRequestGameDraw, isShowAcceptOrRejectGameDraw, onRequestGameDraw } =
     useRoom();
   const { onSend } = useChat();
+  const { isGameStart } = useGame();
   const { onResign: onGameOver } = useChess();
   const { isOpen, onClose, onToggle } = useDisclosure();
 
@@ -52,9 +54,9 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
             <LiveButton
               label="draw-offer"
               onClick={onDraw}
-              disabled={isRequestGameDraw || isShowAcceptOrRejectGameDraw}
+              disabled={!isGameStart || isRequestGameDraw || isShowAcceptOrRejectGameDraw}
             >
-              <Icon as={HiOutlineFlag} fontSize="2xl" />
+              <Icon as={HiOutlineFlag} fontSize="xl" />
               <Text fontSize="sm" fontWeight="semibold">
                 Draw
               </Text>
@@ -105,7 +107,7 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
       </Popover>
 
       <Box mr="10px" gap="5px" color="#666564">
-        <LiveButton label="resign" onClick={onResign}>
+        <LiveButton label="resign" onClick={onResign} disabled={!isGameStart}>
           <Icon as={HiFlag} fontSize="2xl" />
           <Text fontSize="sm" fontWeight="semibold">
             Resign

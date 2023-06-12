@@ -22,7 +22,7 @@ import { SOCKET_EVENTS } from "../services/Socket";
 
 export default function Online() {
   const navigate = useNavigate();
-  const { user, onSetUserColor } = useUser();
+  const { onSetUserColor } = useUser();
   const { ws } = useSocket();
   const [code, setCode] = useState("");
   const [color, setColor] = useState<GameColorOptions>("w");
@@ -63,8 +63,9 @@ export default function Online() {
     if (selectedColor === "random") {
       const colors: Color[] = ["w", "b"];
       selectedColor = colors[Math.floor(Math.random() * colors.length)];
-      onSetUserColor(selectedColor as Color);
     }
+
+    onSetUserColor(selectedColor as Color);
   }, [color]);
 
   return (

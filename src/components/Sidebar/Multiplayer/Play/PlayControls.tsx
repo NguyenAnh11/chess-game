@@ -100,7 +100,7 @@ export default function LiveControls() {
         </Box>
       </Tooltip>
 
-      <Box mr="0.5" fontSize="2xl" color="#8b8987">
+      <Box mr="0.5" fontSize="xl" color="#8b8987">
         <Tooltip label="Back">
           <LiveButton label="Back" onClick={onBack}>
             <Icon as={BsChevronLeft} />
@@ -108,7 +108,7 @@ export default function LiveControls() {
         </Tooltip>
       </Box>
 
-      <Box mr="0.5" fontSize="2xl" color="#8b8987">
+      <Box mr="0.5" fontSize="xl" color="#8b8987">
         <Tooltip label="Forward">
           <LiveButton label="Forward" onClick={onForward}>
             <Icon as={BsChevronRight} />
@@ -116,7 +116,7 @@ export default function LiveControls() {
         </Tooltip>
       </Box>
 
-      <Box mr="0.5" fontSize="2xl" color="#8b8987">
+      <Box mr="0.5" fontSize="xl" color="#8b8987">
         <Tooltip label="Ending">
           <LiveButton label="Ending" onClick={onEnd}>
             <Icon as={BsChevronBarRight} />
@@ -124,7 +124,7 @@ export default function LiveControls() {
         </Tooltip>
       </Box>
 
-      <Box fontSize="2xl" color="#8b8987">
+      <Box fontSize="xl" color="#8b8987">
         <Tooltip label="Setting">
           <LiveButton label="Setting" onClick={onSetting}>
             <Icon as={FiSettings} />
