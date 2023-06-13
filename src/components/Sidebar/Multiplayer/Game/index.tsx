@@ -1,3 +1,3 @@
 export default function GamePanel() {
-    return <div></div>
+    return <div>Will come back soon....</div>
 }
