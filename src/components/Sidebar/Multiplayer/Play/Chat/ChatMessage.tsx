@@ -24,7 +24,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         lineHeight="1.3"
         fontWeight="semibold"
       >
-        {message.user.name}:
+        {message.user?.name}:
       </Text>
       <Text ml="1.5" whiteSpace="pre-wrap">{message.content}</Text>
     </Flex>

@@ -1,4 +1,5 @@
 import { Square, PieceSymbol, Color, Move } from "chess.js";
+import { Omit } from "lodash";
 import { ReactNode } from "react";
 import { IconType } from "react-icons/lib";
 
@@ -267,8 +268,18 @@ export type GameDurationOptions = {
   };
 };
 
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T,K>
+
 export type Message = {
-  user: UserInfo;
+  user?: UserInfo;
   content: string;
   timestamp: number;
+  isFromSystem: boolean;
+}
+
+export type MessageSystem = Message & {
+  type: "Game Over";
+}
+
+export type MessageGameOver = MessageSystem & {
 }

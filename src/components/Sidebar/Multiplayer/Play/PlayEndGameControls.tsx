@@ -8,12 +8,12 @@ export default function PlayEndGameControls({}: PlayEndGameControlsProps) {
   const onShare = () => {};
 
   return (
-    <Box mr="0.5" fontSize="xl" color="#8b8987">
-      <Tooltip label="Sharing">
+    <Tooltip label="Share" placement="top">
+      <Box mr="0.5" fontSize="xl" color="#8b8987">
         <LiveButton label="Sharing" onClick={onShare}>
           <Icon as={BsShareFill} />
         </LiveButton>
-      </Tooltip>
-    </Box>
+      </Box>
+    </Tooltip>
   );
 }

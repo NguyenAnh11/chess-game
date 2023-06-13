@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useParams } from "react-router-dom";
 import { SOCKET_EVENTS } from "../services/Socket";
-import { Message } from "../types";
+import { Message, MessageSystem } from "../types";
 import { useSocket } from "./SocketContext";
 import { useUser } from "./UserContext";
 
@@ -18,6 +18,7 @@ type ChatContextProps = {
 type ChatContext = {
   messages: Message[];
   onSend: (content: string) => void;
+  onSendMessageSystem: (message: MessageSystem) => void;
 };
 
 export const ChatContext = createContext({} as ChatContext);
@@ -25,28 +26,39 @@ export const ChatContext = createContext({} as ChatContext);
 export const useChat = () => useContext(ChatContext);
 
 const ChatProvider = ({ children }: ChatContextProps) => {
-  const { ws } = useSocket();
   const { user } = useUser();
+  const { ws } = useSocket();
   const { code } = useParams();
   const [messages, setMessages] = useState<Message[]>([]);
 
   const onSend = (content: string) => {
     const message: Message = {
+      user,
       content,
-      user: user!,
       timestamp: Date.now(),
+      isFromSystem: false,
     };
 
     setMessages((prev) => [...prev, message]);
 
     ws.emit(SOCKET_EVENTS.SEND_MESSAGE, {
-      code: code,
+      code,
       data: message,
     });
   };
 
+  const onSendMessageSystem = (message: MessageSystem) => {
+    setMessages((prev) => [...prev, message]);
+
+    ws.emit(SOCKET_EVENTS.SEND_MESSAGE, {
+      code,
+      data: message
+    })
+  };
+
   useEffect(() => {
     ws.on(SOCKET_EVENTS.RECEIVE_MESSAGE, (message: Message) => {
+      console.log(message);
       setMessages((prev) => [...prev, message]);
     });
 
@@ -56,7 +68,7 @@ const ChatProvider = ({ children }: ChatContextProps) => {
   }, []);
 
   return (
-    <ChatContext.Provider value={{ messages, onSend }}>
+    <ChatContext.Provider value={{ messages, onSend, onSendMessageSystem }}>
       {children}
     </ChatContext.Provider>
   );

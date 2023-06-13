@@ -249,7 +249,7 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
     if (
       leftClick === square ||
       orientation !== turn ||
-      (leftClick && isGameWaiting)
+      (leftClick && isGameWaiting && mode === "Multiplayer")
     ) {
       setLeftClick(undefined);
       return;
@@ -447,6 +447,7 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
 
     //reset game
     game.current = new Chess();
+    onSetGameReady();
   };
 
   const undoMove = (num: number) => {

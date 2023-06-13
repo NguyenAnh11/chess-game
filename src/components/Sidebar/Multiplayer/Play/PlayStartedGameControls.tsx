@@ -9,13 +9,14 @@ import {
   PopoverContent,
   PopoverBody,
   Flex,
+  Tooltip,
   PopoverArrow,
 } from "@chakra-ui/react";
 import React from "react";
 import { HiFlag, HiOutlineFlag } from "react-icons/hi";
-import { useRoom } from "../../../../contexts/RoomContext";
 import LiveButton from "../../../Common/Button/Live";
 import DefaultButton from "../../../Common/Button/Default";
+import { useRoom } from "../../../../contexts/RoomContext";
 import { useChess } from "../../../../contexts/ChessContext";
 import { useUser } from "../../../../contexts/UserContext";
 import { useChat } from "../../../../contexts/ChatContext";
@@ -50,18 +51,24 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
         onClose={onClose}
       >
         <PopoverTrigger>
-          <Box mr="10px" gap="5px" color="#666564">
-            <LiveButton
-              label="draw-offer"
-              onClick={onDraw}
-              disabled={!isGameStart || isRequestGameDraw || isShowAcceptOrRejectGameDraw}
-            >
-              <Icon as={HiOutlineFlag} fontSize="xl" />
-              <Text fontSize="sm" fontWeight="semibold">
-                Draw
-              </Text>
-            </LiveButton>
-          </Box>
+          <Tooltip label="Draw" placement="top">
+            <Box mr="10px" gap="5px" color="#666564">
+              <LiveButton
+                label="draw-offer"
+                onClick={onDraw}
+                disabled={
+                  !isGameStart ||
+                  isRequestGameDraw ||
+                  isShowAcceptOrRejectGameDraw
+                }
+              >
+                <Icon as={HiOutlineFlag} fontSize="xl" />
+                <Text fontSize="sm" fontWeight="semibold">
+                  Draw
+                </Text>
+              </LiveButton>
+            </Box>
+          </Tooltip>
         </PopoverTrigger>
         <Portal>
           <PopoverContent mb="2">
@@ -106,14 +113,16 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
         </Portal>
       </Popover>
 
-      <Box mr="10px" gap="5px" color="#666564">
-        <LiveButton label="resign" onClick={onResign} disabled={!isGameStart}>
-          <Icon as={HiFlag} fontSize="2xl" />
-          <Text fontSize="sm" fontWeight="semibold">
-            Resign
-          </Text>
-        </LiveButton>
-      </Box>
+      <Tooltip label="Resign" placement="top">
+        <Box mr="10px" gap="5px" color="#666564">
+          <LiveButton label="resign" onClick={onResign} disabled={!isGameStart}>
+            <Icon as={HiFlag} fontSize="2xl" />
+            <Text fontSize="sm" fontWeight="semibold">
+              Resign
+            </Text>
+          </LiveButton>
+        </Box>
+      </Tooltip>
     </React.Fragment>
   );
 }

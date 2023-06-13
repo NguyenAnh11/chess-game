@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SOCKET_EVENTS } from "../services/Socket";
-import { GameInfo } from "../types";
+import { GameInfo, MessageGameOver } from "../types";
 import { MESSAGES } from "../utils";
 import { useChat } from "./ChatContext";
 import { useSocket } from "./SocketContext";
@@ -37,7 +37,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
   const navigate = useNavigate();
   const { code } = useParams();
   const { ws } = useSocket();
-  const { onSend } = useChat();
+  const { onSend, onSendMessageSystem } = useChat();
   const { user, onSetUserColor } = useUser();
   const [game, setGame] = useState<GameInfo>({
     code: code!,
@@ -125,6 +125,15 @@ const RoomProvider = ({ children }: RoomContextProps) => {
 
     if (!accept) {
       onSend(MESSAGES["DECLINED DRAW"]);
+    } else {
+      const message: MessageGameOver = {
+        content: MESSAGES["ACCEPT_DRAW"],
+        timestamp: Date.now(),
+        isFromSystem: true,
+        type: "Game Over"
+      }
+
+      onSendMessageSystem(message);
     }
 
     ws.emit(SOCKET_EVENTS.ACCEPT_OR_REJECT_GAME_DRAW, { code, accept });

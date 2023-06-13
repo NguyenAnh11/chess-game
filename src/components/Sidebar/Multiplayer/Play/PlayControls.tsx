@@ -19,7 +19,7 @@ export default function LiveControls() {
   const { isRequestGameDraw } = useRoom();
   const { onOpenEditSetting } = useSetting();
   const { isGameEnd } = useGame();
-  const { moves, boardIndex, onStep } = useChess();
+  const { moves, boardIndex, setBoardIndex, onStep } = useChess();
 
   const onBack = () => {
     if (boardIndex.step > 0) {
@@ -34,17 +34,25 @@ export default function LiveControls() {
   };
 
   const onStart = () => {
-    if (boardIndex.step === 0) return;
-    onStep(0);
+    if (boardIndex.step !== 0) {
+      onStep(0);
+    }
   };
 
   const onEnd = () => {
-    if (boardIndex.step === moves.length) return;
-    onStep(moves.length);
+    if (boardIndex.step !== moves.length) {
+      onStep(moves.length);
+    }
   };
 
   const onSetting = () => {
     onOpenEditSetting(true);
+  };
+
+  const onReload = () => {
+    if (boardIndex.step !== moves.length) {
+      setBoardIndex((prev) => ({ ...prev, step: moves.length }));
+    }
   };
 
   return (
@@ -85,49 +93,59 @@ export default function LiveControls() {
         </Flex>
       )}
 
-      {isGameEnd ? <PlayStartedGameControls /> : <PlayEndGameControls />}
+      {!isGameEnd ? <PlayStartedGameControls /> : <PlayEndGameControls />}
 
       <Flex flex="1" />
 
-      <Tooltip label="Start">
-        <Box mr="0.5" fontSize="2xl" color="#8b8987">
+      <Tooltip label="Start" placement="top">
+        <Box mr="0.5" fontSize="xl" color="#8b8987">
           <LiveButton label="Start" onClick={onStart}>
             <Icon as={BsChevronBarLeft} />
           </LiveButton>
         </Box>
       </Tooltip>
 
-      <Box mr="0.5" fontSize="xl" color="#8b8987">
-        <Tooltip label="Back">
+      <Tooltip label="Back" placement="top">
+        <Box mr="0.5" fontSize="xl" color="#8b8987">
           <LiveButton label="Back" onClick={onBack}>
             <Icon as={BsChevronLeft} />
           </LiveButton>
-        </Tooltip>
-      </Box>
+        </Box>
+      </Tooltip>
 
-      <Box mr="0.5" fontSize="xl" color="#8b8987">
-        <Tooltip label="Forward">
+      <Tooltip label="Forward" placement="top">
+        <Box mr="0.5" fontSize="xl" color="#8b8987">
           <LiveButton label="Forward" onClick={onForward}>
             <Icon as={BsChevronRight} />
           </LiveButton>
-        </Tooltip>
-      </Box>
+        </Box>
+      </Tooltip>
 
-      <Box mr="0.5" fontSize="xl" color="#8b8987">
-        <Tooltip label="Ending">
+      <Tooltip label="Ending" placement="top">
+        <Box mr="0.5" fontSize="xl" color="#8b8987">
           <LiveButton label="Ending" onClick={onEnd}>
             <Icon as={BsChevronBarRight} />
           </LiveButton>
-        </Tooltip>
-      </Box>
+        </Box>
+      </Tooltip>
 
-      <Box fontSize="xl" color="#8b8987">
-        <Tooltip label="Setting">
+      {isGameEnd && (
+        <Tooltip label="Reload" placement="top">
+          <Box mr="1" fontSize="xl" color="#8b8987">
+            <LiveButton label="Reload" onClick={onReload}>
+              <Icon as={IoReload} />
+            </LiveButton>
+          </Box>
+        </Tooltip>
+      )}
+
+      <Tooltip label="Setting" placement="top">
+        <Box fontSize="xl" color="#8b8987">
           <LiveButton label="Setting" onClick={onSetting}>
             <Icon as={FiSettings} />
           </LiveButton>
-        </Tooltip>
-      </Box>
+        </Box>
+      </Tooltip>
     </Flex>
   );
 }
