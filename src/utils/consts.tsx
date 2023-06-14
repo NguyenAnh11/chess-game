@@ -241,12 +241,14 @@ export const PIECE_INDEX: { [p in PieceSymbol]: number } = {
   p: 5
 };
 
-type MessageTitle = "OFFER_DRAW" | "DECLINED DRAW" | "ACCEPT_DRAW";
+type MessageTitle = "OFFER_DRAW" | "DECLINED DRAW" | "ACCEPT_DRAW" | "RESIGN" | "CHECKMATE";
 
 export const MESSAGES: { [message in MessageTitle]: string } = {
   "OFFER_DRAW": "offered a draw",
   "DECLINED DRAW": "declined a draw",
-  "ACCEPT_DRAW": "Game drawn by agreement "
+  "ACCEPT_DRAW": "Game drawn by agreement",
+  "RESIGN": "wont by resignation",
+  "CHECKMATE": "{0} checkmate"
 }
  
 export const PAWN_EVAL = [

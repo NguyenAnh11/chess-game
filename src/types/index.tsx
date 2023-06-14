@@ -158,12 +158,15 @@ export type UserPlayInfo = UserInfo & {
 
 export type GameStatus = "Wait" | "Ready" | "Draw" | "Game Over";
 
+export type GameOverReason = "Checkmate" | "Resign";
+
 export type GameInfo = {
   code: string;
   duration?: number;
   status: GameStatus;
   members: UserPlayInfo[];
   created_at?: number;
+  gameOverReason?: GameOverReason;
 };
 
 export type CapturePieces = {
@@ -267,8 +270,6 @@ export type GameDurationOptions = {
     };
   };
 };
-
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T,K>
 
 export type Message = {
   user?: UserInfo;

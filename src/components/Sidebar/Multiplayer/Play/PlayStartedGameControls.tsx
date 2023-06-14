@@ -18,7 +18,6 @@ import LiveButton from "../../../Common/Button/Live";
 import DefaultButton from "../../../Common/Button/Default";
 import { useRoom } from "../../../../contexts/RoomContext";
 import { useChess } from "../../../../contexts/ChessContext";
-import { useUser } from "../../../../contexts/UserContext";
 import { useChat } from "../../../../contexts/ChatContext";
 import { MESSAGES } from "../../../../utils";
 import { useGame } from "../../../../contexts/GameContext";
@@ -26,17 +25,12 @@ import { useGame } from "../../../../contexts/GameContext";
 type PlayStartedGameControlsProps = {};
 
 export default function PlayStartedGameControls({}: PlayStartedGameControlsProps) {
-  const { user } = useUser();
   const { isRequestGameDraw, isShowAcceptOrRejectGameDraw, onRequestGameDraw } =
     useRoom();
   const { onSend } = useChat();
   const { isGameStart } = useGame();
-  const { onResign: onGameOver } = useChess();
+  const { onResign } = useChess();
   const { isOpen, onClose, onToggle } = useDisclosure();
-
-  const onResign = () => {
-    onGameOver(user!.id);
-  };
 
   const onDraw = () => {
     onToggle();
@@ -116,7 +110,7 @@ export default function PlayStartedGameControls({}: PlayStartedGameControlsProps
       <Tooltip label="Resign" placement="top">
         <Box mr="10px" gap="5px" color="#666564">
           <LiveButton label="resign" onClick={onResign} disabled={!isGameStart}>
-            <Icon as={HiFlag} fontSize="2xl" />
+            <Icon as={HiFlag} fontSize="xl" />
             <Text fontSize="sm" fontWeight="semibold">
               Resign
             </Text>

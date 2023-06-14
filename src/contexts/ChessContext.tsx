@@ -90,7 +90,7 @@ type ChessContext = {
   onStep: (index: number) => void;
   onChoosedPiecePromotion: (piece: string) => void;
   onClosePromotion: () => void;
-  onResign: (playerId: string) => void;
+  onResign: () => void;
   onHiddenSuggestMove: () => void;
   onSuggestMove: () => void;
 };
@@ -477,8 +477,8 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
     setBoardIndex((pre) => ({ ...pre, step: index }));
   };
 
-  const onResign = (playerId: string) => {
-    onSetPlayerAsLoser(playerId);
+  const onResign = () => {
+    onSetPlayerAsLoser(user!.id, "Resign");
   };
 
   const viewSteps = useMemo(
@@ -620,7 +620,7 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
     if (game.current.isCheckmate() || game.current.isGameOver()) {
       const currentPlayer = gameInfo.members.find((p) => p.color === turn);
       if (currentPlayer) {
-        onResign(currentPlayer.id);
+        onSetPlayerAsLoser(currentPlayer.id, "Checkmate");
       }
     }
 

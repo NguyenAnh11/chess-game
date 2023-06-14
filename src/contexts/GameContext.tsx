@@ -9,7 +9,7 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { GameInfo, UserPlayInfo } from "../types";
+import { GameInfo, GameOverReason, UserPlayInfo } from "../types";
 
 export type GameContextProps = {
   children: ReactNode;
@@ -28,7 +28,10 @@ type GameContext = {
   isShowGameDraw: boolean;
   onCloseModalGameOver: () => void;
   onCloseModalGameDraw: () => void;
-  onSetPlayerAsLoser: (playerId: string) => void;
+  onSetPlayerAsLoser: (
+    playerId: string,
+    gameOverReason: GameOverReason
+  ) => void;
   onSetGameReady: () => void;
   onSetGameDraw: () => void;
   onSetGameOver: () => void;
@@ -51,10 +54,14 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
 
   const onCloseModalGameDraw = () => setIsShowGameDraw(false);
 
-  const onSetPlayerAsLoser = (playerId: string) => {
+  const onSetPlayerAsLoser = (
+    playerId: string,
+    gameOverReason: GameOverReason
+  ) => {
     const cloneGame = cloneDeep(game);
 
     cloneGame.status = "Game Over";
+    cloneGame.gameOverReason = gameOverReason;
 
     cloneGame.members = game.members.reduce(
       (prev: UserPlayInfo[], curr: UserPlayInfo) => {
@@ -83,7 +90,8 @@ const GameProvider = ({ game, onSetGame, children }: GameContextProps) => {
   const onSetGameDraw = () =>
     onSetGame((prev) => ({ ...prev, status: "Draw" }));
 
-  const onSetGameOver = () => onSetGame((prev) => ({ ...prev, status: "Game Over" }));
+  const onSetGameOver = () =>
+    onSetGame((prev) => ({ ...prev, status: "Game Over" }));
 
   return (
     <GameContext.Provider

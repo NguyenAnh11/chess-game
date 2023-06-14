@@ -102,6 +102,10 @@ const RoomProvider = ({ children }: RoomContextProps) => {
       setGame((prev) => ({ ...prev, status: "Draw" }));
     });
 
+    ws.on(SOCKET_EVENTS.OPPONENT_RESIGN, (game: GameInfo) => {
+      setGame(game);
+    });
+
     return () => {
       ws.off(SOCKET_EVENTS.REQ_JOIN_GAME);
       ws.off(SOCKET_EVENTS.USER_JOINED);
@@ -110,6 +114,23 @@ const RoomProvider = ({ children }: RoomContextProps) => {
       ws.off(SOCKET_EVENTS.GAME_DRAW);
     };
   }, []);
+
+  useEffect(() => {
+    if (game.status === "Game Over") {
+      if (game.gameOverReason && game.gameOverReason === "Resign") {
+        ws.emit(SOCKET_EVENTS.RESIGN, { code, userId: user!.id });
+
+        const message: MessageGameOver = {
+          content: `${user?.name} ${MESSAGES["RESIGN"]}`,
+          timestamp: Date.now(),
+          isFromSystem: true,
+          type: "Game Over",
+        };
+
+        onSendMessageSystem(message);
+      }
+    }
+  }, [game.status]);
 
   const onRequestGameDraw = () => {
     setIsRequestGameDraw(true);
@@ -130,8 +151,8 @@ const RoomProvider = ({ children }: RoomContextProps) => {
         content: MESSAGES["ACCEPT_DRAW"],
         timestamp: Date.now(),
         isFromSystem: true,
-        type: "Game Over"
-      }
+        type: "Game Over",
+      };
 
       onSendMessageSystem(message);
     }

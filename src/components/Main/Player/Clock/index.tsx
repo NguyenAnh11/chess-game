@@ -5,7 +5,6 @@ import Countdown from "react-countdown";
 import css from "./clock.module.css";
 import cn from "classnames";
 import { useGame } from "../../../../contexts/GameContext";
-import { useUser } from "../../../../contexts/UserContext";
 
 type ClockProps = {
   color: Color;
@@ -16,9 +15,8 @@ export default function Clock({ color, duration }: ClockProps) {
   const ref = useRef<Countdown>(null);
   const time = useRef(duration);
 
-  const { user } = useUser();
   const { isGameOver, isGameStart } = useGame();
-  const { turn, onResign: onGameOver } = useChess();
+  const { turn, onResign } = useChess();
 
   const [bow, setBow] = useState(0);
 
@@ -70,7 +68,7 @@ export default function Clock({ color, duration }: ClockProps) {
           time.current -= 1;
           setBow((prev) => prev + 90);
         }}
-        onComplete={() => onGameOver(user!.id)}
+        onComplete={onResign}
       />
     </div>
   );

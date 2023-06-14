@@ -5,11 +5,9 @@ import { FiSettings } from "react-icons/fi";
 import { BsFlag } from "react-icons/bs";
 import { useChess } from "../../../../contexts/ChessContext";
 import { useSetting } from "../../../../contexts/SettingContext";
-import { useUser } from "../../../../contexts/UserContext";
 
 export default function SmallControls() {
-  const { user } = useUser();
-  const { boardRef, onResign: onGameResign } = useChess();
+  const { boardRef, onResign} = useChess();
   
   const { onOpenEditSetting } = useSetting();
 
@@ -18,9 +16,6 @@ export default function SmallControls() {
     if (element) {}
   };
 
-  const onResign = () => {
-    onGameResign(user!.id);
-  };
 
   return (
     <Flex w="full" justify="space-between">
