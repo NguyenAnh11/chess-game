@@ -58,7 +58,6 @@ const ChatProvider = ({ children }: ChatContextProps) => {
 
   useEffect(() => {
     ws.on(SOCKET_EVENTS.RECEIVE_MESSAGE, (message: Message) => {
-      console.log(message);
       setMessages((prev) => [...prev, message]);
     });
 
