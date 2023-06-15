@@ -262,8 +262,8 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
 
       if (
         position[leftClick]![1] === "P" &&
-        ((orientation === color && leftClick[1] === "7") ||
-          (orientation !== color && leftClick[1] === "2"))
+        ((orientation === "w" && leftClick[1] === "7") ||
+          (orientation === "b" && leftClick[1] === "2"))
       ) {
         const isMoveToEndRow =
           hintMoves.find((p) => p.square === square) !== undefined;
@@ -390,8 +390,8 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
 
       if (
         position[source]![1] === "P" &&
-        ((orientation === color && source[1] === "7") ||
-          (orientation !== color && source[1] === "2"))
+        ((orientation === "w" && source[1] === "7") ||
+          (orientation === "b" && source[1] === "2"))
       ) {
         const isMoveToEndRow =
           hintMoves.find((p) => p.square === target) !== undefined;
