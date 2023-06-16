@@ -194,7 +194,9 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
   const onSuggestMove = () => {
     setSuggestMove((prev) => ({ ...prev, loading: true }));
 
-    hintWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
+    hintWorker.postMessage(
+      JSON.stringify({ fen: game.current.fen(), depth: setting.board.depth })
+    );
   };
 
   const makeMove = (action: MoveAction, move: Move) => {
@@ -684,7 +686,12 @@ const ChessProvider = ({ children, boardRef }: ChessboardProviderProps) => {
   useEffect(() => {
     if (orientation !== turn) {
       if (mode === "AI" && !isGameWaiting) {
-        aiWorker.postMessage(JSON.stringify({ fen: game.current.fen() }));
+        aiWorker.postMessage(
+          JSON.stringify({
+            fen: game.current.fen(),
+            depth: setting.board.depth,
+          })
+        );
       }
 
       if (ws && mode === "Multiplayer" && moves.length > 0) {

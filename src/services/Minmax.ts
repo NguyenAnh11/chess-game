@@ -4,15 +4,16 @@ import { evalBoard } from "./AI/Evaluation";
 import { sortMove } from "./AI/MoveOrder";
 
 export default class MinMax {
-  private DEPTH: number = 3;
+  private depth: number;
   private board: Board;
-  constructor(game: Chess) {
+  constructor(game: Chess, depth: number) {
     this.board = new Board(game);
+    this.depth = depth;
   }
 
   public chooseMove(): Move {
     const [score, move] = this.minmax(
-      this.DEPTH,
+      this.depth,
       -Number.POSITIVE_INFINITY,
       Number.POSITIVE_INFINITY,
       this.board.turn() === "w"

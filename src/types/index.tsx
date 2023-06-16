@@ -135,6 +135,7 @@ export type BoardSetting = BaseSetting & {
   showArrow: number;
   showHintMove: number;
   highlightMove: number;
+  depth: number;
 };
 
 export type PlaySetting = BaseSetting & {
@@ -181,6 +182,7 @@ export type Setting = {
 export type SettingProps<T extends BaseSetting> = {
   setting: T;
   onChange: (key: keyof T, value: ControlValue) => void;
+  mode: Mode;
 };
 
 export type ControlValue = string | number;

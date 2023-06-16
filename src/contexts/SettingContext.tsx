@@ -39,6 +39,7 @@ const SettingProvider = ({ mode, children }: SettingContextProps) => {
       showArrow: 1,
       showHintMove: 1,
       highlightMove: 1,
+      depth: 3,
     },
     play: {
       enablePremove: 1,
