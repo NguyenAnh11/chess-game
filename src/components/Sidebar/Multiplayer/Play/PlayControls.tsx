@@ -63,6 +63,7 @@ export default function LiveControls() {
       height="10"
       gap="1px"
       bgColor="#f1f1f1"
+      mt={isRequestGameDraw ? "4" : "0"}
     >
       {isRequestGameDraw && (
         <Flex

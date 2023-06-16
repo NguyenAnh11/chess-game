@@ -11,7 +11,7 @@ type MoveRowProps = {
 
 export default function MoveRow({ index, steps }: MoveRowProps) {
   return (
-    <Box className={css.move}>
+    <Box className={css.move} bg={index % 2 === 1 ? "#f8f8f8" : "#fff"}>
       {index + 1}.
       {steps.map((move, i) => (
         <Fragment key={i}>
