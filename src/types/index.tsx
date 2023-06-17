@@ -1,5 +1,4 @@
 import { Square, PieceSymbol, Color, Move } from "chess.js";
-import { Omit } from "lodash";
 import { ReactNode } from "react";
 import { IconType } from "react-icons/lib";
 
@@ -281,8 +280,5 @@ export type Message = {
 }
 
 export type MessageSystem = Message & {
-  type: "Game Over";
-}
-
-export type MessageGameOver = MessageSystem & {
+  type: "Game Over" | "System";
 }

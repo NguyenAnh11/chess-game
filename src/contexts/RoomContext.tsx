@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SOCKET_EVENTS } from "../services/Socket";
-import { GameInfo, MessageGameOver } from "../types";
+import { GameInfo, MessageSystem } from "../types";
 import { MESSAGES } from "../utils";
 import { useChat } from "./ChatContext";
 import { useSocket } from "./SocketContext";
@@ -106,6 +106,11 @@ const RoomProvider = ({ children }: RoomContextProps) => {
       setGame(game);
     });
 
+    ws.on(SOCKET_EVENTS.OPPONENT_LEAVE, (game: GameInfo) => {
+      console.log(game)
+      setGame(game);
+    });
+
     return () => {
       ws.off(SOCKET_EVENTS.REQ_JOIN_GAME);
       ws.off(SOCKET_EVENTS.USER_JOINED);
@@ -120,7 +125,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
       if (game.gameOverReason && game.gameOverReason === "Resign") {
         ws.emit(SOCKET_EVENTS.RESIGN, { code, userId: user!.id });
 
-        const message: MessageGameOver = {
+        const message: MessageSystem = {
           content: `${user?.name} ${MESSAGES["RESIGN"]}`,
           timestamp: Date.now(),
           isFromSystem: true,
@@ -147,7 +152,7 @@ const RoomProvider = ({ children }: RoomContextProps) => {
     if (!accept) {
       onSend(MESSAGES["DECLINED DRAW"]);
     } else {
-      const message: MessageGameOver = {
+      const message: MessageSystem = {
         content: MESSAGES["ACCEPT_DRAW"],
         timestamp: Date.now(),
         isFromSystem: true,

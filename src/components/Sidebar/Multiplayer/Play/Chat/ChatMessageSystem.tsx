@@ -1,13 +1,11 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { MessageGameOver } from "../../../../../types";
+import { MessageSystem } from "../../../../../types";
 
-type ChatMessageGameOverProps = {
-  message: MessageGameOver;
+type ChatMessageSystemProps = {
+  message: MessageSystem;
 };
 
-export default function ChatMessageGameOver({
-  message,
-}: ChatMessageGameOverProps) {
+export default function ChatMessageSystem({ message }: ChatMessageSystemProps) {
   return (
     <Flex
       style={{ wordWrap: "break-word" }}
@@ -19,7 +17,7 @@ export default function ChatMessageGameOver({
       wordBreak="break-word"
       direction="column"
     >
-      <strong>GAME OVER</strong>
+      <strong style={{ textTransform: "uppercase" }}>{message.type}</strong>
       <Text mt="1">{message.content}</Text>
     </Flex>
   );

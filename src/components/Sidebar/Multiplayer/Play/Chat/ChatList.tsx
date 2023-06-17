@@ -2,9 +2,9 @@ import { Box, Flex } from "@chakra-ui/react";
 import { ReactNode, useMemo } from "react";
 import ChatInput from "./ChatInput";
 import ChatMessage from "./ChatMessage";
-import ChatMessageGameOver from "./ChatMessageGameOver";
+import ChatMessageSystem from "./ChatMessageSystem";
 import { useChat } from "../../../../../contexts/ChatContext";
-import { MessageGameOver, MessageSystem } from "../../../../../types";
+import { MessageSystem } from "../../../../../types";
 
 export default function ChatList() {
   const { messages } = useChat();
@@ -12,18 +12,12 @@ export default function ChatList() {
   const messageNodes = useMemo((): ReactNode[] => {
     const nodes: ReactNode[] = [];
 
-    for (const message of messages) {
+    for (let index = 0; index < messages.length; index++) {
+      const message = messages[index];
       if (message.isFromSystem) {
-        const messageSystem = message as MessageSystem;
-
-        if (messageSystem.type === "Game Over") {
-          nodes.push(
-            <ChatMessageGameOver
-              key={message.timestamp}
-              message={message as MessageGameOver}
-            />
-          );
-        }
+        nodes.push(
+          <ChatMessageSystem key={index} message={message as MessageSystem} />
+        );
       } else {
         nodes.push(<ChatMessage key={message.timestamp} message={message} />);
       }
