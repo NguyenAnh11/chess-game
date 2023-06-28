@@ -4,6 +4,7 @@ import { useChess } from "../../../../contexts/ChessContext";
 import Countdown from "react-countdown";
 import css from "./clock.module.css";
 import cn from "classnames";
+import { useGame } from "../../../../contexts/GameContext";
 
 type ClockProps = {
   color: Color;
@@ -14,23 +15,24 @@ export default function Clock({ color, duration }: ClockProps) {
   const ref = useRef<Countdown>(null);
   const time = useRef(duration);
 
-  const { turn, gameOver, onGameOver } = useChess();
+  const { isGameOver, isGameStart } = useGame();
+  const { turn, onResign } = useChess();
 
   const [bow, setBow] = useState(0);
 
   const clockClass = cn(css.clock, {
     [css.white]: color === "w",
     [css.black]: color === "b",
-    [css.turn]: color === turn && !gameOver,
+    [css.turn]: color === turn && !isGameOver,
   });
 
   useEffect(() => {
     if (ref) {
-      if (gameOver) ref.current?.stop();
+      if (isGameOver) ref.current?.stop();
       if (turn === color) ref.current?.start();
-      if (turn !== color) ref.current?.pause();
+      if (!isGameStart || turn !== color) ref.current?.pause();
     }
-  }, [ref, turn, color, gameOver]);
+  }, [ref, turn, color, isGameOver, isGameStart]);
 
   useEffect(() => {
     time.current = duration
@@ -39,7 +41,7 @@ export default function Clock({ color, duration }: ClockProps) {
   return (
     <div className={clockClass}>
       <div
-        style={{ opacity: gameOver ? 0 :  color === turn ? 1 : 0 }}
+        style={{ opacity: isGameOver ? 0 :  color === turn ? 1 : 0 }}
         className={css.clock_icon}
       >
         <svg
@@ -66,7 +68,7 @@ export default function Clock({ color, duration }: ClockProps) {
           time.current -= 1;
           setBow((prev) => prev + 90);
         }}
-        onComplete={() => onGameOver()}
+        onComplete={onResign}
       />
     </div>
   );

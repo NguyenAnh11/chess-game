@@ -3,7 +3,7 @@ import { FaChessBoard, FaPlaystation } from "react-icons/fa";
 import { useSetting } from "../../contexts/SettingContext";
 import { ControlValue, Setting } from "../../types";
 import Modal from "../Common/Modal";
-import Button from "../Common/Button";
+import Button from "../Common/Button/Default";
 import { TabList } from "../Common/Tab";
 import BoardPanel from "./TabPanels/Board";
 import PlayPanel from "./TabPanels/Play";
@@ -36,6 +36,7 @@ export default function GameSetting() {
         label: "Board",
         component: (
           <BoardPanel
+            mode={mode}
             setting={data.board}
             onChange={(name, value) => onChange("board", name, value)}
           />
@@ -46,6 +47,7 @@ export default function GameSetting() {
         label: "Play",
         component: (
           <PlayPanel
+            mode={mode}
             setting={data.play}
             onChange={(name, value) => onChange("play", name, value)}
           />
@@ -58,7 +60,7 @@ export default function GameSetting() {
   const onCancel = () => {
     onOpenEditSetting(false);
     setTabIndex(0);
-  }
+  };
 
   const onSave = () => {
     onSetting(data);

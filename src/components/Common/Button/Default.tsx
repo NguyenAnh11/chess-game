@@ -6,7 +6,7 @@ type ButtonProps = {
   label: string;
   disabled?: boolean;
   variant?: "basic" | "primary";
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
   loading?: boolean;
   children: ReactNode;
   onClick: () => void;

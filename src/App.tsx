@@ -1,63 +1,73 @@
-import React, { useRef } from "react";
-import { Flex, Box } from "@chakra-ui/react";
-import SettingProvider from "./contexts/SettingContext";
-import ChessProvider from "./contexts/ChessContext";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import BoardSidebar from "./components/Sidebar";
-import BoardMain from "./components/Main";
-import GameSetting from "./components/Setting/";
-import BoardPlayer from "./components/Main/Player";
-import { PlayerInfo } from "./types";
+import React, { Suspense, lazy } from "react";
 import "./index.css";
+import { Routes, Route } from "react-router-dom";
+import Loading from "./pages/Loading";
+import PrivateRoute from "./routers/PrivateRoute";
+import SocketProvider from "./contexts/SocketContext";
+import RoomProvider from "./contexts/RoomContext";
+import ChatProvider from "./contexts/ChatContext";
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const Offline = lazy(() => import("./pages/Offline"));
+const Online = lazy(() => import("./pages/Online"));
+const Room = lazy(() => import("./pages/Room"));
 
 const App = () => {
-  const boardRef = useRef<HTMLDivElement>(null);
-
-  const players: PlayerInfo[] = [
-    {
-      id: "1",
-      name: "AI",
-      avatar:
-        "https://images.chesscomfiles.com/uploads/v1/user/245425421.309e579e.200x200o.39adf462b98e.png",
-      color: "b",
-    },
-    {
-      id: "2",
-      name: "Anh",
-      avatar:
-        "https://images.chesscomfiles.com/uploads/v1/user/71619756.cd8be4a4.50x50o.539eb11f041e.png",
-      color: "w",
-    },
-  ]
-
   return (
     <React.Fragment>
-      <Flex
-        h="100vh"
-        bgColor="#312e2b"
-        align="center"
-        justify="center"
-        userSelect="none"
-      >
-        <Flex position="relative" h="min-content">
-          <SettingProvider mode="AI">
-            <ChessProvider boardRef={boardRef} orientation="w" playerInfos={players}>
-              <Box flex="1">
-                <DndProvider backend={HTML5Backend}>
-                  <BoardPlayer color="b" info={players[0]} />
-                  <BoardMain ref={boardRef} />
-                  <GameSetting />
-                  <BoardPlayer color="w" info={players[1]} />
-                </DndProvider>
-              </Box>
-              <Box flex="1">
-                <BoardSidebar />
-              </Box>
-            </ChessProvider>
-          </SettingProvider>
-        </Flex>
-      </Flex>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <Suspense fallback={<Loading />}>
+              <Login />
+            </Suspense>
+          }
+        />
+        <Route element={<PrivateRoute />}>
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Home />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/offline"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Offline />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/online"
+            element={
+              <Suspense fallback={<Loading />}>
+                <SocketProvider>
+                  <Online />
+                </SocketProvider>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/live/:code"
+            element={
+              <Suspense fallback={<Loading />}>
+                <SocketProvider>
+                  <ChatProvider>
+                    <RoomProvider>
+                      <Room />
+                    </RoomProvider>
+                  </ChatProvider>
+                </SocketProvider>
+              </Suspense>
+            }
+          />
+        </Route>
+      </Routes>
     </React.Fragment>
   );
 };

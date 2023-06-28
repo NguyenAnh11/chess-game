@@ -4,11 +4,11 @@ import MinMax from "./MinMax";
 
 
 self.onmessage = (e: MessageEvent<string>) => {
-    const { fen } = JSON.parse(e.data) 
+    const { fen, depth } = JSON.parse(e.data) 
 
     const game = new Chess(fen)
 
-    const minmax = new MinMax(game);
+    const minmax = new MinMax(game, depth);
 
     const move = minmax.chooseMove();
 

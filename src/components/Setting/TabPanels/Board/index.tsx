@@ -6,11 +6,12 @@ import { getFieldControls } from "./controls";
 import { TabPanel } from "../../../Common/Tab";
 
 export default function BoardPanel({
+  mode,
   setting,
   onChange,
 }: SettingProps<BoardSetting>) {
   const controls = useMemo(
-    () => getFieldControls({ setting, onChange }),
+    () => getFieldControls({ mode, setting, onChange }),
     [setting]
   );
 

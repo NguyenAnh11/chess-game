@@ -1,7 +1,8 @@
+import { Fragment } from "react";
 import { Box } from "@chakra-ui/react";
-import { Move } from "chess.js";
 import MoveItem from "./MoveItem";
-import css from "./move.module.css"
+import css from "./move.module.css";
+import { Move } from "chess.js";
 
 type MoveRowProps = {
   index: number;
@@ -10,10 +11,12 @@ type MoveRowProps = {
 
 export default function MoveRow({ index, steps }: MoveRowProps) {
   return (
-    <Box className={css.move}>
+    <Box className={css.move} bg={index % 2 === 1 ? "#f8f8f8" : "#fff"}>
       {index + 1}.
       {steps.map((move, i) => (
-        <MoveItem key={i} index={(index * 2) + i} move={move} />
+        <Fragment key={i}>
+          <MoveItem index={index * 2 + i} move={move} />
+        </Fragment>
       ))}
     </Box>
   );

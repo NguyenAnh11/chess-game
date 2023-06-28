@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Box } from "@chakra-ui/react";
 import { useChess } from "../../../../contexts/ChessContext";
-import { Move } from "chess.js";
 import MoveRow from "./MoveRow";
+import { Move } from "chess.js";
 
 export default function MoveList() {
   const { moves } = useChess();

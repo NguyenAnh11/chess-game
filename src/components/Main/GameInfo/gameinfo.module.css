@@ -1,4 +1,4 @@
-.modal_game_over {
+.modal_game_info {
     position: absolute;
     top: 0;
     left: 0;
@@ -11,7 +11,7 @@
     transition: all .3s ease;
 }
 
-.modal_game_over_bg {
+.modal_game_info_bg {
     position: absolute;
     top: 0;
     left: 0;
@@ -21,7 +21,7 @@
     z-index: -1;
 }
 
-.modal_game_over_content {
+.modal_game_info_content {
     background-color: #fff;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     margin: 10px;
@@ -30,11 +30,11 @@
     width: 336px;
 }
 
-.modal_game_over_content.modal_game_over_content_rounded_grey {
+.modal_game_info_content.modal_game_info_content_rounded_grey {
     background: radial-gradient(61rem 27rem at top center,#666564 39%,#fff 40%);
 }
 
-.modal_game_over_header {
+.modal_game_info_header {
     height: 70px;
     display: flex;
     position: relative;
@@ -43,11 +43,11 @@
     flex-direction: column;
 }
 
-.modal_game_over_header.modal_game_over_header_grey {
+.modal_game_info_header.modal_game_info_header_grey {
     background-color: #666564;
 }
 
-.modal_game_over_header_title {
+.modal_game_info_header_title {
     font-weight: 800;
     line-height: 30px;
     margin-top: 17px;
@@ -59,7 +59,7 @@
     transform: scale(1);
 }
 
-.modal_game_over_header_close {
+.modal_game_info_header_close {
     align-items: center;
     background-color: transparent;
     border: none;
@@ -74,14 +74,14 @@
     width: 30px;
 }
 
-.modal_game_over_players {
+.modal_game_info_players {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 11px;
 }
 
-.modal_game_over_score {
+.modal_game_info_score {
     align-self: flex-start;
     color: #fff;
     font-weight: 500;
@@ -91,7 +91,7 @@
     text-align: center;
 }
 
-.modal_game_over_player {
+.modal_game_info_player {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -100,7 +100,7 @@
     width: 30%;
 }
 
-.modal_game_over_player_avatar_container {
+.modal_game_info_player_avatar_container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,19 +108,19 @@
     width: 100px;
 }
 
-.modal_game_over_player_avatar {
+.modal_game_info_player_avatar {
     box-shadow: 0 3px 4px 1px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     cursor: pointer;
     position: relative;
 }
 
-.modal_game_over_player_avatar > img {
+.modal_game_info_player_avatar > img {
     width: 80px;
     height: 80px;
 }
 
-.modal_game_over_player_username {
+.modal_game_info_player_username {
     color: #a7a6a2;
     cursor: pointer;
     line-height: 1.7rem;

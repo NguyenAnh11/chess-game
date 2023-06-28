@@ -1,20 +1,25 @@
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
-import { Color } from "chess.js";
-import { PlayerInfo } from "../../../types";
 import { useSetting } from "../../../contexts/SettingContext";
 import { useChess } from "../../../contexts/ChessContext";
+import { useGame } from "../../../contexts/GameContext";
+import { useUser } from "../../../contexts/UserContext";
 import CapturePieces from "./CapturePieces";
 import Clock from "./Clock";
 import css from "./player.module.css";
 
 type BoardPlayerProp = {
-  color: Color;
-  info: PlayerInfo;
+  isOpponent: boolean;
 };
 
-export default function BoardPlayer({ color, info }: BoardPlayerProp) {
+export default function BoardPlayer({ isOpponent }: BoardPlayerProp) {
+  const { user } = useUser();
+  const { game } = useGame();
   const { mode } = useSetting();
-  const { duration, capturePieces, capturePiecesScore } = useChess();
+  const { capturePieces, capturePiecesScore } = useChess();
+
+  const color = !isOpponent ? user!.color : user!.color === "w" ? "b" : "w";
+
+  const player = !isOpponent ? user : game.members.find(p => p.id !== user!.id)
 
   const captureColor = color === "w" ? "b" : "w";
 
@@ -29,12 +34,12 @@ export default function BoardPlayer({ color, info }: BoardPlayerProp) {
               w="40px"
               h="40px"
               className={css.player_row_avatar}
-              src={info.avatar}
+              src={player ? player.avatar : import.meta.env.VITE_DEFAULT_AVATAR}
             />
             <div>
               <Box color="#fff" className={css.player_row_name}>
                 <Text lineHeight="short" fontWeight="semibold" fontSize="sm">
-                  {info.name}
+                  {player ? player.name : "Opponent"}
                 </Text>
               </Box>
               <CapturePieces
@@ -45,7 +50,7 @@ export default function BoardPlayer({ color, info }: BoardPlayerProp) {
             </div>
           </Flex>
         </Box>
-        {mode !== "AI" && <Clock color={color} duration={duration}/>}
+        {/* {mode !== "AI" && <Clock color={color} duration={game.duration!} />} */}
       </Box>
     </Box>
   );

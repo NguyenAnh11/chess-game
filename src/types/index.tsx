@@ -111,7 +111,7 @@ export type SuggestMove = {
   move: Move | undefined;
   hidden: boolean;
   loading: boolean;
-}
+};
 
 export type KingSquare = CustomSquare;
 
@@ -134,6 +134,7 @@ export type BoardSetting = BaseSetting & {
   showArrow: number;
   showHintMove: number;
   highlightMove: number;
+  depth: number;
 };
 
 export type PlaySetting = BaseSetting & {
@@ -143,15 +144,29 @@ export type PlaySetting = BaseSetting & {
   confirmResignDraw: number;
 };
 
-export type PlayerInfo = {
+export type UserInfo = {
   id: string;
   name: string;
   avatar: string;
   color: Color;
+  countryFlag: string;
 };
 
-export type PlayerInfoGame = PlayerInfo & {
-  lose: boolean;
+export type UserPlayInfo = UserInfo & {
+  isLoser: boolean;
+}
+
+export type GameStatus = "Wait" | "Ready" | "Draw" | "Game Over";
+
+export type GameOverReason = "Checkmate" | "Resign";
+
+export type GameInfo = {
+  code: string;
+  duration?: number;
+  status: GameStatus;
+  members: UserPlayInfo[];
+  created_at?: number;
+  gameOverReason?: GameOverReason;
 };
 
 export type CapturePieces = {
@@ -166,6 +181,7 @@ export type Setting = {
 export type SettingProps<T extends BaseSetting> = {
   setting: T;
   onChange: (key: keyof T, value: ControlValue) => void;
+  mode: Mode;
 };
 
 export type ControlValue = string | number;
@@ -229,4 +245,40 @@ export class FieldSwitchControl<T> extends FieldControl<T> {
   ) {
     super(name, label, value, onChange);
   }
+}
+
+export type GameColorOptions = Color | "random";
+
+export type GameDurationType = "rapid" | "daily" | "blitz";
+
+export type GameDurationOptions = {
+  blitz: {
+    [p in "2 min" | "3 min" | "5 min"]: {
+      text: string;
+      value: number;
+    };
+  }
+  rapid: {
+    [p in "10 min" | "15 min" | "30 min"]: {
+      text: string;
+      value: number;
+    };
+  };
+  daily: {
+    [p in "1 day" | "7 day" | "30 day"]: {
+      text: string;
+      value: number;
+    };
+  };
+};
+
+export type Message = {
+  user?: UserInfo;
+  content: string;
+  timestamp: number;
+  isFromSystem: boolean;
+}
+
+export type MessageSystem = Message & {
+  type: "Game Over" | "System";
 }

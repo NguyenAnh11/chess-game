@@ -7,10 +7,11 @@ import {
 } from "../../../../types";
 
 export const getFieldControls = ({
+  mode,
   setting,
   onChange,
 }: SettingProps<BoardSetting>): FieldControl<BoardSetting>[] => {
-  return [
+  const controls = [
     new FieldSelectControl<BoardSetting>(
       "pieceColor",
       "Pieces",
@@ -20,7 +21,7 @@ export const getFieldControls = ({
         { label: "Neo", value: "neo" },
         { label: "Wood", value: "wood" },
         { label: "Neo Wood", value: "neo_wood" },
-        { label: "Book", value: "book" }
+        { label: "Book", value: "book" },
       ]
     ),
     new FieldSelectControl<BoardSetting>(
@@ -81,4 +82,22 @@ export const getFieldControls = ({
       onChange
     ),
   ];
+
+  if (mode === "AI") {
+    controls.push(
+      new FieldSelectControl<BoardSetting>(
+        "depth",
+        "Depth",
+        setting.depth,
+        onChange,
+        [
+          { label: "Easy", value: 1 },
+          { label: "Medium", value: 2 },
+          { label: "Hard", value: 3 },
+        ]
+      )
+    );
+  }
+
+  return controls;
 };
